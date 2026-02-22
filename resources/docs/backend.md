@@ -6,7 +6,10 @@ The HelpRest API is a RESTful backend built with **Bun** runtime, **MongoDB** (o
 
 **Entry point:** `src/index.ts`  
 **Dev command:** `bun run dev` (auto-restarts on changes)  
-**Test command:** `bun test`
+**Seed command:** `bun run seed` (populates database with test data)  
+**Test command:** `bun test`  
+**API test file:** `resources/api/api.http` (VS Code REST Client)  
+**Insomnia collection:** `resources/api/insomnia.json`
 
 ---
 
@@ -33,7 +36,7 @@ src/
 |---|---|---|
 | `User` | `entities/User.ts` | name, email, passwordHash, birthDate, flags (ObjectId[]), location, socialLinks, profilePhoto |
 | `Establishment` | `entities/Establishment.ts` | companyName, location (GeoJSON), flags, logo, rating, ratingCount, isSponsored |
-| `Flag` | `entities/Flag.ts` | type, identifier, description, tag |
+| `Flag` | `entities/Flag.ts` | type, identifier, description, tag, backgroundColor, textColor |
 | `Visit` | `entities/Visit.ts` | establishmentId, userId, date, review, rating (1-5) |
 
 All entities:
@@ -191,6 +194,19 @@ Zod v4 schemas with type inference for each endpoint group:
 | Method | Route | Description |
 |---|---|---|
 | `GET` | `/api/health` | Health check |
+
+---
+
+## Testing Endpoints (`api.http`)
+
+O arquivo `resources/api/api.http` é o **padrão** para documentar e testar endpoints. Usa a extensão [REST Client](https://marketplace.visualstudio.com/items?itemName=humao.rest-client) do VS Code. Para Insomnia, importe `resources/api/insomnia.json`.
+
+**Regras:**
+- Todo novo endpoint **deve** ser adicionado ao `api.http` com um example request.
+- O login request é `@name login` — seu token é propagado automaticamente via `{{accessToken}}`.
+- Agrupe requests por seção (AUTH, USER, ESTABLISHMENTS, etc.).
+- Inclua body de exemplo para POST/PATCH.
+- Para Insomnia/Bruno: importe o `api.http` diretamente.
 
 ---
 

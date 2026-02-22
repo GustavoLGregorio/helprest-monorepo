@@ -1,0 +1,174 @@
+### ─────────────────────────────────────────────
+### HelpRest API
+### Compatible: VS Code REST Client + Insomnia
+### ─────────────────────────────────────────────
+
+@baseUrl = http://localhost:3000/api
+
+# After running "Login", copy the accessToken to this variable:
+@accessToken = PASTE_TOKEN_HERE
+
+### ═══════════════════════════════════════════════
+###  HEALTH CHECK
+### ═══════════════════════════════════════════════
+
+### Health Check
+GET {{baseUrl}}/health
+Content-Type: application/json
+
+### ═══════════════════════════════════════════════
+###  AUTH
+### ═══════════════════════════════════════════════
+
+### Register User
+POST {{baseUrl}}/auth/register
+Content-Type: application/json
+
+{
+  "name": "Teste User",
+  "email": "teste@email.com",
+  "password": "senha123",
+  "birthDate": "1995-06-15"
+}
+
+### Login
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "joao@teste.com",
+  "password": "teste123"
+}
+
+### Refresh Token
+POST {{baseUrl}}/auth/refresh
+Content-Type: application/json
+
+{
+  "refreshToken": "PASTE_REFRESH_TOKEN_HERE"
+}
+
+### ═══════════════════════════════════════════════
+###  USER
+### ═══════════════════════════════════════════════
+
+### Get My Profile
+GET {{baseUrl}}/users/me
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+### Update Profile
+PATCH {{baseUrl}}/users/me
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+{
+  "name": "João Atualizado",
+  "socialLinksEnabled": true,
+  "socialLinks": {
+    "instagram": "@joao.teste"
+  }
+}
+
+### Update User Flags
+PATCH {{baseUrl}}/users/me/flags
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+{
+  "flagIds": []
+}
+
+### ═══════════════════════════════════════════════
+###  FLAGS
+### ═══════════════════════════════════════════════
+
+### List All Flags
+GET {{baseUrl}}/flags
+Content-Type: application/json
+
+### Create Flag
+POST {{baseUrl}}/flags
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+{
+  "type": "dietary",
+  "identifier": "sugar-free",
+  "description": "Estabelecimento com opções sem açúcar",
+  "tag": "Sem Açúcar",
+  "backgroundColor": "#E2B93B",
+  "textColor": "#FFFFFF"
+}
+
+### ═══════════════════════════════════════════════
+###  ESTABLISHMENTS
+### ═══════════════════════════════════════════════
+
+### List Establishments
+GET {{baseUrl}}/establishments?page=1&limit=5
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+### Get Single Establishment
+GET {{baseUrl}}/establishments/REPLACE_WITH_ID
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+### Get Recommended (Curitiba centro)
+GET {{baseUrl}}/establishments/recommended?lat=-25.429&lng=-49.27&limit=10
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+### Get Nearby (5km, Curitiba centro)
+GET {{baseUrl}}/establishments/nearby?lat=-25.429&lng=-49.27&maxDistance=5000&limit=10
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+### Search Establishments
+GET {{baseUrl}}/establishments/search?q=vegano&page=1&limit=10
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+### Create Establishment
+POST {{baseUrl}}/establishments
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+{
+  "companyName": "Novo Restaurante Teste",
+  "location": {
+    "state": "PR",
+    "city": "Curitiba",
+    "neighborhood": "Centro Cívico",
+    "address": "Rua Teste, 123",
+    "coordinates": { "lat": -25.42, "lng": -49.27 }
+  },
+  "flagIds": [],
+  "logo": "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=200&h=200&fit=crop"
+}
+
+### ═══════════════════════════════════════════════
+###  VISITS
+### ═══════════════════════════════════════════════
+
+### Create Visit
+POST {{baseUrl}}/visits
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+{
+  "establishmentId": "REPLACE_WITH_ID",
+  "rating": 5,
+  "review": "Excelente restaurante! Opções veganas deliciosas."
+}
+
+### List User Visits
+GET {{baseUrl}}/visits/user/REPLACE_WITH_USER_ID?page=1&limit=10
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+### List Establishment Visits
+GET {{baseUrl}}/visits/establishment/REPLACE_WITH_ID?page=1&limit=10
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
