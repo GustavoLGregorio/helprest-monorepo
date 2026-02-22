@@ -2,7 +2,10 @@
 # FRONTEND
 # -------------------------------------------------------------------------------------------------
 
-# dependencies
+# Git
+helprest-app/.gitignore
+
+# Dependencies
 helprest-app/node_modules/
 
 # Expo
@@ -44,7 +47,11 @@ helprest-app/app-example
 # -------------------------------------------------------------------------------------------------
 # BACKEND
 # -------------------------------------------------------------------------------------------------
-# dependencies (bun install)
+
+# Git
+helprest-api/.gitignore
+
+# Dependencies (bun install)
 /helprest-api/node_modules
 
 # output
