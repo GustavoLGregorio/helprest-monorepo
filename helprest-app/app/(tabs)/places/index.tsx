@@ -1,14 +1,72 @@
 import Card from "@/components/ui/Card";
+import { useApi } from "@/hooks/useApi";
+import {
+	getRecommended,
+	getNearby,
+	listEstablishments,
+} from "@/services/establishment.service";
+import type {
+	EstablishmentDTO,
+	RecommendedEstablishmentDTO,
+	PaginatedResponse,
+} from "@/types/api.types";
 import { useFonts } from "expo-font";
-import { ScrollView, StyleSheet, Text, View } from "react-native";
+import {
+	ActivityIndicator,
+	ScrollView,
+	StyleSheet,
+	Text,
+	View,
+} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+
+// Default location: Curitiba centro
+const DEFAULT_LAT = -25.429;
+const DEFAULT_LNG = -49.27;
 
 function PlacesTab() {
 	useFonts({
 		Roboto: require("@/assets/fonts/Roboto-Variable.ttf"),
 	});
 
-	const items = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
+	// ── API Calls ──
+	const recommended = useApi<RecommendedEstablishmentDTO[]>(
+		() => getRecommended(DEFAULT_LAT, DEFAULT_LNG, 10),
+		[],
+	);
+
+	const nearby = useApi<EstablishmentDTO[]>(
+		() => getNearby(DEFAULT_LAT, DEFAULT_LNG, 5000, 10),
+		[],
+	);
+
+	const all = useApi<PaginatedResponse<EstablishmentDTO>>(
+		() => listEstablishments(1, 10),
+		[],
+	);
+
+	// ── Helpers ──
+	function formatDistance(meters: number | undefined): string {
+		if (!meters) return "";
+		if (meters < 1000) return `${Math.round(meters)}m`;
+		return `${(meters / 1000).toFixed(1)}km`;
+	}
+
+	function renderLoading() {
+		return (
+			<View style={styles.loadingContainer}>
+				<ActivityIndicator size="small" color="#888" />
+			</View>
+		);
+	}
+
+	function renderError(message: string) {
+		return (
+			<View style={styles.loadingContainer}>
+				<Text style={styles.errorText}>{message}</Text>
+			</View>
+		);
+	}
 
 	return (
 		<SafeAreaView>
@@ -20,114 +78,169 @@ function PlacesTab() {
 				bounces={false}
 				decelerationRate="normal"
 			>
+				{/* ── Recomendados ── */}
 				<View style={styles.sectionContainer}>
 					<Text style={styles.sectionTitle}>Recomendados</Text>
-					<ScrollView
-						horizontal={true}
-						showsHorizontalScrollIndicator={false}
-						overScrollMode="never"
-						bounces={false}
-						decelerationRate="normal"
-					>
-						<View style={styles.horizontalContainer}>
-							{items.map((value, key) => {
-								return (
-									<Card key={key} width={150}>
+					{recommended.loading ? (
+						renderLoading()
+					) : recommended.error ? (
+						renderError(recommended.error)
+					) : (
+						<ScrollView
+							horizontal={true}
+							showsHorizontalScrollIndicator={false}
+							overScrollMode="never"
+							bounces={false}
+							decelerationRate="normal"
+						>
+							<View style={styles.horizontalContainer}>
+								{(recommended.data ?? []).map((est) => (
+									<Card key={est.id} width={150}>
 										<Card.Header>
 											<Card.Header.Image
-												source={require("@/assets/images/8.jpeg")}
+												source={{ uri: est.logo }}
 												width={142}
 												height={142}
-											></Card.Header.Image>
+											/>
 										</Card.Header>
 
 										<Card.Body direction="row">
 											<Card.Header.Icon
-												source={require("@/assets/images/8.jpeg")}
+												source={{ uri: est.logo }}
 												size={32}
-												alt="icon"
+												alt={est.companyName}
 											/>
-											<Card.Header.Title title="Restaurante Fitness" />
+											<Card.Header.Title title={est.companyName} />
 										</Card.Body>
 
 										<Card.Footer direction="row">
-											<Card.Footer.Text text="200m" />
-											<Card.Footer.Text text="·" />
-											<Card.Footer.Flag text="vegan" backgroundColor="#56CCF2" textColor="white" />
-											<Card.Footer.Flag text="vegan" backgroundColor="#56CCF2" textColor="white" />
+											{est.distanceMeters ? (
+												<>
+													<Card.Footer.Text
+														text={formatDistance(est.distanceMeters)}
+													/>
+													<Card.Footer.Text text="·" />
+												</>
+											) : null}
+											{est.flags.map((flag) => (
+												<Card.Footer.Flag
+													key={flag.id}
+													text={flag.identifier}
+													backgroundColor={flag.backgroundColor}
+													textColor={flag.textColor}
+												/>
+											))}
 										</Card.Footer>
 									</Card>
-								);
-							})}
-						</View>
-					</ScrollView>
+								))}
+							</View>
+						</ScrollView>
+					)}
 				</View>
 
+				{/* ── Locais Próximos ── */}
 				<View style={styles.sectionContainer}>
 					<Text style={styles.sectionTitle}>Locais Próximos</Text>
-					<ScrollView
-						horizontal={true}
-						showsHorizontalScrollIndicator={false}
-						overScrollMode="never"
-						bounces={false}
-						decelerationRate="normal"
-					>
-						<View style={[styles.horizontalContainer, styles.cardGapLarge]}>
-							{items.map((value, key) => {
-								return (
-									<Card key={key} gap={1} width={88} maxWidth={88}>
+					{nearby.loading ? (
+						renderLoading()
+					) : nearby.error ? (
+						renderError(nearby.error)
+					) : (
+						<ScrollView
+							horizontal={true}
+							showsHorizontalScrollIndicator={false}
+							overScrollMode="never"
+							bounces={false}
+							decelerationRate="normal"
+						>
+							<View
+								style={[styles.horizontalContainer, styles.cardGapLarge]}
+							>
+								{(nearby.data ?? []).map((est) => (
+									<Card key={est.id} gap={1} width={88} maxWidth={88}>
 										<Card.Header>
 											<Card.Header.Icon
-												source={require("@/assets/images/8.jpeg")}
+												source={{ uri: est.logo }}
 												size={88}
-												alt="icon"
-											></Card.Header.Icon>
+												alt={est.companyName}
+											/>
 										</Card.Header>
 
 										<Card.Body direction="row">
-											<Card.Header.Title title="Restaurante Fitness" align="center" />
+											<Card.Header.Title
+												title={est.companyName}
+												align="center"
+											/>
 										</Card.Body>
 
 										<Card.Footer>
-											<Card.Footer.Text text="Patrocinado" />
+											{est.isSponsored ? (
+												<Card.Footer.Text text="Patrocinado" />
+											) : (
+												<Card.Footer.Text
+													text={est.location.neighborhood}
+												/>
+											)}
 										</Card.Footer>
 									</Card>
-								);
-							})}
-						</View>
-					</ScrollView>
+								))}
+							</View>
+						</ScrollView>
+					)}
 				</View>
 
+				{/* ── Estabelecimentos ── */}
 				<View style={styles.sectionContainer}>
 					<Text style={styles.sectionTitle}>Estabelecimentos</Text>
-					<View style={styles.verticalContainer}>
-						{items.map((value, key) => {
-							return (
-								<Card key={key} gap={1} direction="row" width="auto">
+					{all.loading ? (
+						renderLoading()
+					) : all.error ? (
+						renderError(all.error)
+					) : (
+						<View style={styles.verticalContainer}>
+							{(all.data?.data ?? []).map((est) => (
+								<Card
+									key={est.id}
+									gap={1}
+									direction="row"
+									width="auto"
+								>
 									<Card.Header>
 										<Card.Header.Icon
-											source={require("@/assets/images/8.jpeg")}
+											source={{ uri: est.logo }}
 											size={62}
-											alt="icon"
-										></Card.Header.Icon>
+											alt={est.companyName}
+										/>
 									</Card.Header>
 
 									<Card.Body direction="column">
-										<Card.Header.Title title="Restaurante Fitness" align="center" />
-										<Card.Footer.Text text="Patrocinado" />
+										<Card.Header.Title
+											title={est.companyName}
+											align="center"
+										/>
+										{est.isSponsored ? (
+											<Card.Footer.Text text="Patrocinado" />
+										) : (
+											<Card.Footer.Text
+												text={`${est.location.neighborhood}, ${est.location.city}`}
+											/>
+										)}
 									</Card.Body>
 
 									<Card.Footer direction="column">
-										<Card.Header.Icon
-											source={require("@/assets/images/8.jpeg")}
-											size={62}
-											alt="icon"
-										></Card.Header.Icon>
+										{est.flags.slice(0, 2).map((flag) => (
+											<Card.Footer.Flag
+												key={flag.id}
+												text={flag.identifier}
+												backgroundColor={flag.backgroundColor}
+												textColor={flag.textColor}
+											/>
+										))}
 									</Card.Footer>
 								</Card>
-							);
-						})}
-					</View>
+							))}
+						</View>
+					)}
 				</View>
 			</ScrollView>
 		</SafeAreaView>
@@ -155,7 +268,6 @@ const styles = StyleSheet.create({
 		justifyContent: "flex-start",
 		flexDirection: "column",
 		gap: 8,
-		backgroundColor: "green",
 	},
 	horizontalContainer: {
 		display: "flex",
@@ -171,6 +283,17 @@ const styles = StyleSheet.create({
 	},
 	cardGapLarge: {
 		gap: 12,
+	},
+	loadingContainer: {
+		alignItems: "center",
+		justifyContent: "center",
+		paddingVertical: 24,
+	},
+	errorText: {
+		color: "#EB5757",
+		fontSize: 14,
+		fontFamily: "Roboto",
+		textAlign: "center",
 	},
 });
 
