@@ -4,8 +4,9 @@
   "type": "module",
   "private": true,
   "scripts": {
-    "dev": "bun run --watch src/index.ts",
+    "dev": "bun run --hot src/index.ts",
     "start": "bun run src/index.ts",
+    "seed": "bun run scripts/seed.ts",
     "test": "bun test",
     "lint": "bunx --bun eslint src/",
     "format": "bunx --bun prettier --write src/"

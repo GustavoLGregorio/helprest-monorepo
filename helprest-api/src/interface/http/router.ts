@@ -197,7 +197,7 @@ addRoute("PATCH", "/api/users/me/flags", async (req) => {
 addRoute("GET", "/api/establishments", async (req, url) => {
     await authenticateRequest(req);
     const input = parseQuery(url, listEstablishmentsSchema);
-    const useCase = new ListEstablishments(estRepo);
+    const useCase = new ListEstablishments(estRepo, flagRepo);
     const result = await useCase.execute(input);
     return json(result);
 });
@@ -205,7 +205,7 @@ addRoute("GET", "/api/establishments", async (req, url) => {
 addRoute("GET", "/api/establishments/recommended", async (req, url) => {
     const auth = await authenticateRequest(req);
     const params = parseQuery(url, nearbyEstablishmentsSchema);
-    const useCase = new GetRecommendedEstablishments(estRepo, userRepo);
+    const useCase = new GetRecommendedEstablishments(estRepo, userRepo, flagRepo);
     const result = await useCase.execute(auth.sub, params.lat, params.lng, params.limit);
     return json(result);
 });
@@ -213,7 +213,7 @@ addRoute("GET", "/api/establishments/recommended", async (req, url) => {
 addRoute("GET", "/api/establishments/nearby", async (req, url) => {
     await authenticateRequest(req);
     const input = parseQuery(url, nearbyEstablishmentsSchema);
-    const useCase = new GetNearbyEstablishments(estRepo);
+    const useCase = new GetNearbyEstablishments(estRepo, flagRepo);
     const result = await useCase.execute(input);
     return json(result);
 });
@@ -221,14 +221,14 @@ addRoute("GET", "/api/establishments/nearby", async (req, url) => {
 addRoute("GET", "/api/establishments/search", async (req, url) => {
     await authenticateRequest(req);
     const input = parseQuery(url, searchEstablishmentsSchema);
-    const useCase = new SearchEstablishments(estRepo);
+    const useCase = new SearchEstablishments(estRepo, flagRepo);
     const result = await useCase.execute(input);
     return json(result);
 });
 
 addRoute("GET", "/api/establishments/:id", async (req, _url, params) => {
     await authenticateRequest(req);
-    const useCase = new GetEstablishment(estRepo);
+    const useCase = new GetEstablishment(estRepo, flagRepo);
     const result = await useCase.execute(params.id!);
     return json(result);
 });
@@ -254,7 +254,7 @@ addRoute("GET", "/api/flags", async () => {
 addRoute("POST", "/api/flags", async (req) => {
     await authenticateRequest(req);
     const body = await req.json() as Record<string, unknown>;
-    const sanitized = sanitize(body) as { type: string; identifier: string; description: string; tag: string };
+    const sanitized = sanitize(body) as { type: string; identifier: string; description: string; tag: string; backgroundColor: string; textColor: string };
     const useCase = new CreateFlag(flagRepo);
     const result = await useCase.execute(sanitized);
     return json(result, 201);

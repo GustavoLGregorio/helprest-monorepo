@@ -6,6 +6,8 @@ export interface FlagProps {
     identifier: string;
     description: string;
     tag: string;
+    backgroundColor: string;
+    textColor: string;
 }
 
 export class Flag {
@@ -14,6 +16,8 @@ export class Flag {
     readonly identifier: string;
     readonly description: string;
     readonly tag: string;
+    readonly backgroundColor: string;
+    readonly textColor: string;
 
     private constructor(props: FlagProps) {
         this.id = props.id ?? new ObjectId();
@@ -21,6 +25,8 @@ export class Flag {
         this.identifier = props.identifier;
         this.description = props.description;
         this.tag = props.tag;
+        this.backgroundColor = props.backgroundColor;
+        this.textColor = props.textColor;
     }
 
     static create(props: FlagProps): Flag {
@@ -37,6 +43,8 @@ export class Flag {
             identifier: doc.identifier as string,
             description: doc.description as string,
             tag: doc.tag as string,
+            backgroundColor: (doc.backgroundColor as string) ?? "#888888",
+            textColor: (doc.textColor as string) ?? "#FFFFFF",
         });
     }
 
@@ -47,6 +55,8 @@ export class Flag {
             identifier: this.identifier,
             description: this.description,
             tag: this.tag,
+            backgroundColor: this.backgroundColor,
+            textColor: this.textColor,
         };
     }
 }

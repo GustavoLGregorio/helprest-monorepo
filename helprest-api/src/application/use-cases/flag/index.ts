@@ -12,6 +12,8 @@ export class ListFlags {
             identifier: f.identifier,
             description: f.description,
             tag: f.tag,
+            backgroundColor: f.backgroundColor,
+            textColor: f.textColor,
         }));
     }
 }
@@ -19,7 +21,14 @@ export class ListFlags {
 export class CreateFlag {
     constructor(private readonly flagRepo: IFlagRepository) { }
 
-    async execute(input: { type: string; identifier: string; description: string; tag: string }) {
+    async execute(input: {
+        type: string;
+        identifier: string;
+        description: string;
+        tag: string;
+        backgroundColor: string;
+        textColor: string;
+    }) {
         const flag = Flag.create(input);
         await this.flagRepo.create(flag);
         return { id: flag.id.toHexString() };
