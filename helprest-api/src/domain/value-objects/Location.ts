@@ -5,7 +5,7 @@ export interface LocationProps {
     city: string;
     neighborhood: string;
     address: string;
-    coordinates: {
+    coordinates?: {
         lat: number;
         lng: number;
     };
@@ -23,21 +23,23 @@ export class Location {
         this.city = props.city;
         this.neighborhood = props.neighborhood;
         this.address = props.address;
-        this.coordinates = Object.freeze({ ...props.coordinates });
+        this.coordinates = Object.freeze({ ...(props.coordinates ?? { lat: 0, lng: 0 }) });
     }
 
     static create(props: LocationProps): Location {
-        if (
-            props.coordinates.lat < -90 ||
-            props.coordinates.lat > 90 ||
-            props.coordinates.lng < -180 ||
-            props.coordinates.lng > 180
-        ) {
-            throw new Error("Invalid coordinates: lat must be [-90, 90], lng must be [-180, 180]");
+        if (props.coordinates) {
+            if (
+                props.coordinates.lat < -90 ||
+                props.coordinates.lat > 90 ||
+                props.coordinates.lng < -180 ||
+                props.coordinates.lng > 180
+            ) {
+                throw new Error("Invalid coordinates: lat must be [-90, 90], lng must be [-180, 180]");
+            }
         }
 
-        if (!props.state || !props.city || !props.address) {
-            throw new Error("Location requires at least state, city, and address");
+        if (!props.address) {
+            throw new Error("Location requires at least an address");
         }
 
         return new Location(props);
@@ -45,8 +47,12 @@ export class Location {
 
     /**
      * Returns MongoDB GeoJSON format for 2dsphere index queries.
+     * Returns null if coordinates are not set (lat=0, lng=0).
      */
-    toGeoJSON(): { type: "Point"; coordinates: [number, number] } {
+    toGeoJSON(): { type: "Point"; coordinates: [number, number] } | null {
+        if (this.coordinates.lat === 0 && this.coordinates.lng === 0) {
+            return null;
+        }
         return {
             type: "Point",
             coordinates: [this.coordinates.lng, this.coordinates.lat],

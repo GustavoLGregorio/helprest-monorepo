@@ -5,16 +5,18 @@ import {
     TouchableOpacity,
     Alert,
     ActivityIndicator,
+    FlatList,
+    TextInput,
 } from "react-native";
 import React, { useState, useEffect } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import NextButton from "@/components/login/NextButton";
-import UserInput from "@/components/login/UserInput";
 import UserProgress from "@/components/login/UserProgress";
 import { useRouter } from "expo-router";
-import Container from "@/components/login/Container";
 import { api } from "@/services/api";
 import { loadUserName, loadUserBirthDate, loadUserDefaultLocation } from "@/utils/saveUserRegisterInfo";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { Image } from "expo-image";
 
 interface ApiFlag {
     id: string;
@@ -24,6 +26,10 @@ interface ApiFlag {
     tag: string;
     backgroundColor: string;
     textColor: string;
+    images: {
+        tag: string | null;
+        pin: string | null;
+    };
 }
 
 export default function Step4() {
@@ -60,7 +66,7 @@ export default function Step4() {
     const filteredFlags = flags.filter((flag) =>
         searchText.length === 0 ||
         flag.tag.toLowerCase().includes(searchText.toLowerCase()) ||
-        flag.identifier.toLowerCase().includes(searchText.toLowerCase())
+        flag.identifier.toLowerCase().includes(searchText.toLowerCase()),
     );
 
     const finalizeRegistration = async () => {
@@ -70,32 +76,33 @@ export default function Step4() {
             const birthDate = loadUserBirthDate();
             const defaultLocation = loadUserDefaultLocation();
 
-            // Update user profile with collected data
             const profileUpdate: Record<string, unknown> = {};
             if (name) profileUpdate.name = name;
             if (birthDate) profileUpdate.birthDate = birthDate;
             if (defaultLocation) {
-                profileUpdate.location = {
-                    address: defaultLocation,
-                };
+                profileUpdate.location = { address: defaultLocation };
             }
 
             if (Object.keys(profileUpdate).length > 0) {
-                await api.patch("/api/users/me", {
+                const profileRes = await api.patch("/api/users/me", {
                     body: profileUpdate,
                     authenticated: true,
                 });
+                if (!profileRes.ok) {
+                    console.error("Failed to update profile:", profileRes.data);
+                }
             }
 
-            // Update user flags
             if (selectedFlagIds.length > 0) {
-                await api.patch("/api/users/me/flags", {
+                const flagsRes = await api.patch("/api/users/me/flags", {
                     body: { flagIds: selectedFlagIds },
                     authenticated: true,
                 });
+                if (!flagsRes.ok) {
+                    console.error("Failed to update flags:", flagsRes.data);
+                }
             }
 
-            // Navigate to home
             router.replace("/(app)/(tabs)/(home)");
         } catch (error) {
             console.error("Error finalizing registration:", error);
@@ -103,6 +110,44 @@ export default function Step4() {
         } finally {
             setIsLoading(false);
         }
+    };
+
+    const renderFlagItem = ({ item }: { item: ApiFlag }) => {
+        const isSelected = selectedFlagIds.includes(item.id);
+        const hasTagImage = !!item.images?.tag;
+        return (
+            <TouchableOpacity
+                style={styles.flagItem}
+                onPress={() => toggleFlag(item.id)}
+                activeOpacity={0.7}
+            >
+                <View
+                    style={[
+                        styles.flagCard,
+                        {
+                            backgroundColor: item.backgroundColor || "#F5F5F5",
+                            borderColor: isSelected ? "#009C9D" : "transparent",
+                        },
+                    ]}
+                >
+                    {hasTagImage ? (
+                        <Image
+                            source={{ uri: item.images.tag! }}
+                            style={styles.flagImage}
+                            contentFit="contain"
+                        />
+                    ) : (
+                        <Text
+                            style={[styles.flagCardText, { color: item.textColor || "#333" }]}
+                            numberOfLines={2}
+                        >
+                            {item.tag}
+                        </Text>
+                    )}
+                </View>
+                <Text style={styles.flagLabel} numberOfLines={1}>{item.tag}</Text>
+            </TouchableOpacity>
+        );
     };
 
     return (
@@ -119,66 +164,36 @@ export default function Step4() {
             </View>
 
             <View style={styles.contentContainer}>
-                <UserInput
-                    label={"Selecione suas restrições alimentares"}
-                    placeholder="Buscar restrição"
-                    changeTextAction={(t) => setSearchText(t)}
-                    isSearchInput={true}
-                />
-                <Container width="100%" height={448} marginTop={16}>
+                <Text style={styles.sectionLabel}>Selecione suas restrições alimentares</Text>
+
+                <View style={styles.searchBar}>
+                    <TextInput
+                        style={styles.searchInput}
+                        placeholder="Buscar restrição"
+                        placeholderTextColor="#AAA"
+                        value={searchText}
+                        onChangeText={setSearchText}
+                    />
+                    <MaterialCommunityIcons name="magnify" size={22} color="#AAA" />
+                </View>
+
+                <View style={styles.flagsWrapper}>
                     {isFlagsLoading ? (
-                        <ActivityIndicator size="large" color="#009C9D" />
+                        <ActivityIndicator size="large" color="#009C9D" style={{ marginTop: 40 }} />
                     ) : filteredFlags.length === 0 ? (
-                        <Text style={{ textAlign: "center", color: "#999", marginTop: 20 }}>
-                            Nenhuma restrição encontrada
-                        </Text>
+                        <Text style={styles.emptyText}>Nenhuma restrição encontrada</Text>
                     ) : (
-                        filteredFlags.map((flag) => (
-                            <TouchableOpacity
-                                key={flag.id}
-                                onPress={() => toggleFlag(flag.id)}
-                            >
-                                <View style={{ alignItems: "center" }}>
-                                    <View
-                                        style={{
-                                            width: 108,
-                                            height: 108,
-                                            borderRadius: 16,
-                                            borderWidth: 4,
-                                            borderColor: selectedFlagIds.includes(flag.id)
-                                                ? "#009C9D"
-                                                : "#EEE",
-                                            backgroundColor: flag.backgroundColor || "#F5F5F5",
-                                            justifyContent: "center",
-                                            alignItems: "center",
-                                        }}
-                                    >
-                                        <Text style={{
-                                            fontSize: 14,
-                                            fontWeight: "600",
-                                            color: flag.textColor || "#333",
-                                            textAlign: "center",
-                                            paddingHorizontal: 4,
-                                        }}>
-                                            {flag.tag}
-                                        </Text>
-                                    </View>
-                                    <Text
-                                        style={{
-                                            textAlign: "center",
-                                            marginTop: 10,
-                                            fontWeight: "500",
-                                            textTransform: "capitalize",
-                                            maxWidth: 108,
-                                        }}
-                                    >
-                                        {flag.tag}
-                                    </Text>
-                                </View>
-                            </TouchableOpacity>
-                        ))
+                        <FlatList
+                            data={filteredFlags}
+                            renderItem={renderFlagItem}
+                            keyExtractor={(item) => item.id}
+                            numColumns={3}
+                            columnWrapperStyle={styles.flagRow}
+                            contentContainerStyle={styles.flagListContent}
+                            showsVerticalScrollIndicator={false}
+                        />
                     )}
-                </Container>
+                </View>
             </View>
 
             <View style={styles.buttonContainer}>
@@ -194,14 +209,14 @@ export default function Step4() {
 
 const styles = StyleSheet.create({
     container: {
-        paddingHorizontal: "30%",
         backgroundColor: "#FFF",
-        height: "100%",
+        flex: 1,
+        paddingHorizontal: 24,
         paddingVertical: 24,
     },
     header: {
         marginTop: 24,
-        marginBottom: 100,
+        marginBottom: 32,
     },
     headerText: {
         fontSize: 20,
@@ -209,22 +224,85 @@ const styles = StyleSheet.create({
         textAlign: "center",
         marginBottom: 4,
     },
-    contentContainer: {
-        width: "100%",
-        display: "flex",
-        position: "absolute",
-        alignSelf: "center",
-        top: 280,
-    },
-    buttonContainer: {
-        display: "flex",
-        position: "absolute",
-        bottom: 54,
-        width: "100%",
-        alignSelf: "center",
-    },
     infoText: {
         fontSize: 16,
         textAlign: "center",
+        color: "#555",
+    },
+    contentContainer: {
+        flex: 1,
+    },
+    sectionLabel: {
+        fontSize: 16,
+        fontWeight: "600",
+        color: "#333",
+        marginBottom: 12,
+    },
+    searchBar: {
+        flexDirection: "row",
+        alignItems: "center",
+        backgroundColor: "#F5F5F5",
+        borderRadius: 24,
+        paddingHorizontal: 16,
+        paddingVertical: 10,
+        marginBottom: 16,
+    },
+    searchInput: {
+        flex: 1,
+        fontSize: 16,
+        color: "#333",
+    },
+    flagsWrapper: {
+        flex: 1,
+        backgroundColor: "#F0F0F0",
+        borderRadius: 16,
+        padding: 8,
+    },
+    flagRow: {
+        justifyContent: "flex-start",
+        gap: 8,
+    },
+    flagListContent: {
+        gap: 12,
+        paddingVertical: 8,
+    },
+    flagItem: {
+        flex: 1,
+        maxWidth: "33.33%",
+        alignItems: "center",
+    },
+    flagCard: {
+        width: "90%",
+        aspectRatio: 1,
+        borderRadius: 16,
+        borderWidth: 3,
+        justifyContent: "center",
+        alignItems: "center",
+        overflow: "hidden",
+    },
+    flagImage: {
+        width: "70%",
+        height: "70%",
+    },
+    flagCardText: {
+        fontSize: 12,
+        fontWeight: "700",
+        textAlign: "center",
+        paddingHorizontal: 2,
+    },
+    flagLabel: {
+        textAlign: "center",
+        marginTop: 4,
+        fontWeight: "500",
+        fontSize: 11,
+        color: "#555",
+    },
+    emptyText: {
+        textAlign: "center",
+        color: "#999",
+        marginTop: 40,
+    },
+    buttonContainer: {
+        paddingTop: 16,
     },
 });

@@ -1,14 +1,14 @@
 import { z } from "zod/v4";
 
 const locationSchema = z.object({
-    state: z.string().min(1),
-    city: z.string().min(1),
+    state: z.string().optional().default(""),
+    city: z.string().optional().default(""),
     neighborhood: z.string().optional().default(""),
     address: z.string().min(1),
     coordinates: z.object({
         lat: z.number().min(-90).max(90),
         lng: z.number().min(-180).max(180),
-    }),
+    }).optional(),
 });
 
 const socialLinksSchema = z.object({
@@ -21,6 +21,7 @@ const socialLinksSchema = z.object({
 
 export const updateProfileSchema = z.object({
     name: z.string().min(2).max(100).optional(),
+    birthDate: z.iso.date().optional(),
     location: locationSchema.optional(),
     socialLinksEnabled: z.boolean().optional(),
     socialLinks: socialLinksSchema.optional(),
