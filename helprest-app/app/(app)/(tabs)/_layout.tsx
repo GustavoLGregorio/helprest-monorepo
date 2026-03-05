@@ -3,14 +3,16 @@ import { Tabs } from "expo-router";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { Colors } from "@/constants/Colors";
 import { ColorValue } from "react-native";
+import { emitMapRecenter } from "@/utils/mapEvents";
 
-export default function RootLayout() {
+export default function TabsLayout() {
     return (
         <Tabs
             screenOptions={{
                 animation: "shift",
                 headerShown: false,
                 tabBarActiveTintColor: Colors.light.tint,
+                freezeOnBlur: true,
                 tabBarStyle: {
                     elevation: 1,
                     height: 76,
@@ -31,6 +33,9 @@ export default function RootLayout() {
                             color={color}
                         />
                     ),
+                }}
+                listeners={{
+                    tabPress: () => emitMapRecenter(),
                 }}
             />
             <Tabs.Screen

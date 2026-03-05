@@ -18,9 +18,14 @@ import type { Flag } from "@domain/entities/Flag";
 
 interface FlagDTO {
     id: string;
+    tag: string;
     identifier: string;
     backgroundColor: string;
     textColor: string;
+    images: {
+        tag: string | null;
+        pin: string | null;
+    };
 }
 
 async function populateFlags(
@@ -31,9 +36,11 @@ async function populateFlags(
     const flags = await flagRepo.findByIds([...flagIds]);
     return flags.map((f) => ({
         id: f.id.toHexString(),
+        tag: f.tag,
         identifier: f.identifier,
         backgroundColor: f.backgroundColor,
         textColor: f.textColor,
+        images: f.images,
     }));
 }
 

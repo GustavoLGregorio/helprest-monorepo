@@ -7,6 +7,8 @@ import LoginOption from "@/components/login/LoginOption";
 import { useRouter } from "expo-router";
 import { signInWithGoogle } from "@/services/auth";
 import { saveUserName } from "@/utils/saveUserRegisterInfo";
+import { api } from "@/services/api";
+import { saveUserProfile, getIncompleteOnboardingStep, type CachedUserProfile } from "@/storage/userProfile";
 
 export default function LoginScreen() {
 	const router = useRouter();
@@ -24,7 +26,8 @@ export default function LoginScreen() {
 					}
 					router.replace("/(auth)/register/step1");
 				} else {
-					router.replace("/(app)/(tabs)/(home)");
+					// Validate profile and check onboarding for existing users
+					await validateAndNavigate();
 				}
 			} else {
 				if (result.error !== "Login cancelled") {
@@ -35,6 +38,29 @@ export default function LoginScreen() {
 			Alert.alert("Erro", "Ocorreu um erro inesperado");
 		} finally {
 			setIsLoading(false);
+		}
+	};
+
+	const validateAndNavigate = async () => {
+		try {
+			const response = await api.get<CachedUserProfile>("/api/users/me", { authenticated: true });
+			if (!response.ok) {
+				Alert.alert("Erro", "Falha ao validar sessão");
+				return;
+			}
+
+			const profile = response.data;
+			saveUserProfile(profile);
+
+			const incompleteStep = getIncompleteOnboardingStep(profile);
+			if (incompleteStep !== null) {
+				router.replace(`/(auth)/register/step${incompleteStep}` as never);
+			} else {
+				router.replace("/(app)/(tabs)/(home)");
+			}
+		} catch {
+			// Fallback: navigate to home and let root layout handle it
+			router.replace("/(app)/(tabs)/(home)");
 		}
 	};
 

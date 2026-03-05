@@ -106,3 +106,15 @@ export async function signInWithGoogle(): Promise<{
         };
     }
 }
+
+/**
+ * Sign out of Google and revoke the cached session.
+ * Must be called on logout to prevent auto-sign-in.
+ */
+export async function signOutGoogle(): Promise<void> {
+    try {
+        await GoogleSignin.signOut();
+    } catch (error) {
+        console.error("Google sign-out error:", error);
+    }
+}
