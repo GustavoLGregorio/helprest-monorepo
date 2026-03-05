@@ -1,0 +1,406 @@
+{
+    "_type": "export",
+    "__export_format": 4,
+    "__export_source": "helprest-api",
+    "resources": [
+        {
+            "_id": "wrk_helprest",
+            "_type": "workspace",
+            "name": "HelpRest API",
+            "description": "HelpRest Backend API Collection"
+        },
+        {
+            "_id": "env_base",
+            "_type": "environment",
+            "parentId": "wrk_helprest",
+            "name": "Local",
+            "data": {
+                "baseUrl": "http://localhost:3000/api",
+                "accessToken": "",
+                "refreshToken": ""
+            }
+        },
+        {
+            "_id": "fld_auth",
+            "_type": "request_group",
+            "parentId": "wrk_helprest",
+            "name": "Auth"
+        },
+        {
+            "_id": "fld_user",
+            "_type": "request_group",
+            "parentId": "wrk_helprest",
+            "name": "User"
+        },
+        {
+            "_id": "fld_flags",
+            "_type": "request_group",
+            "parentId": "wrk_helprest",
+            "name": "Flags"
+        },
+        {
+            "_id": "fld_establishments",
+            "_type": "request_group",
+            "parentId": "wrk_helprest",
+            "name": "Establishments"
+        },
+        {
+            "_id": "fld_visits",
+            "_type": "request_group",
+            "parentId": "wrk_helprest",
+            "name": "Visits"
+        },
+        {
+            "_id": "fld_system",
+            "_type": "request_group",
+            "parentId": "wrk_helprest",
+            "name": "System"
+        },
+        {
+            "_id": "req_health",
+            "_type": "request",
+            "parentId": "fld_system",
+            "name": "Health Check",
+            "method": "GET",
+            "url": "{{ _.baseUrl }}/health",
+            "headers": [
+                {
+                    "name": "Content-Type",
+                    "value": "application/json"
+                }
+            ],
+            "body": {}
+        },
+        {
+            "_id": "req_register",
+            "_type": "request",
+            "parentId": "fld_auth",
+            "name": "Register",
+            "method": "POST",
+            "url": "{{ _.baseUrl }}/auth/register",
+            "headers": [
+                {
+                    "name": "Content-Type",
+                    "value": "application/json"
+                }
+            ],
+            "body": {
+                "mimeType": "application/json",
+                "text": "{\n  \"name\": \"Teste User\",\n  \"email\": \"teste@email.com\",\n  \"password\": \"senha123\",\n  \"birthDate\": \"1995-06-15\"\n}"
+            }
+        },
+        {
+            "_id": "req_login",
+            "_type": "request",
+            "parentId": "fld_auth",
+            "name": "Login",
+            "method": "POST",
+            "url": "{{ _.baseUrl }}/auth/login",
+            "headers": [
+                {
+                    "name": "Content-Type",
+                    "value": "application/json"
+                }
+            ],
+            "body": {
+                "mimeType": "application/json",
+                "text": "{\n  \"email\": \"joao@teste.com\",\n  \"password\": \"teste123\"\n}"
+            }
+        },
+        {
+            "_id": "req_refresh",
+            "_type": "request",
+            "parentId": "fld_auth",
+            "name": "Refresh Token",
+            "method": "POST",
+            "url": "{{ _.baseUrl }}/auth/refresh",
+            "headers": [
+                {
+                    "name": "Content-Type",
+                    "value": "application/json"
+                }
+            ],
+            "body": {
+                "mimeType": "application/json",
+                "text": "{\n  \"refreshToken\": \"{{ _.refreshToken }}\"\n}"
+            }
+        },
+        {
+            "_id": "req_get_profile",
+            "_type": "request",
+            "parentId": "fld_user",
+            "name": "Get My Profile",
+            "method": "GET",
+            "url": "{{ _.baseUrl }}/users/me",
+            "headers": [
+                {
+                    "name": "Content-Type",
+                    "value": "application/json"
+                },
+                {
+                    "name": "Authorization",
+                    "value": "Bearer {{ _.accessToken }}"
+                }
+            ],
+            "body": {}
+        },
+        {
+            "_id": "req_update_profile",
+            "_type": "request",
+            "parentId": "fld_user",
+            "name": "Update Profile",
+            "method": "PATCH",
+            "url": "{{ _.baseUrl }}/users/me",
+            "headers": [
+                {
+                    "name": "Content-Type",
+                    "value": "application/json"
+                },
+                {
+                    "name": "Authorization",
+                    "value": "Bearer {{ _.accessToken }}"
+                }
+            ],
+            "body": {
+                "mimeType": "application/json",
+                "text": "{\n  \"name\": \"João Atualizado\",\n  \"socialLinksEnabled\": true,\n  \"socialLinks\": {\n    \"instagram\": \"@joao.teste\"\n  }\n}"
+            }
+        },
+        {
+            "_id": "req_update_flags",
+            "_type": "request",
+            "parentId": "fld_user",
+            "name": "Update User Flags",
+            "method": "PATCH",
+            "url": "{{ _.baseUrl }}/users/me/flags",
+            "headers": [
+                {
+                    "name": "Content-Type",
+                    "value": "application/json"
+                },
+                {
+                    "name": "Authorization",
+                    "value": "Bearer {{ _.accessToken }}"
+                }
+            ],
+            "body": {
+                "mimeType": "application/json",
+                "text": "{\n  \"flagIds\": []\n}"
+            }
+        },
+        {
+            "_id": "req_list_flags",
+            "_type": "request",
+            "parentId": "fld_flags",
+            "name": "List All Flags",
+            "method": "GET",
+            "url": "{{ _.baseUrl }}/flags",
+            "headers": [
+                {
+                    "name": "Content-Type",
+                    "value": "application/json"
+                }
+            ],
+            "body": {}
+        },
+        {
+            "_id": "req_create_flag",
+            "_type": "request",
+            "parentId": "fld_flags",
+            "name": "Create Flag",
+            "method": "POST",
+            "url": "{{ _.baseUrl }}/flags",
+            "headers": [
+                {
+                    "name": "Content-Type",
+                    "value": "application/json"
+                },
+                {
+                    "name": "Authorization",
+                    "value": "Bearer {{ _.accessToken }}"
+                }
+            ],
+            "body": {
+                "mimeType": "application/json",
+                "text": "{\n  \"type\": \"dietary\",\n  \"identifier\": \"sugar-free\",\n  \"description\": \"Estabelecimento com opções sem açúcar\",\n  \"tag\": \"Sem Açúcar\",\n  \"backgroundColor\": \"#E2B93B\",\n  \"textColor\": \"#FFFFFF\"\n}"
+            }
+        },
+        {
+            "_id": "req_list_establishments",
+            "_type": "request",
+            "parentId": "fld_establishments",
+            "name": "List Establishments",
+            "method": "GET",
+            "url": "{{ _.baseUrl }}/establishments?page=1&limit=5",
+            "headers": [
+                {
+                    "name": "Content-Type",
+                    "value": "application/json"
+                },
+                {
+                    "name": "Authorization",
+                    "value": "Bearer {{ _.accessToken }}"
+                }
+            ],
+            "body": {}
+        },
+        {
+            "_id": "req_get_establishment",
+            "_type": "request",
+            "parentId": "fld_establishments",
+            "name": "Get Establishment",
+            "method": "GET",
+            "url": "{{ _.baseUrl }}/establishments/REPLACE_WITH_ID",
+            "headers": [
+                {
+                    "name": "Content-Type",
+                    "value": "application/json"
+                },
+                {
+                    "name": "Authorization",
+                    "value": "Bearer {{ _.accessToken }}"
+                }
+            ],
+            "body": {}
+        },
+        {
+            "_id": "req_recommended",
+            "_type": "request",
+            "parentId": "fld_establishments",
+            "name": "Get Recommended",
+            "method": "GET",
+            "url": "{{ _.baseUrl }}/establishments/recommended?lat=-25.429&lng=-49.27&limit=10",
+            "headers": [
+                {
+                    "name": "Content-Type",
+                    "value": "application/json"
+                },
+                {
+                    "name": "Authorization",
+                    "value": "Bearer {{ _.accessToken }}"
+                }
+            ],
+            "body": {}
+        },
+        {
+            "_id": "req_nearby",
+            "_type": "request",
+            "parentId": "fld_establishments",
+            "name": "Get Nearby",
+            "method": "GET",
+            "url": "{{ _.baseUrl }}/establishments/nearby?lat=-25.429&lng=-49.27&maxDistance=5000&limit=10",
+            "headers": [
+                {
+                    "name": "Content-Type",
+                    "value": "application/json"
+                },
+                {
+                    "name": "Authorization",
+                    "value": "Bearer {{ _.accessToken }}"
+                }
+            ],
+            "body": {}
+        },
+        {
+            "_id": "req_search",
+            "_type": "request",
+            "parentId": "fld_establishments",
+            "name": "Search Establishments",
+            "method": "GET",
+            "url": "{{ _.baseUrl }}/establishments/search?q=vegano&page=1&limit=10",
+            "headers": [
+                {
+                    "name": "Content-Type",
+                    "value": "application/json"
+                },
+                {
+                    "name": "Authorization",
+                    "value": "Bearer {{ _.accessToken }}"
+                }
+            ],
+            "body": {}
+        },
+        {
+            "_id": "req_create_establishment",
+            "_type": "request",
+            "parentId": "fld_establishments",
+            "name": "Create Establishment",
+            "method": "POST",
+            "url": "{{ _.baseUrl }}/establishments",
+            "headers": [
+                {
+                    "name": "Content-Type",
+                    "value": "application/json"
+                },
+                {
+                    "name": "Authorization",
+                    "value": "Bearer {{ _.accessToken }}"
+                }
+            ],
+            "body": {
+                "mimeType": "application/json",
+                "text": "{\n  \"companyName\": \"Novo Restaurante Teste\",\n  \"location\": {\n    \"state\": \"PR\",\n    \"city\": \"Curitiba\",\n    \"neighborhood\": \"Centro Cívico\",\n    \"address\": \"Rua Teste, 123\",\n    \"coordinates\": { \"lat\": -25.42, \"lng\": -49.27 }\n  },\n  \"flagIds\": [],\n  \"logo\": \"https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=200&h=200&fit=crop\"\n}"
+            }
+        },
+        {
+            "_id": "req_create_visit",
+            "_type": "request",
+            "parentId": "fld_visits",
+            "name": "Create Visit",
+            "method": "POST",
+            "url": "{{ _.baseUrl }}/visits",
+            "headers": [
+                {
+                    "name": "Content-Type",
+                    "value": "application/json"
+                },
+                {
+                    "name": "Authorization",
+                    "value": "Bearer {{ _.accessToken }}"
+                }
+            ],
+            "body": {
+                "mimeType": "application/json",
+                "text": "{\n  \"establishmentId\": \"REPLACE_WITH_ID\",\n  \"rating\": 5,\n  \"review\": \"Excelente restaurante! Opções veganas deliciosas.\"\n}"
+            }
+        },
+        {
+            "_id": "req_user_visits",
+            "_type": "request",
+            "parentId": "fld_visits",
+            "name": "List User Visits",
+            "method": "GET",
+            "url": "{{ _.baseUrl }}/visits/user/REPLACE_WITH_USER_ID?page=1&limit=10",
+            "headers": [
+                {
+                    "name": "Content-Type",
+                    "value": "application/json"
+                },
+                {
+                    "name": "Authorization",
+                    "value": "Bearer {{ _.accessToken }}"
+                }
+            ],
+            "body": {}
+        },
+        {
+            "_id": "req_establishment_visits",
+            "_type": "request",
+            "parentId": "fld_visits",
+            "name": "List Establishment Visits",
+            "method": "GET",
+            "url": "{{ _.baseUrl }}/visits/establishment/REPLACE_WITH_ID?page=1&limit=10",
+            "headers": [
+                {
+                    "name": "Content-Type",
+                    "value": "application/json"
+                },
+                {
+                    "name": "Authorization",
+                    "value": "Bearer {{ _.accessToken }}"
+                }
+            ],
+            "body": {}
+        }
+    ]
+}

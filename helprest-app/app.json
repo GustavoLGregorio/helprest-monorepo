@@ -1,0 +1,101 @@
+{
+    "expo": {
+        "name": "HelpRest",
+        "slug": "helprest",
+        "version": "1.0.0",
+        "orientation": "portrait",
+        "icon": "./assets/images/logo/logo_bare.png",
+        "scheme": "helprest",
+        "userInterfaceStyle": "automatic",
+        "newArchEnabled": true,
+        "ios": {
+            "supportsTablet": true
+        },
+        "android": {
+            "adaptiveIcon": {
+                "foregroundImage": "./assets/images/logo/logo_max.png",
+                "backgroundColor": "#009C9D"
+            },
+            "edgeToEdgeEnabled": true,
+            "package": "com.gustavo_lg.helprest",
+            "keystore": {
+                "keystorePath": "./keys/keystore.jks",
+                "keystorePassword": "74bf17c9dd20d10911aa48e1490f8171",
+                "keyAlias": "0d33bb73fe7a6b8ae839b001b6696f06",
+                "keyPassword": "619e9a2516524d7d30f3f7b7aa249bde"
+            },
+            "config": {
+                "googleMaps": {
+                    "apiKey": "AIzaSyARH_6MQ83tI50HcTgiC221FGS1iW8vb_8"
+                }
+            },
+            "permissions": [
+                "ACCESS_FINE_LOCATION",
+                "ACCESS_COARSE_LOCATION",
+                "ACCESS_BACKGROUND_LOCATION",
+                "FOREGROUND_SERVICE",
+                "FOREGROUND_SERVICE_LOCATION",
+                "VIBRATE",
+                "POST_NOTIFICATIONS"
+            ]
+        },
+        "web": {
+            "bundler": "metro",
+            "output": "static",
+            "favicon": "./assets/images/icon.png"
+        },
+        "plugins": [
+            "expo-router",
+            [
+                "expo-splash-screen",
+                {
+                    "image": "./assets/images/logo/logo_bare.png",
+                    "imageWidth": 200,
+                    "resizeMode": "contain",
+                    "backgroundColor": "#009c9d"
+                }
+            ],
+            [
+                "expo-maps",
+                {
+                    "requestLocationPermission": "true",
+                    "locationPermission": "Allow $(helprest) to have permission"
+                }
+            ],
+            [
+                "@react-native-google-signin/google-signin",
+                {
+                    "webClientId": "81623569961-n7p4nljitfi9ua6hmtumhn93gs3s3074.apps.googleusercontent.com",
+                    "iosUrlScheme": "com.googleusercontent.apps.81623569961-atvlv5qhp59f5egeesv163kcdm9b36i4"
+                }
+            ],
+            [
+                "expo-location",
+                {
+                    "locationAlwaysAndWhenInUsePermission": "O HelpRest precisa da sua localização para encontrar estabelecimentos próximos e registrar visitas.",
+                    "locationAlwaysPermission": "O HelpRest usa sua localização em segundo plano para detectar aproximação de estabelecimentos.",
+                    "locationWhenInUsePermission": "O HelpRest usa sua localização para mostrar estabelecimentos próximos no mapa.",
+                    "isAndroidBackgroundLocationEnabled": true,
+                    "isAndroidForegroundServiceEnabled": true
+                }
+            ],
+            [
+                "expo-notifications",
+                {
+                    "icon": "./assets/images/logo/logo_bare.png",
+                    "color": "#009C9D"
+                }
+            ]
+        ],
+        "experiments": {
+            "typedRoutes": true
+        },
+        "extra": {
+            "router": {},
+            "eas": {
+                "projectId": "4972cabb-9eb9-4ec5-88f7-f7d39e3c2773"
+            }
+        },
+        "owner": "gustavo_lg"
+    }
+}

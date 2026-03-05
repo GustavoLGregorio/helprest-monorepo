@@ -1,0 +1,37 @@
+{
+	"empresa": "sem culpa - sem gluten",
+	"cnpj": "12345678000199",
+	"matriz": true,
+	"unidade": "curitiba",
+	"localizacao": {
+		"pais": "br",
+		"estado": "pr",
+		"cidade": "curitiba",
+		"bairro": "hugo lange",
+		"endereco": "rua schiller, 1960",
+		"cep": "80040160"
+	},
+	"email": "example@gmail.com",
+	"telefone": "419999999999",
+	"logo_empresa": "https://7cip0odrw7.ufs.sh/f/4zVtXExgGxJThkFxjUhpUOoxjcdXK0npyzF5RfuTie4vZ3VE",
+	"fotos": [
+		"https://7cip0odrw7.ufs.sh/f/4zVtXExgGxJT4u5oWIxgGxJTQHtmwA5lz1KY2Dk6XC7VpnhL",
+		"https://7cip0odrw7.ufs.sh/f/4zVtXExgGxJTG11KPmBzQqJsmB7P2D15cAwZ3bgYuR04MvKT",
+		"https://7cip0odrw7.ufs.sh/f/4zVtXExgGxJT61JJU9YKqD0UPAeZy2Bz8fYSF16wgtro3Xin",
+		"https://7cip0odrw7.ufs.sh/f/4zVtXExgGxJT8aLjkxQxqn6LQX1VagHCdrNAJRSZuoGFcfWK",
+		"https://7cip0odrw7.ufs.sh/f/4zVtXExgGxJT6qlokDYKqD0UPAeZy2Bz8fYSF16wgtro3Xin"
+	],
+	"nota_estabelecimento": 79,
+	"redirecionamento": [
+		{
+			"para": "",
+			"tipo": "",
+			"link": "",
+			"_id": {
+				"$oid": "681bf3142947d6140130cf50"
+			}
+		}
+	],
+	"coordenadas": [-49.2491384, -25.417829],
+	"flags": ["gluten-free", "vegan"]
+}

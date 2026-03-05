@@ -1,0 +1,14 @@
+{
+	"folders": [
+		{
+			"path": "helprest-api"
+		},
+		{
+			"path": "helprest-app"
+		},
+		{
+			"path": "resources"
+		}
+	],
+	"settings": {}
+}

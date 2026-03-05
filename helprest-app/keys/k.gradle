@@ -1,0 +1,6 @@
+        debug {
+            storeFile file('keystore.jks')
+            storePassword '74bf17c9dd20d10911aa48e1490f8171'
+            keyAlias '0d33bb73fe7a6b8ae839b001b6696f06'
+            keyPassword '619e9a2516524d7d30f3f7b7aa249bde'
+        }

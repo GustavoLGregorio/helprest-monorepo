@@ -1,0 +1,27 @@
+{
+  "name": "helprest-api",
+  "module": "src/index.ts",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "dev": "bun run --hot src/index.ts",
+    "start": "bun run src/index.ts",
+    "seed": "bun run scripts/seed.ts",
+    "test": "bun test",
+    "lint": "bunx --bun eslint src/",
+    "format": "bunx --bun prettier --write src/"
+  },
+  "devDependencies": {
+    "@types/bun": "^1.3.9"
+  },
+  "peerDependencies": {
+    "typescript": "^5.9.3"
+  },
+  "dependencies": {
+    "argon2": "^0.44.0",
+    "ioredis": "^5.9.3",
+    "jose": "^6.1.3",
+    "mongodb": "^7.1.0",
+    "zod": "^4.3.6"
+  }
+}

@@ -1,0 +1,87 @@
+# -------------------------------------------------------------------------------------------------
+# FRONTEND
+# -------------------------------------------------------------------------------------------------
+
+# Git
+helprest-app/.gitignore
+
+# Dependencies
+helprest-app/node_modules/
+
+# Expo
+helprest-app/.expo/
+helprest-app/dist/
+helprest-app/web-build/
+helprest-app/android/
+helprest-app/ios/
+helprest-app/expo-env.d.ts
+
+# Native
+helprest-app/.kotlin/
+helprest-app/*.orig.*
+helprest-app/*.jks
+helprest-app/*.p8
+helprest-app/*.p12
+helprest-app/*.key
+helprest-app/*.mobileprovision
+
+# Metro
+helprest-app/.metro-health-check*
+
+# debug
+helprest-app/npm-debug.*
+helprest-app/yarn-debug.*
+helprest-app/yarn-error.*
+
+# macOS
+helprest-app/.DS_Store
+helprest-app/*.pem
+
+# local env files
+helprest-app/.env*.local
+
+# typescript
+helprest-app/*.tsbuildinfo
+helprest-app/app-example
+
+# -------------------------------------------------------------------------------------------------
+# BACKEND
+# -------------------------------------------------------------------------------------------------
+
+# Git
+helprest-api/.gitignore
+
+# Dependencies (bun install)
+/helprest-api/node_modules
+
+# output
+/helprest-api/out
+/helprest-api/dist
+/helprest-api/*.tgz
+
+# code coverage
+/helprest-api/coverage
+/helprest-api/*.lcov
+
+# logs
+/helprest-api/logs
+/helprest-api/_.log
+/helprest-api/report.[0-9]_.[0-9]_.[0-9]_.[0-9]_.json
+
+# dotenv environment variable files
+/helprest-api/.env
+/helprest-api/.env.development.local
+/helprest-api/.env.test.local
+/helprest-api/.env.production.local
+/helprest-api/.env.local
+
+# caches
+/helprest-api/.eslintcache
+/helprest-api/.cache
+/helprest-api/*.tsbuildinfo
+
+# IntelliJ based IDEs
+/helprest-api/.idea
+
+# Finder (MacOS) folder config
+/helprest-api/.DS_Store
