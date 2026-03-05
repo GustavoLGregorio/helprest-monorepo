@@ -24,6 +24,7 @@ const ImageRounded: React.FC<ImageRoundedProps> = ({ imageSource, width, height,
 
 const styles = StyleSheet.create({
 	image: {
+		display: "flex",
 		borderRadius: 24,
 	},
 });

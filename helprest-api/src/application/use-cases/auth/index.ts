@@ -23,6 +23,7 @@ export class RegisterUser {
             name: input.name,
             email: input.email,
             passwordHash,
+            authProvider: "local",
             birthDate: new Date(input.birthDate),
             flags: flagIds,
             socialLinksEnabled: false,
@@ -41,6 +42,10 @@ export class LoginUser {
         const user = await this.userRepo.findByEmail(input.email);
         if (!user) {
             throw new UnauthorizedError("Invalid email or password");
+        }
+
+        if (!user.passwordHash) {
+            throw new UnauthorizedError("This account uses Google sign-in");
         }
 
         const isValid = await verifyPassword(user.passwordHash, input.password);

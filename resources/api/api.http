@@ -48,6 +48,14 @@ Content-Type: application/json
   "refreshToken": "PASTE_REFRESH_TOKEN_HERE"
 }
 
+### Google OAuth2 Login
+POST {{baseUrl}}/auth/google
+Content-Type: application/json
+
+{
+  "googleIdToken": "PASTE_GOOGLE_ID_TOKEN_HERE"
+}
+
 ### ═══════════════════════════════════════════════
 ###  USER
 ### ═══════════════════════════════════════════════

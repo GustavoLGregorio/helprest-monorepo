@@ -15,6 +15,7 @@ import { MongoVisitRepository } from "@infra/repositories/MongoVisitRepository";
 
 // Use Cases — Auth
 import { RegisterUser, LoginUser, RefreshToken } from "@application/use-cases/auth";
+import { GoogleAuthUser } from "@application/use-cases/auth/GoogleAuthUser";
 
 // Use Cases — User
 import { GetUserProfile, UpdateUserProfile, UpdateUserFlags } from "@application/use-cases/user";
@@ -36,7 +37,7 @@ import { ListFlags, CreateFlag } from "@application/use-cases/flag";
 import { CreateVisit, ListUserVisits, GetEstablishmentVisits } from "@application/use-cases/visit";
 
 // Validation schemas
-import { registerSchema, loginSchema, refreshTokenSchema } from "@interface/validation/auth.schema";
+import { registerSchema, loginSchema, refreshTokenSchema, googleAuthSchema } from "@interface/validation/auth.schema";
 import { updateProfileSchema, updateFlagsSchema } from "@interface/validation/user.schema";
 import {
     createEstablishmentSchema,
@@ -161,6 +162,13 @@ addRoute("POST", "/api/auth/refresh", async (req) => {
     const useCase = new RefreshToken(userRepo);
     const tokens = await useCase.execute(input.refreshToken);
     return json(tokens);
+});
+
+addRoute("POST", "/api/auth/google", async (req) => {
+    const input = await parseBody(req, googleAuthSchema);
+    const useCase = new GoogleAuthUser(userRepo);
+    const result = await useCase.execute(input);
+    return json(result);
 });
 
 // ═══════════════════════════════════════════════════════

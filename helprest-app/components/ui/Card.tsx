@@ -1,6 +1,7 @@
 import { useFonts } from "expo-font";
+import { useRouter } from "expo-router";
 import React from "react";
-import { ImageSourcePropType, StyleSheet, Text, View } from "react-native";
+import { ImageSourcePropType, Pressable, StyleSheet, Text, View } from "react-native";
 import FlagColoredText, { FlagColoredTextProps } from "./FlagColoredText";
 import IconCircle from "./IconCircle";
 import ImageRounded from "./ImageRounded";
@@ -60,7 +61,7 @@ type CardTextProps = {
 	align: "auto" | "center" | "justify" | "left" | "right";
 };
 
-// FATHER
+// CARD
 const Card: CardComposedComponent = ({ children, direction = "column", gap, width, maxWidth }) => {
 	let gapSize: number = 4;
 	let widthSize: number | "auto" = 150;
@@ -70,26 +71,29 @@ const Card: CardComposedComponent = ({ children, direction = "column", gap, widt
 
 	let maxWidthSize: number | "auto" = widthSize;
 	if (maxWidth) maxWidthSize = maxWidth;
+	const router = useRouter();
 
 	return (
-		<View
-			style={[
-				styles.card,
-				{
-					gap: gapSize,
-					rowGap: gapSize,
-					width: widthSize,
-					maxWidth: maxWidthSize,
-					flexDirection: direction,
-				},
-			]}
-		>
-			{children}
-		</View>
+		<Pressable onPress={() => router.push("../details/1")}>
+			<View
+				style={[
+					styles.card,
+					{
+						gap: gapSize,
+						rowGap: gapSize,
+						width: widthSize,
+						maxWidth: maxWidthSize,
+						flexDirection: direction,
+					},
+				]}
+			>
+				{children}
+			</View>
+		</Pressable>
 	);
 };
 
-// CHILDREN
+// CARD CHILDREN
 const CardHeader: ComposableComponent = ({ children, direction = "column" }) => {
 	return <View style={[styles.header, direction && { flexDirection: direction }]}>{children}</View>;
 };
@@ -104,7 +108,7 @@ const CardFooter: ComposableComponent = ({ children, direction = "column" }) => 
 	);
 };
 
-// GRANDCHILDREN
+// CARD CHILDREN CONTENTS
 const CardImage: React.FC<CardImageProps> = ({ source, width, height, alt }) => {
 	return <ImageRounded imageSource={source} width={width} height={height} alt={alt} />;
 };
@@ -130,10 +134,12 @@ const CardFlag: React.FC<FlagColoredTextProps> = ({ text, backgroundColor, textC
 const styles = StyleSheet.create({
 	card: {
 		display: "flex",
-		rowGap: 8,
-		backgroundColor: "#ececec",
-		boxSizing: "border-box",
-		padding: 4,
+		borderColor: "#ddd",
+		borderWidth: 1,
+		borderRadius: 12,
+		boxSizing: "content-box",
+		paddingHorizontal: 4,
+		paddingVertical: 6,
 	},
 	header: {
 		display: "flex",

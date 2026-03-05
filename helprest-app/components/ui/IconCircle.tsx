@@ -1,10 +1,21 @@
 import React from "react";
 import { Image, StyleSheet } from "react-native";
 import { ImageProps } from "../Types";
+import { ImageStyle } from "expo-image";
 
-const IconCircle: React.FC<ImageProps> = ({ imageSource, size, alt }) => {
+type IconCircleProps = ImageProps & {
+	style?: ImageStyle;
+};
+
+const IconCircle: React.FC<IconCircleProps> = ({ imageSource, size, alt, style }) => {
 	return (
-		<Image style={styles.image} source={imageSource} width={size} height={size} alt={alt}></Image>
+		<Image
+			style={[styles.image, style]}
+			source={imageSource}
+			width={size}
+			height={size}
+			alt={alt}
+		></Image>
 	);
 };
 

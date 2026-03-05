@@ -14,6 +14,11 @@ export class MongoUserRepository implements IUserRepository {
         return doc ? User.fromDocument(doc) : null;
     }
 
+    async findByGoogleId(googleId: string): Promise<User | null> {
+        const doc = await getUsersCollection().findOne({ googleId });
+        return doc ? User.fromDocument(doc) : null;
+    }
+
     async create(user: User): Promise<void> {
         await getUsersCollection().insertOne(user.toDocument());
     }
@@ -31,3 +36,4 @@ export class MongoUserRepository implements IUserRepository {
         await getUsersCollection().deleteOne({ _id: id });
     }
 }
+

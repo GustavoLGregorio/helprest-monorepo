@@ -4,12 +4,16 @@ import { SocialLinks } from "../value-objects/SocialLinks";
 import type { LocationProps } from "../value-objects/Location";
 import type { SocialLinksProps } from "../value-objects/SocialLinks";
 
+export type AuthProvider = "local" | "google";
+
 export interface UserProps {
     id?: ObjectId;
     name: string;
     email: string;
-    passwordHash: string;
-    birthDate: Date;
+    passwordHash?: string;
+    authProvider: AuthProvider;
+    googleId?: string;
+    birthDate?: Date;
     flags: ObjectId[];
     location?: Location;
     socialLinksEnabled: boolean;
@@ -23,8 +27,10 @@ export class User {
     readonly id: ObjectId;
     readonly name: string;
     readonly email: string;
-    readonly passwordHash: string;
-    readonly birthDate: Date;
+    readonly passwordHash?: string;
+    readonly authProvider: AuthProvider;
+    readonly googleId?: string;
+    readonly birthDate?: Date;
     readonly flags: ReadonlyArray<ObjectId>;
     readonly location?: Location;
     readonly socialLinksEnabled: boolean;
@@ -38,6 +44,8 @@ export class User {
         this.name = props.name;
         this.email = props.email;
         this.passwordHash = props.passwordHash;
+        this.authProvider = props.authProvider;
+        this.googleId = props.googleId;
         this.birthDate = props.birthDate;
         this.flags = Object.freeze([...props.flags]);
         this.location = props.location;
@@ -49,8 +57,16 @@ export class User {
     }
 
     static create(props: UserProps): User {
-        if (!props.name || !props.email || !props.passwordHash) {
-            throw new Error("User requires name, email, and passwordHash");
+        if (!props.name || !props.email) {
+            throw new Error("User requires name and email");
+        }
+
+        if (props.authProvider === "local" && !props.passwordHash) {
+            throw new Error("Local auth users require a passwordHash");
+        }
+
+        if (props.authProvider === "google" && !props.googleId) {
+            throw new Error("Google auth users require a googleId");
         }
 
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -69,8 +85,12 @@ export class User {
             id: doc._id as ObjectId,
             name: doc.name as string,
             email: doc.email as string,
-            passwordHash: doc.passwordHash as string,
-            birthDate: new Date(doc.birthDate as string | number | Date),
+            passwordHash: doc.passwordHash as string | undefined,
+            authProvider: (doc.authProvider as AuthProvider) ?? "local",
+            googleId: doc.googleId as string | undefined,
+            birthDate: doc.birthDate
+                ? new Date(doc.birthDate as string | number | Date)
+                : undefined,
             flags: (doc.flags as ObjectId[]) ?? [],
             location: locationDoc
                 ? Location.create(locationDoc as unknown as LocationProps)
@@ -91,6 +111,8 @@ export class User {
             name: this.name,
             email: this.email,
             passwordHash: this.passwordHash,
+            authProvider: this.authProvider,
+            googleId: this.googleId,
             birthDate: this.birthDate,
             flags: [...this.flags],
             location: this.location

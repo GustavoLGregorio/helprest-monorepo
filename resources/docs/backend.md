@@ -34,7 +34,7 @@ src/
 
 | Entity | File | Key Fields |
 |---|---|---|
-| `User` | `entities/User.ts` | name, email, passwordHash, birthDate, flags (ObjectId[]), location, socialLinks, profilePhoto |
+| `User` | `entities/User.ts` | name, email, passwordHash?, authProvider (local/google), googleId?, birthDate?, flags (ObjectId[]), location, socialLinks, profilePhoto |
 | `Establishment` | `entities/Establishment.ts` | companyName, location (GeoJSON), flags, logo, rating, ratingCount, isSponsored |
 | `Flag` | `entities/Flag.ts` | type, identifier, description, tag, backgroundColor, textColor |
 | `Visit` | `entities/Visit.ts` | establishmentId, userId, date, review, rating (1-5) |
@@ -73,7 +73,7 @@ Abstract contracts implemented by infrastructure layer:
 
 | Module | Use Cases |
 |---|---|
-| `auth/` | `RegisterUser`, `LoginUser`, `RefreshToken` |
+| `auth/` | `RegisterUser`, `LoginUser`, `RefreshToken`, `GoogleAuthUser` |
 | `user/` | `GetUserProfile`, `UpdateUserProfile`, `UpdateUserFlags` |
 | `establishment/` | `ListEstablishments`, `GetEstablishment`, `GetRecommendedEstablishments`, `GetNearbyEstablishments`, `SearchEstablishments`, `CreateEstablishment` |
 | `flag/` | `ListFlags`, `CreateFlag` |
@@ -159,6 +159,7 @@ Zod v4 schemas with type inference for each endpoint group:
 | `POST` | `/api/auth/register` | Register + return tokens |
 | `POST` | `/api/auth/login` | Login + return tokens |
 | `POST` | `/api/auth/refresh` | Rotate refresh token |
+| `POST` | `/api/auth/google` | Google OAuth2 login (verify ID token, find-or-create user) |
 
 ### Users (authenticated)
 | Method | Route | Description |
@@ -225,6 +226,7 @@ All defined in `.env` (gitignored) with `.env.example` for reference:
 | `JWT_ACCESS_EXPIRATION` | Access token TTL (default: 15m) |
 | `JWT_REFRESH_EXPIRATION` | Refresh token TTL (default: 7d) |
 | `CORS_ORIGINS` | Comma-separated allowed origins (default: *) |
+| `GOOGLE_OAUTH_CLIENT_ID` | Google OAuth2 client ID for ID token verification |
 
 ---
 
@@ -287,3 +289,5 @@ bun run dev               # Starts with --watch
 5. **Repositories as singletons** — Stateless, instantiated once in router
 6. **Use cases per-request** — Created fresh per handler call for isolation
 7. **Immutable entities** — Updates return new instances (`withNewRating()`)
+8. **Google OAuth server-side** — Uses `jose.createRemoteJWKSet` to verify Google ID tokens with Google’s public JWK set; no Google SDK required on backend
+9. **Multi-provider auth** — `User.authProvider` field allows `"local"` (email/password) and `"google"` to coexist. `passwordHash` is optional for Google users
