@@ -34,8 +34,9 @@
                 "ACCESS_COARSE_LOCATION",
                 "ACCESS_BACKGROUND_LOCATION",
                 "FOREGROUND_SERVICE",
-                "android.permission.ACCESS_COARSE_LOCATION",
-                "android.permission.ACCESS_FINE_LOCATION"
+                "FOREGROUND_SERVICE_LOCATION",
+                "VIBRATE",
+                "POST_NOTIFICATIONS"
             ]
         },
         "web": {
@@ -66,6 +67,23 @@
                 {
                     "webClientId": "81623569961-n7p4nljitfi9ua6hmtumhn93gs3s3074.apps.googleusercontent.com",
                     "iosUrlScheme": "com.googleusercontent.apps.81623569961-atvlv5qhp59f5egeesv163kcdm9b36i4"
+                }
+            ],
+            [
+                "expo-location",
+                {
+                    "locationAlwaysAndWhenInUsePermission": "O HelpRest precisa da sua localização para encontrar estabelecimentos próximos e registrar visitas.",
+                    "locationAlwaysPermission": "O HelpRest usa sua localização em segundo plano para detectar aproximação de estabelecimentos.",
+                    "locationWhenInUsePermission": "O HelpRest usa sua localização para mostrar estabelecimentos próximos no mapa.",
+                    "isAndroidBackgroundLocationEnabled": true,
+                    "isAndroidForegroundServiceEnabled": true
+                }
+            ],
+            [
+                "expo-notifications",
+                {
+                    "icon": "./assets/images/logo/logo_bare.png",
+                    "color": "#009C9D"
                 }
             ]
         ],
