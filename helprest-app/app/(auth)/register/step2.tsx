@@ -10,7 +10,7 @@ import {
     loadUserBirthDate,
 } from "@/utils/saveUserRegisterInfo";
 
-function parseStoredDate(stored: string | null): Date {
+function parseStoredDate(stored: string | null | undefined): Date {
     if (stored) {
         const parsed = new Date(stored);
         if (!isNaN(parsed.getTime())) return parsed;

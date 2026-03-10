@@ -1,4 +1,4 @@
-import mongoose, { VirtualTypeOptions } from "mongoose";
+// import mongoose, { VirtualTypeOptions } from "mongoose";
 
 /**
  * adicionar mais tarde mais opções para gerentes:
@@ -36,6 +36,7 @@ export type EstabelecimentoType = {
 	redirecionamento: RedirectType;
 };
 
+/*
 const EstabelecimentoSchema = new mongoose.Schema<EstabelecimentoType>({
 	empresa: {
 		type: String,
@@ -154,6 +155,7 @@ const EstabelecimentoSchema = new mongoose.Schema<EstabelecimentoType>({
 	],
 });
 
+/*
 EstabelecimentoSchema.pre("save", async function (next) {
 	if (
 		!this.isModified("localizacao.endereco") &&
@@ -192,3 +194,4 @@ EstabelecimentoSchema.pre("save", async function (next) {
 
 export const Estabelecimento =
 	mongoose.models.Estabelecimento || mongoose.model("Estabelecimento", EstabelecimentoSchema);
+*/

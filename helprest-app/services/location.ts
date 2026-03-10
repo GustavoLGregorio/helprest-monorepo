@@ -129,7 +129,7 @@ export function distanceBetween(a: LocationCoords, b: LocationCoords): number {
 // ─── Background Task Definition ─────────────────────────────────
 // This must be at module level (outside any component)
 
-TaskManager.defineTask(BACKGROUND_LOCATION_TASK, ({ data, error }) => {
+TaskManager.defineTask(BACKGROUND_LOCATION_TASK, async ({ data, error }) => {
     if (error) {
         console.error("Background location error:", error.message);
         return;
