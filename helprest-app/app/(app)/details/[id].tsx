@@ -23,42 +23,42 @@ const SocialScreen = () => {
 	const temp_places: TempPlacesType[] = [
 		{
 			id: 0,
-			empresa: "Sem Culpa - Sem Glúten",
+			empresa: "Verde Oliva Bistrô",
 			flags: ["gluten", "vegan"],
 			logo_empresa: require("@/assets/images/places/1.jpeg"),
 			fotos: [require("@/assets/images/places/10.jpeg")],
 		},
 		{
 			id: 1,
-			empresa: "Espaço Vegano",
+			empresa: "Raízes do Campo",
 			flags: ["gluten", "vegan"],
 			logo_empresa: require("@/assets/images/places/2.jpeg"),
 			fotos: [require("@/assets/images/places/10.jpeg")],
 		},
 		{
 			id: 2,
-			empresa: "Real Food Place",
+			empresa: "Alquimia dos Grãos",
 			flags: ["gluten", "vegan"],
 			logo_empresa: require("@/assets/images/places/3.jpeg"),
 			fotos: [require("@/assets/images/places/10.jpeg")],
 		},
 		{
 			id: 3,
-			empresa: "Comida Saudável",
+			empresa: "Pura Vida Lab",
 			flags: ["gluten", "vegan"],
 			logo_empresa: require("@/assets/images/places/4.jpeg"),
 			fotos: [require("@/assets/images/places/10.jpeg")],
 		},
 		{
 			id: 4,
-			empresa: "Definitavamente um Restaurante",
+			empresa: "Bistrô Sem Culpa",
 			flags: ["gluten", "vegan"],
 			logo_empresa: require("@/assets/images/places/5.jpeg"),
 			fotos: [require("@/assets/images/places/10.jpeg")],
 		},
 		{
 			id: 5,
-			empresa: "Mais um Restaurante",
+			empresa: "Equilíbrio Natural",
 			flags: ["gluten", "vegan"],
 			logo_empresa: require("@/assets/images/places/6.jpeg"),
 			fotos: [require("@/assets/images/places/10.jpeg")],
@@ -68,39 +68,39 @@ const SocialScreen = () => {
 	const temp_foods: TempFoodType[] = [
 		{
 			id: 0,
-			foodname: "Almoço vegano",
+			foodname: "Bowl de Quinoa Real",
 			image: require("@/assets/images/places/5.jpeg"),
-			price: 24.99,
+			price: 38.9,
 		},
 		{
 			id: 1,
-			foodname: "Salada de vegetais",
+			foodname: "Hambúrguer de Shiitake",
 			image: require("@/assets/images/places/6.jpeg"),
-			price: 34.99,
+			price: 42.5,
 		},
 		{
 			id: 2,
-			foodname: "Mais vegetais",
+			foodname: "Nhoque de Batata Doce",
 			image: require("@/assets/images/places/7.jpeg"),
-			price: 32.99,
+			price: 45.0,
 		},
 		{
 			id: 3,
-			foodname: "Saladinha",
+			foodname: "Salada Tropical Mix",
 			image: require("@/assets/images/places/8.jpeg"),
-			price: 45.99,
+			price: 34.9,
 		},
 		{
 			id: 4,
-			foodname: "Sla, mais salada",
+			foodname: "Risoto de Aspargos",
 			image: require("@/assets/images/places/9.jpeg"),
-			price: 99.99,
+			price: 52.0,
 		},
 		{
 			id: 5,
-			foodname: "Salada com carne de jaca",
+			foodname: "Taco Veggie Gourmet",
 			image: require("@/assets/images/places/13.jpeg"),
-			price: 12.35,
+			price: 29.9,
 		},
 	];
 
@@ -125,7 +125,7 @@ const SocialScreen = () => {
 				<View style={styles.cardContentContainer}>
 					<View style={styles.cardTop}>
 						<View>
-							<Text style={styles.cardTitle}>Sabor Natural</Text>
+							<Text style={styles.cardTitle}>Verde Oliva Bistrô</Text>
 						</View>
 						<View style={styles.cardTopTexts}>
 							<TextDistance distance={1850} />
@@ -178,7 +178,7 @@ const SocialScreen = () => {
 								<ImageRounded imageSource={food.image} width={112} height={112} alt={String(id)} />
 								<View style={styles.foodCardTextContainer}>
 									<Text style={[styles.foodName, styles.text]}>{food.foodname}</Text>
-									<Text style={[styles.foodPrice]}>R$ {food.price}</Text>
+									<Text style={[styles.foodPrice]}>R$ {food.price.toFixed(2).replace(".", ",")}</Text>
 								</View>
 							</View>
 						))}
@@ -192,7 +192,7 @@ const SocialScreen = () => {
 								<ImageRounded imageSource={food.image} width={112} height={112} alt={String(id)} />
 								<View style={styles.foodCardTextContainer}>
 									<Text style={[styles.foodName, styles.text]}>{food.foodname}</Text>
-									<Text style={[styles.foodPrice]}>R$ {food.price}</Text>
+									<Text style={[styles.foodPrice]}>R$ {food.price.toFixed(2).replace(".", ",")}</Text>
 								</View>
 							</View>
 						))}
