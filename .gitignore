@@ -85,3 +85,10 @@ helprest-api/.gitignore
 
 # Finder (MacOS) folder config
 /helprest-api/.DS_Store
+
+# -------------------------------------------------------------------------------------------------
+# AGENT SLOT (Infraestrutura de Engenharia)
+# -------------------------------------------------------------------------------------------------
+# Força inclusão do agent-slot no versionamento como infraestrutura do projeto.
+# Anti-Nesting Policy: o .git interno foi removido — o slot é parte do repositório host.
+!agent-helprest/
