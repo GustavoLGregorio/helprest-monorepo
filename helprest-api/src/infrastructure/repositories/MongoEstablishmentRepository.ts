@@ -13,6 +13,13 @@ export class MongoEstablishmentRepository implements IEstablishmentRepository {
         return doc ? Establishment.fromDocument(doc) : null;
     }
 
+    async findManyByIds(ids: ObjectId[]): Promise<Establishment[]> {
+        const docs = await getEstablishmentsCollection()
+            .find({ _id: { $in: ids } })
+            .toArray();
+        return docs.map((doc) => Establishment.fromDocument(doc));
+    }
+
     async findAll(limit: number, skip: number): Promise<Establishment[]> {
         const docs = await getEstablishmentsCollection()
             .find()

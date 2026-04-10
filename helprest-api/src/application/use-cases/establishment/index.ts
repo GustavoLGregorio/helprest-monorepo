@@ -2,6 +2,7 @@ import { ObjectId } from "mongodb";
 import type { IEstablishmentRepository } from "@domain/repositories/IEstablishmentRepository";
 import type { IFlagRepository } from "@domain/repositories/IFlagRepository";
 import type { IUserRepository } from "@domain/repositories/IUserRepository";
+import type { ProductRepository } from "@application/repositories/ProductRepository";
 import { Establishment } from "@domain/entities/Establishment";
 import { Location } from "@domain/value-objects/Location";
 import { RecommendationService } from "@domain/services/RecommendationService";
@@ -100,6 +101,7 @@ export class GetEstablishment {
     constructor(
         private readonly estRepo: IEstablishmentRepository,
         private readonly flagRepo: IFlagRepository,
+        private readonly productRepo: ProductRepository,
     ) { }
 
     async execute(id: string) {
@@ -109,8 +111,23 @@ export class GetEstablishment {
         }
 
         const flags = await populateFlags(est.flags, this.flagRepo);
+        const productsRaw = await this.productRepo.findByEstablishmentId(est.id);
+        const products = await Promise.all(productsRaw.map(async (p) => {
+            const pFlags = await populateFlags(p.flags, this.flagRepo);
+            return {
+                id: p.id.toHexString(),
+                flags: pFlags,
+                name: p.name,
+                description: p.description,
+                price: p.price,
+                imageUrl: p.imageUrl,
+                ingredients: [...p.ingredients]
+            };
+        }));
+
         return {
             ...toEstablishmentDTO(est, flags),
+            products,
             ratingCount: est.ratingCount,
         };
     }

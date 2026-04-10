@@ -12,6 +12,8 @@ import { MongoUserRepository } from "@infra/repositories/MongoUserRepository";
 import { MongoEstablishmentRepository } from "@infra/repositories/MongoEstablishmentRepository";
 import { MongoFlagRepository } from "@infra/repositories/MongoFlagRepository";
 import { MongoVisitRepository } from "@infra/repositories/MongoVisitRepository";
+import { MongoProductRepository } from "@infra/repositories/MongoProductRepository";
+import { MongoUserFavoriteRepository } from "@infra/repositories/MongoUserFavoriteRepository";
 
 // Use Cases — Auth
 import { RegisterUser, LoginUser, RefreshToken } from "@application/use-cases/auth";
@@ -36,6 +38,14 @@ import { ListFlags, CreateFlag } from "@application/use-cases/flag";
 // Use Cases — Visit
 import { CreateVisit, ListUserVisits, GetEstablishmentVisits } from "@application/use-cases/visit";
 
+// Use Cases — Product
+import { ListEstablishmentProducts } from "@application/use-cases/product";
+
+// Use Cases — Favorite
+import { AddFavorite } from "@application/use-cases/favorite/AddFavorite";
+import { RemoveFavorite } from "@application/use-cases/favorite/RemoveFavorite";
+import { GetUserFavorites } from "@application/use-cases/favorite/GetUserFavorites";
+
 // Validation schemas
 import { registerSchema, loginSchema, refreshTokenSchema, googleAuthSchema } from "@interface/validation/auth.schema";
 import { updateProfileSchema, updateFlagsSchema } from "@interface/validation/user.schema";
@@ -46,12 +56,15 @@ import {
     searchEstablishmentsSchema,
 } from "@interface/validation/establishment.schema";
 import { createVisitSchema, listVisitsSchema } from "@interface/validation/visit.schema";
+import { addFavoriteSchema } from "@interface/validation/favorite.schema";
 
 // ── Singleton repository instances ──
 const userRepo = new MongoUserRepository();
 const estRepo = new MongoEstablishmentRepository();
 const flagRepo = new MongoFlagRepository();
 const visitRepo = new MongoVisitRepository();
+const productRepo = new MongoProductRepository();
+const favoriteRepo = new MongoUserFavoriteRepository();
 
 // ── Helpers ──
 
@@ -236,10 +249,12 @@ addRoute("GET", "/api/establishments/search", async (req, url) => {
 
 addRoute("GET", "/api/establishments/:id", async (req, _url, params) => {
     await authenticateRequest(req);
-    const useCase = new GetEstablishment(estRepo, flagRepo);
+    const useCase = new GetEstablishment(estRepo, flagRepo, productRepo);
     const result = await useCase.execute(params.id!);
     return json(result);
 });
+
+
 
 addRoute("POST", "/api/establishments", async (req) => {
     await authenticateRequest(req);
@@ -294,6 +309,32 @@ addRoute("GET", "/api/visits/establishment/:id", async (req, url, params) => {
     const useCase = new GetEstablishmentVisits(visitRepo);
     const result = await useCase.execute(params.id!, input);
     return json(result);
+});
+
+// ═══════════════════════════════════════════════════════
+//  FAVORITES ROUTES (authenticated)
+// ═══════════════════════════════════════════════════════
+
+addRoute("GET", "/api/favorites", async (req) => {
+    const auth = await authenticateRequest(req);
+    const useCase = new GetUserFavorites(favoriteRepo, estRepo, productRepo, userRepo, flagRepo);
+    const result = await useCase.execute(auth.sub);
+    return json(result);
+});
+
+addRoute("POST", "/api/favorites", async (req) => {
+    const auth = await authenticateRequest(req);
+    const input = await parseBody(req, addFavoriteSchema);
+    const useCase = new AddFavorite(favoriteRepo);
+    await useCase.execute(auth.sub, input.referenceId, input.type as 'establishment' | 'product');
+    return json({ success: true }, 201);
+});
+
+addRoute("DELETE", "/api/favorites/:id", async (req, _url, params) => {
+    const auth = await authenticateRequest(req);
+    const useCase = new RemoveFavorite(favoriteRepo);
+    await useCase.execute(auth.sub, params.id!);
+    return json({ success: true });
 });
 
 // ═══════════════════════════════════════════════════════

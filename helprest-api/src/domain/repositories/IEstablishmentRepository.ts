@@ -19,6 +19,7 @@ export interface FindByFlagsOptions {
 export interface IEstablishmentRepository {
     findById(id: ObjectId): Promise<Establishment | null>;
     findAll(limit: number, skip: number): Promise<Establishment[]>;
+    findManyByIds(ids: ObjectId[]): Promise<Establishment[]>;
     findNearby(options: FindNearbyOptions): Promise<Establishment[]>;
     findByFlags(options: FindByFlagsOptions): Promise<Establishment[]>;
     findSponsored(limit: number): Promise<Establishment[]>;
