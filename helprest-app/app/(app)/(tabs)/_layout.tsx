@@ -11,12 +11,15 @@ export default function TabsLayout() {
             screenOptions={{
                 animation: "shift",
                 headerShown: false,
+                tabBarShowLabel: false,
                 tabBarActiveTintColor: Colors.light.tint,
                 freezeOnBlur: true,
+
                 tabBarStyle: {
                     elevation: 1,
-                    height: 76,
+                    height: 70,
                     paddingTop: 8,
+                    paddingBottom: 8,
                     boxShadow: "0 0px 16px 1px rgba(0, 0, 0, 0.2)",
                 },
             }}
@@ -47,6 +50,20 @@ export default function TabsLayout() {
                         <MaterialCommunityIcons
                             size={28}
                             name="map-marker"
+                            color={color}
+                        />
+                    ),
+                }}
+            />
+            <Tabs.Screen
+                name="(favorites)/index"
+                options={{
+                    title: "Favoritos",
+                    tabBarLabel: "Favoritos",
+                    tabBarIcon: ({ color }: { color: ColorValue }) => (
+                        <MaterialCommunityIcons
+                            size={28}
+                            name="heart"
                             color={color}
                         />
                     ),

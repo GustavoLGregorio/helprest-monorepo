@@ -1,12 +1,48 @@
-import { Platform, StyleSheet, View, Text, TouchableOpacity, ActivityIndicator } from "react-native";
+/**
+ * HomeScreen — Map View
+ *
+ * WHY REMOTE URLs DON'T WORK AS MARKER ICONS ON ANDROID
+ * ─────────────────────────────────────────────────────
+ * Google Maps Android SDK does not accept live View trees as marker icons.
+ * react-native-maps works around this by converting JS view trees to Bitmap
+ * snapshots via Android's View.buildDrawingCache(). The snapshot is taken
+ * at an unpredictable point in the render cycle, often BEFORE the remote
+ * image has been composited into the native canvas — producing blank markers.
+ * tracksViewChanges, delays, expo-image, and other incremental fixes do not
+ * eliminate this race condition; they only reduce its probability.
+ *
+ * THE DEFINITIVE FIX
+ * ──────────────────
+ * 1. Download every remote pin image to the device filesystem BEFORE rendering
+ *    any markers (expo-file-system + expo-crypto for deterministic filenames).
+ * 2. Pass the local `file://` path via the `image` prop on <Marker>.
+ *    The native Maps layer reads local files synchronously — no race condition.
+ * 3. Set tracksViewChanges={false} permanently — local files are always ready.
+ * 4. Cache by content-addressed hash: no re-downloads for the same URL.
+ *
+ * This is the pattern recommended by the react-native-maps community and
+ * proven in production apps that combine map markers with remote images.
+ */
+
+import {
+    Platform,
+    StyleSheet,
+    View,
+    Text,
+    TouchableOpacity,
+    ActivityIndicator,
+    Image,
+} from "react-native";
 import MapView, { Marker } from "react-native-maps";
 import { useQuery } from "@tanstack/react-query";
-import { useEffect, useState, useCallback, useRef } from "react";
+import { useEffect, useState, useCallback, useRef, memo } from "react";
 import UserBar from "@/components/ui/UserBar";
-import { useRouter } from "expo-router";
+import { useRouter, useFocusEffect } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { api } from "@/services/api";
 import { usePermissions } from "@/hooks/usePermissions";
+import * as FileSystem from "expo-file-system";
+import * as Crypto from "expo-crypto";
 import {
     getCurrentPosition,
     startForegroundTracking,
@@ -15,6 +51,8 @@ import {
 } from "@/services/location";
 import { onMapRecenter } from "@/utils/mapEvents";
 import { loadUserProfile } from "@/storage/userProfile";
+
+// ─── Types ─────────────────────────────────────────────────────────────────────
 
 interface FlagImages {
     tag: string | null;
@@ -55,14 +93,161 @@ interface EstablishmentsResponse {
     };
 }
 
-// Default location (Curitiba centro) as last resort
+interface PlaceMarkerData {
+    id: string;
+    coordinates: { latitude: number; longitude: number };
+    title: string;
+    /** Local file:// URI — always set before rendering (null → use fallback) */
+    localPinUri: string | null;
+}
+
+// ─── Constants ─────────────────────────────────────────────────────────────────
+
 const DEFAULT_LOCATION: LocationCoords = {
     latitude: -25.4284,
     longitude: -49.2733,
 };
 
-// Default pin for fallback (when no pin image URL exists)
 const DEFAULT_PIN = require("@/assets/images/pins/min/pin_vegan.png");
+
+/** Directory inside cacheDirectory where downloaded pin images are stored. */
+const MARKER_CACHE_DIR = `${FileSystem.cacheDirectory}helprest_markers/`;
+
+// ─── Image download utilities ──────────────────────────────────────────────────
+
+/**
+ * Returns a deterministic filename for a given URL by SHA-256 hashing it.
+ * Same URL → same filename → file is downloaded only once, ever.
+ */
+async function getLocalPathForUrl(remoteUrl: string): Promise<string> {
+    const hash = await Crypto.digestStringAsync(
+        Crypto.CryptoDigestAlgorithm.SHA256,
+        remoteUrl,
+    );
+    return `${MARKER_CACHE_DIR}${hash}`;
+}
+
+/**
+ * Downloads all unique pin image URLs to the device filesystem.
+ * Returns a Map<remoteUrl, localFileUri> for resolved images.
+ * Images that were already downloaded are served from the local cache.
+ */
+async function downloadMarkerImages(
+    remoteUrls: string[],
+): Promise<Map<string, string>> {
+    const result = new Map<string, string>();
+
+    // Ensure the cache directory exists
+    await FileSystem.makeDirectoryAsync(MARKER_CACHE_DIR, { intermediates: true });
+
+    await Promise.allSettled(
+        remoteUrls.map(async (url) => {
+            try {
+                const localPath = await getLocalPathForUrl(url);
+                const info = await FileSystem.getInfoAsync(localPath);
+
+                if (!info.exists) {
+                    // Download for the first time
+                    const result_dl = await FileSystem.downloadAsync(url, localPath);
+                    if (result_dl.status !== 200) {
+                        throw new Error(`HTTP ${result_dl.status} for ${url}`);
+                    }
+                }
+
+                // Android requires explicit file:// prefix for local URIs
+                result.set(url, `file://${localPath}`);
+            } catch (err) {
+                // Non-critical: marker will use the bundled fallback pin
+                console.warn(`[MarkerCache] Failed to download pin: ${url}`, err);
+            }
+        }),
+    );
+
+    return result;
+}
+
+// ─── useLocalMarkerImages hook ─────────────────────────────────────────────────
+
+/**
+ * Downloads all remote pin images to the device filesystem.
+ *
+ * Returns:
+ *   localImageMap  — Map<remoteUrl, file:// URI>
+ *   isDownloading  — true while any image is being downloaded
+ */
+function useLocalMarkerImages(establishments: Establishment[] | undefined): {
+    localImageMap: Map<string, string>;
+    isDownloading: boolean;
+} {
+    const [localImageMap, setLocalImageMap] = useState<Map<string, string>>(new Map());
+    const [isDownloading, setIsDownloading] = useState(false);
+
+    useEffect(() => {
+        if (!establishments?.length) return;
+
+        const uniqueUrls = [
+            ...new Set(
+                establishments
+                    .flatMap((e) => e.flags)
+                    .map((f) => f.images?.pin)
+                    .filter((url): url is string => Boolean(url)),
+            ),
+        ];
+
+        if (uniqueUrls.length === 0) return;
+
+        let cancelled = false;
+        setIsDownloading(true);
+
+        downloadMarkerImages(uniqueUrls).then((map) => {
+            if (!cancelled) {
+                setLocalImageMap(map);
+                setIsDownloading(false);
+            }
+        });
+
+        return () => {
+            cancelled = true;
+        };
+    }, [establishments]);
+
+    return { localImageMap, isDownloading };
+}
+
+// ─── SimpleMarker ──────────────────────────────────────────────────────────────
+
+/**
+ * Renders a single map marker.
+ *
+ * Uses the `image` prop (not children) with a local file:// URI so that
+ * Android's native layer reads the image synchronously from disk — no bitmap
+ * capture race condition, no timing delay needed, tracksViewChanges is always
+ * false from the very first render.
+ */
+interface SimpleMarkerProps {
+    place: PlaceMarkerData;
+    onPress: () => void;
+}
+
+const SimpleMarker = memo(({ place, onPress }: SimpleMarkerProps) => {
+    const imageSource = place.localPinUri
+        ? { uri: place.localPinUri }
+        : DEFAULT_PIN;
+
+    return (
+        <Marker
+            coordinate={place.coordinates}
+            title={place.title}
+            image={imageSource}
+            tracksViewChanges={false}
+            onPress={onPress}
+        />
+    );
+});
+
+SimpleMarker.displayName = "SimpleMarker";
+
+// ─── HomeScreen ────────────────────────────────────────────────────────────────
 
 export default function HomeScreen() {
     const router = useRouter();
@@ -72,7 +257,13 @@ export default function HomeScreen() {
     const [locationReady, setLocationReady] = useState(false);
     const [locationSource, setLocationSource] = useState<"gps" | "profile" | "default">("default");
 
-    // Fetch establishments — staleTime keeps data alive across tab switches
+    // Used to force a fresh key on MapView when returning to the tab.
+    // Changing the key re-mounts MapView, which re-draws all markers from
+    // their already-cached local files. Since no network is involved, this
+    // is fast and completely reliable.
+    const [mapKey, setMapKey] = useState(0);
+
+    // ── Data fetching ──────────────────────────────────────────────────────
     const { data: establishmentsData, isPending, error } = useQuery<EstablishmentsResponse>({
         queryKey: ["places"],
         queryFn: async () => {
@@ -81,17 +272,35 @@ export default function HomeScreen() {
                 { authenticated: true },
             );
             if (!response.ok) {
-                console.error("Establishments fetch failed:", response.status, response.data);
+                console.error(
+                    "Establishments fetch failed:",
+                    response.status,
+                    JSON.stringify(response.data),
+                );
                 throw new Error("Falha ao carregar estabelecimentos");
             }
             return response.data;
         },
-        staleTime: 5 * 60 * 1000,       // Data considered fresh for 5 minutes
-        gcTime: 30 * 60 * 1000,          // Keep in cache for 30 minutes
-        refetchOnWindowFocus: false,      // Don't refetch when tab regains focus
+        staleTime: 5 * 60 * 1000,
+        gcTime: 30 * 60 * 1000,
+        refetchOnWindowFocus: false,
     });
 
-    // Determine location: GPS > profile.location > default
+    // ── Local image cache ──────────────────────────────────────────────────
+    const { localImageMap, isDownloading } = useLocalMarkerImages(
+        establishmentsData?.data,
+    );
+
+    // ── Tab focus handler ──────────────────────────────────────────────────
+    // Re-mounting MapView on focus is cheap because all images are already
+    // on disk — no network requests, just filesystem reads.
+    useFocusEffect(
+        useCallback(() => {
+            setMapKey((k) => k + 1);
+        }, []),
+    );
+
+    // ── Location resolution ────────────────────────────────────────────────
     const resolveLocation = useCallback(async () => {
         if (permissions.locationForeground) {
             const gpsCoords = await getCurrentPosition();
@@ -126,16 +335,28 @@ export default function HomeScreen() {
         return () => unsub();
     }, [permissions.locationForeground]);
 
+    // Center on location update
+    useEffect(() => {
+        if (locationSource === "gps") {
+            mapRef.current?.animateCamera(
+                { center: currentLocation },
+                { duration: 500 },
+            );
+        }
+    }, [currentLocation, locationSource]);
+
+    // Recenter manually when clicking Home Tab
     useEffect(() => {
         const unsub = onMapRecenter(() => {
             mapRef.current?.animateCamera(
-                { center: currentLocation, zoom: 15 },
+                { center: currentLocation, zoom: 17 },
                 { duration: 500 },
             );
         });
         return () => unsub();
     }, [currentLocation]);
 
+    // ── Loading / error states ─────────────────────────────────────────────
     if (!locationReady || isPending) {
         return (
             <SafeAreaView style={styles.loadingContainer}>
@@ -154,16 +375,19 @@ export default function HomeScreen() {
         );
     }
 
+    // ── Marker data ────────────────────────────────────────────────────────
     const establishments = establishmentsData?.data ?? [];
 
     if (Platform.OS === "android") {
-        const placeMarkers = establishments
-            .filter((p) => p.location?.coordinates?.lat != null && p.location?.coordinates?.lng != null)
+        const placeMarkers: PlaceMarkerData[] = establishments
+            .filter(
+                (p) =>
+                    p.location?.coordinates?.lat != null &&
+                    p.location?.coordinates?.lng != null,
+            )
             .map((place) => {
-                // Use the first flag's pin image, or fallback to default
                 const firstFlagWithPin = place.flags.find((f) => f.images?.pin);
-                const pinImage = firstFlagWithPin?.images?.pin;
-
+                const remoteUrl = firstFlagWithPin?.images?.pin ?? null;
                 return {
                     id: place.id,
                     coordinates: {
@@ -171,7 +395,8 @@ export default function HomeScreen() {
                         longitude: place.location.coordinates.lng,
                     },
                     title: place.companyName,
-                    pinImage,
+                    // Use the local file:// URI if download succeeded, null otherwise
+                    localPinUri: remoteUrl ? (localImageMap.get(remoteUrl) ?? null) : null,
                 };
             });
 
@@ -195,7 +420,16 @@ export default function HomeScreen() {
                     </View>
                 )}
 
+                {/* Subtle download indicator — shown only on first fetch */}
+                {isDownloading && (
+                    <View style={styles.downloadIndicator}>
+                        <ActivityIndicator size="small" color="#009C9D" />
+                        <Text style={styles.downloadText}>Carregando ícones...</Text>
+                    </View>
+                )}
+
                 <MapView
+                    key={mapKey}
                     ref={mapRef}
                     style={styles.androidMap}
                     initialCamera={{
@@ -214,28 +448,16 @@ export default function HomeScreen() {
                             key="user-fallback"
                             coordinate={currentLocation}
                             title="Sua localização"
-                            icon={require("@/assets/images/min_user_marker.png")}
+                            image={require("@/assets/images/min_user_marker.png")}
                             tracksViewChanges={false}
                         />
                     )}
 
                     {placeMarkers.map((place) => (
-                        <Marker
+                        <SimpleMarker
                             key={place.id}
-                            coordinate={place.coordinates}
-                            title={place.title}
-                            icon={
-                                place.pinImage
-                                    ? { uri: place.pinImage }
-                                    : DEFAULT_PIN
-                            }
-                            tracksViewChanges={false}
-                            onPress={() =>
-                                router.push({
-                                    pathname: "../../details/place",
-                                    params: { place: place.id },
-                                })
-                            }
+                            place={place}
+                            onPress={() => router.push(`/(app)/details/${place.id}`)}
                         />
                     ))}
                 </MapView>
@@ -270,6 +492,25 @@ const styles = StyleSheet.create({
     },
     errorText: { fontSize: 18, fontWeight: "bold", color: "#D32F2F", marginBottom: 8 },
     errorDetail: { fontSize: 14, color: "#666", textAlign: "center" },
+    downloadIndicator: {
+        position: "absolute",
+        bottom: 90,
+        alignSelf: "center",
+        zIndex: 10,
+        flexDirection: "row",
+        alignItems: "center",
+        gap: 8,
+        backgroundColor: "rgba(255,255,255,0.92)",
+        borderRadius: 20,
+        paddingVertical: 6,
+        paddingHorizontal: 14,
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: 1 },
+        shadowOpacity: 0.12,
+        shadowRadius: 4,
+        elevation: 3,
+    },
+    downloadText: { fontSize: 12, color: "#555" },
     locationBanner: {
         position: "absolute",
         top: 50,

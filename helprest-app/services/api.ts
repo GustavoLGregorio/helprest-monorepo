@@ -61,9 +61,11 @@ async function request<T = unknown>(
 
     if (authenticated) {
         const tokens = loadTokens();
-        if (tokens?.accessToken) {
-            headers["Authorization"] = `Bearer ${tokens.accessToken}`;
+        if (!tokens?.accessToken) {
+            // No token available — fail fast instead of sending an unauthenticated request
+            throw new Error("No access token available. User must be logged in.");
         }
+        headers["Authorization"] = `Bearer ${tokens.accessToken}`;
     }
 
     let response = await fetch(`${API_URL}${path}`, {

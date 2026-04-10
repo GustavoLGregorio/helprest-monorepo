@@ -7,6 +7,8 @@ import {
     TouchableOpacity,
     ScrollView,
     Pressable,
+    Animated,
+    PanResponder,
 } from "react-native";
 import { Image } from "expo-image";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
@@ -38,6 +40,44 @@ const ProfileSheet: React.FC = () => {
     const queryClient = useQueryClient();
     const [visible, setVisible] = useState(false);
     const [profile, setProfile] = useState<CachedUserProfile | null>(() => loadUserProfile());
+
+    const panY = React.useRef(new Animated.Value(1000)).current;
+
+    useEffect(() => {
+        if (visible) {
+            panY.setValue(1000);
+            Animated.spring(panY, {
+                toValue: 0,
+                friction: 8,
+                tension: 60,
+                useNativeDriver: true,
+            }).start();
+        }
+    }, [visible]);
+
+    const panResponder = React.useRef(
+        PanResponder.create({
+            onStartShouldSetPanResponder: () => true,
+            onMoveShouldSetPanResponder: (_, gs) => gs.dy > 5,
+            onPanResponderMove: (_, gs) => {
+                if (gs.dy > 0) {
+                    panY.setValue(gs.dy);
+                }
+            },
+            onPanResponderRelease: (_, gs) => {
+                if (gs.dy > 120 || gs.vy > 1.2) {
+                    setVisible(false);
+                    setTimeout(() => panY.setValue(0), 300);
+                } else {
+                    Animated.spring(panY, {
+                        toValue: 0,
+                        useNativeDriver: true,
+                        bounciness: 4,
+                    }).start();
+                }
+            },
+        })
+    ).current;
 
     // Re-load cached profile when modal opens (catches updates)
     useEffect(() => {
@@ -98,15 +138,17 @@ const ProfileSheet: React.FC = () => {
             {/* Bottom sheet modal */}
             <Modal
                 visible={visible}
-                animationType="slide"
+                animationType="fade"
                 transparent
                 statusBarTranslucent
                 onRequestClose={() => setVisible(false)}
             >
                 <Pressable style={styles.overlay} onPress={() => setVisible(false)}>
-                    <Pressable style={styles.sheet} onPress={() => { }}>
-                        {/* Drag indicator */}
-                        <View style={styles.dragIndicator} />
+                    <Animated.View style={[styles.sheet, { transform: [{ translateY: panY }] }]}>
+                        {/* Drag zone */}
+                        <View {...panResponder.panHandlers} style={styles.dragZone}>
+                            <View style={styles.dragIndicator} />
+                        </View>
 
                         {/* Profile header */}
                         <View style={styles.profileHeader}>
@@ -185,7 +227,7 @@ const ProfileSheet: React.FC = () => {
                                 />
                             </View>
                         </ScrollView>
-                    </Pressable>
+                    </Animated.View>
                 </Pressable>
             </Modal>
         </>
@@ -249,14 +291,18 @@ const styles = StyleSheet.create({
         paddingBottom: 32,
         maxHeight: "75%",
     },
+    dragZone: {
+        width: "100%",
+        paddingTop: 12,
+        paddingBottom: 16,
+        backgroundColor: "transparent",
+    },
     dragIndicator: {
         width: 40,
-        height: 4,
-        borderRadius: 2,
-        backgroundColor: "#DDD",
+        height: 6,
+        borderRadius: 3,
+        backgroundColor: "#E0E0E0",
         alignSelf: "center",
-        marginTop: 12,
-        marginBottom: 16,
     },
 
     // Profile header

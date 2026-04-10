@@ -1,5 +1,4 @@
 import { useFonts } from "expo-font";
-import { useRouter } from "expo-router";
 import React from "react";
 import { ImageSourcePropType, Pressable, StyleSheet, Text, View } from "react-native";
 import FlagColoredText, { FlagColoredTextProps } from "./FlagColoredText";
@@ -16,6 +15,8 @@ type CardProps = {
 	gap?: number;
 	width?: number | "auto";
 	maxWidth?: number | "auto";
+	/** Navigation callback. If not provided, the card is not pressable. */
+	onPress?: () => void;
 };
 type CardComposedComponent = React.FC<CardProps> & {
 	Header: any;
@@ -62,7 +63,7 @@ type CardTextProps = {
 };
 
 // CARD
-const Card: CardComposedComponent = ({ children, direction = "column", gap, width, maxWidth }) => {
+const Card: CardComposedComponent = ({ children, direction = "column", gap, width, maxWidth, onPress }) => {
 	let gapSize: number = 4;
 	let widthSize: number | "auto" = 150;
 
@@ -71,10 +72,9 @@ const Card: CardComposedComponent = ({ children, direction = "column", gap, widt
 
 	let maxWidthSize: number | "auto" = widthSize;
 	if (maxWidth) maxWidthSize = maxWidth;
-	const router = useRouter();
 
 	return (
-		<Pressable onPress={() => router.push("../details/1")}>
+		<Pressable onPress={onPress} style={{ opacity: onPress ? 1 : 1 }}>
 			<View
 				style={[
 					styles.card,

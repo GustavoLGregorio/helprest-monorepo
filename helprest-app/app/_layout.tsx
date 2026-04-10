@@ -82,7 +82,25 @@ export default function RootLayout() {
             // All good
             setAuthState("authenticated");
         } catch {
-            // Network error — try cached profile
+            // Network error — try to refresh token before falling back to cache
+            const tokens = loadTokens();
+            if (tokens?.refreshToken) {
+                try {
+                    const refreshResponse = await api.post<{ accessToken: string; refreshToken: string }>(
+                        "/api/auth/refresh",
+                        { body: { refreshToken: tokens.refreshToken } },
+                    );
+                    if (refreshResponse.ok) {
+                        // Refresh succeeded — re-run full validation
+                        validateSession();
+                        return;
+                    }
+                } catch {
+                    // Refresh also failed — tokens are dead
+                }
+            }
+
+            // Tokens dead or no network + no refresh — fall back to cache
             const cached = loadUserProfile();
             if (cached) {
                 setAuthState("authenticated");
@@ -106,6 +124,7 @@ export default function RootLayout() {
             <Stack screenOptions={{ headerShown: false }}>
                 <Stack.Screen name="(app)/(tabs)" />
                 <Stack.Screen name="(auth)" />
+                <Stack.Screen name="(app)/product/[id]" options={{ presentation: "modal" }} />
             </Stack>
         </QueryClientProvider>
     );
