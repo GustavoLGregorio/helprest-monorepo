@@ -19,6 +19,8 @@ import ProductBottomSheet from "@/components/ui/ProductBottomSheet";
 
 const PLACEHOLDER_LOGO = require("@/assets/images/icon.png");
 const PLACEHOLDER_BANNER = require("@/assets/images/places/3.jpeg");
+// Fraction of the banner height (screen_width / 2) that the card overlaps
+const BANNER_OVERLAP_RATIO = 0.35;
 
 interface FlagDTO {
     id: string;
@@ -237,8 +239,10 @@ const PlaceDetailsScreen = () => {
         >
             <Image source={bannerSource} style={styles.banner} />
             
-            {/* Card overlaps bottom of banner via negative marginTop */}
-            <View style={[styles.cardWrapper, { marginTop: -(screenWidth / 2) * 0.35 }]}>
+            {/* Card overlaps bottom of banner via negative marginTop.
+                The banner uses aspectRatio 16:8 (= width/2), so 35% of half
+                the screen width gives a proportional overlap on any device. */}
+            <View style={[styles.cardWrapper, { marginTop: -(screenWidth / 2) * BANNER_OVERLAP_RATIO }]}>
                 <View style={styles.card}>
                     <View style={styles.cardIconSpacer}>
                         <IconCircle
