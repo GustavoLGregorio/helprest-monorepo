@@ -231,8 +231,8 @@ export default function PlacesScreen() {
 
     // ── Render ─────────────────────────────────────────────────────────────
     return (
-        <SafeAreaView style={{ height: "100%", paddingBottom: 0, marginBottom: 0 }}>
-            <View style={{ height: "105%" }}>
+        <SafeAreaView style={{ flex: 1, paddingBottom: 0, marginBottom: 0 }}>
+            <View style={{ flex: 1 }}>
                 <ScrollView
                     style={styles.container}
                     horizontal={false}
@@ -429,7 +429,7 @@ export default function PlacesScreen() {
 }
 
 const styles = StyleSheet.create({
-    container: { height: "100%" },
+    container: { flex: 1 },
     sectionContainer: {
         marginTop: 18,
         marginHorizontal: 12,

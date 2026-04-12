@@ -46,14 +46,13 @@ export default function Step1() {
 
 const styles = StyleSheet.create({
     container: {
-        paddingHorizontal: "30%",
+        paddingHorizontal: "5%",
         backgroundColor: "#FFF",
-        height: "100%",
+        flex: 1,
         paddingVertical: 24,
     },
     header: {
         marginTop: 24,
-        // marginBottom: 100,
     },
     headerText: {
         fontSize: 20,
@@ -62,18 +61,11 @@ const styles = StyleSheet.create({
         marginBottom: 4,
     },
     contentContainer: {
-        width: "100%",
-        display: "flex",
-        position: "absolute",
-        alignSelf: "center",
-        top: 280,
+        flex: 1,
+        justifyContent: "center",
     },
     buttonContainer: {
-        display: "flex",
-        position: "absolute",
-        bottom: 54,
-        width: "100%",
-        alignSelf: "center",
+        paddingBottom: 16,
     },
     infoText: {
         fontSize: 16,

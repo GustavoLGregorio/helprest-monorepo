@@ -88,7 +88,7 @@ const styles = StyleSheet.create({
     },
     imageContainer: {
         width: "100%",
-        height: 250,
+        aspectRatio: "16/9",
         position: "relative",
     },
     coverImage: {

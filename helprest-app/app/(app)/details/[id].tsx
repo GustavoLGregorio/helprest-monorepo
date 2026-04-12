@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, ActivityIndicator, ScrollView, Pressable, Modal } from "react-native";
+import { StyleSheet, Text, View, ActivityIndicator, ScrollView, Pressable, Modal, useWindowDimensions } from "react-native";
 import React, { useEffect, useState, useCallback, useMemo } from "react";
 import { BlurView } from "expo-blur";
 import { Image } from "expo-image";
@@ -77,6 +77,7 @@ const PlaceDetailsScreen = () => {
     // Tratamos tanto "id" quanto "place" para retrocompatibilidade do router push anterior
     const { id, place } = useLocalSearchParams<{ id?: string; place?: string }>();
     const actualId = id || place;
+    const { width: screenWidth } = useWindowDimensions();
 
     const [userCoords, setUserCoords] = useState<{ lat: number; lng: number } | null>(null);
     const [activeTab, setActiveTab] = useState<"forYou" | "others">("forYou");
@@ -236,57 +237,60 @@ const PlaceDetailsScreen = () => {
         >
             <Image source={bannerSource} style={styles.banner} />
             
-            <View style={styles.card}>
-                <View style={{ height: "22.5%" }}>
-                    <IconCircle
-                        style={styles.cardImage}
-                        imageSource={logoSource}
-                        size={76}
-                    />
-                </View>
-                <View style={styles.cardContentContainer}>
-                    <View style={styles.cardTop}>
-                        <View>
-                            <Text style={styles.cardTitle}>{est.companyName || "—"}</Text>
-                        </View>
-                        <View style={styles.cardTopTexts}>
-                            <Text style={styles.text}>{distLabel}</Text>
-                            {est.flags.length > 0 && <MiddleDot color={Colors.light.gray} size={5} />}
-                            {est.flags.slice(0, 3).map((flag) => (
-                                <FlagColoredText
-                                    key={flag.id}
-                                    text={flag.tag.substring(0, 12)}
-                                    textColor={flag.textColor || "white"}
-                                    backgroundColor={flag.backgroundColor || Colors.light.tint}
-                                />
-                            ))}
-                            <View style={{ display: "flex", flexGrow: 1, alignItems: "flex-end" }}>
-                                <HeartClicable
-                                    size={28}
-                                    startActivated={isFavorite(actualId as string, "establishment")}
-                                    activateAction={() => toggleFavorite(actualId as string, "establishment")}
-                                    deactivateAction={() => toggleFavorite(actualId as string, "establishment")}
-                                />
+            {/* Card overlaps bottom of banner via negative marginTop */}
+            <View style={[styles.cardWrapper, { marginTop: -(screenWidth / 2) * 0.35 }]}>
+                <View style={styles.card}>
+                    <View style={styles.cardIconSpacer}>
+                        <IconCircle
+                            style={styles.cardImage}
+                            imageSource={logoSource}
+                            size={76}
+                        />
+                    </View>
+                    <View style={styles.cardContentContainer}>
+                        <View style={styles.cardTop}>
+                            <View>
+                                <Text style={styles.cardTitle}>{est.companyName || "—"}</Text>
+                            </View>
+                            <View style={styles.cardTopTexts}>
+                                <Text style={styles.text}>{distLabel}</Text>
+                                {est.flags.length > 0 && <MiddleDot color={Colors.light.gray} size={5} />}
+                                {est.flags.slice(0, 3).map((flag) => (
+                                    <FlagColoredText
+                                        key={flag.id}
+                                        text={flag.tag.substring(0, 12)}
+                                        textColor={flag.textColor || "white"}
+                                        backgroundColor={flag.backgroundColor || Colors.light.tint}
+                                    />
+                                ))}
+                                <View style={{ display: "flex", flexGrow: 1, alignItems: "flex-end" }}>
+                                    <HeartClicable
+                                        size={28}
+                                        startActivated={isFavorite(actualId as string, "establishment")}
+                                        activateAction={() => toggleFavorite(actualId as string, "establishment")}
+                                        deactivateAction={() => toggleFavorite(actualId as string, "establishment")}
+                                    />
+                                </View>
                             </View>
                         </View>
-                    </View>
-                    
-                    <View style={styles.cardMiddle}>
-                        <StarReview
-                            ratingValue={est.rating * 20} // Converte rating de 0-5 para porcentagem (se o StarReview assumir percentual, senão apenas passe est.rating)
-                            backgroundColor="none"
-                            textColor={Colors.light.gold}
-                        />
-                        <Text style={styles.text}> {ratingLabel} ({est.ratingCount} Avaliações)</Text>
-                    </View>
-                    
-                    <View style={styles.cardBottom}>
-                        <Text style={styles.text}>Retirada</Text>
-                        <MiddleDot size={6} color={Colors.light.text} />
-                        <Text style={styles.text}>Entrega</Text>
-                        <Text style={styles.text}>{"❯"}</Text>
-                        <Text style={styles.text}>40-50 min</Text>
-                        <Text style={[styles.text, { color: Colors.light.tint }]}>Grátis</Text>
+                        
+                        <View style={styles.cardMiddle}>
+                            <StarReview
+                                ratingValue={est.rating * 20} // Converte rating de 0-5 para porcentagem (se o StarReview assumir percentual, senão apenas passe est.rating)
+                                backgroundColor="none"
+                                textColor={Colors.light.gold}
+                            />
+                            <Text style={styles.text}> {ratingLabel} ({est.ratingCount} Avaliações)</Text>
+                        </View>
+                        
+                        <View style={styles.cardBottom}>
+                            <Text style={styles.text}>Retirada</Text>
+                            <MiddleDot size={6} color={Colors.light.text} />
+                            <Text style={styles.text}>Entrega</Text>
+                            <Text style={styles.text}>{"❯"}</Text>
+                            <Text style={styles.text}>40-50 min</Text>
+                            <Text style={[styles.text, { color: Colors.light.tint }]}>Grátis</Text>
+                        </View>
                     </View>
                 </View>
             </View>
@@ -368,22 +372,21 @@ const styles = StyleSheet.create({
         objectFit: "cover",
     },
     card: {
-        display: "flex",
-        position: "absolute",
         width: "90%",
-        height: 240,
         backgroundColor: "white",
-        left: "50%",
-        transform: [{ translateX: "-50%" }],
-        top: 130,
         borderColor: Colors.light.gray,
         borderWidth: 1,
         borderRadius: 32,
     },
-    cardTitle: {
-        fontSize: 24,
-        fontWeight: "bold",
-        color: Colors.light.text,
+    cardWrapper: {
+        alignItems: "center",
+        paddingHorizontal: "5%",
+        paddingTop: 38,
+        zIndex: 1,
+    },
+    cardIconSpacer: {
+        height: 44,
+        position: "relative",
     },
     cardImage: {
         position: "absolute",
@@ -395,8 +398,13 @@ const styles = StyleSheet.create({
         borderWidth: 2,
     },
     cardContentContainer: {
-        height: "77.5%",
         paddingHorizontal: "7.5%",
+        paddingBottom: 12,
+    },
+    cardTitle: {
+        fontSize: 24,
+        fontWeight: "bold",
+        color: Colors.light.text,
     },
     cardTop: {
         display: "flex",
@@ -432,7 +440,7 @@ const styles = StyleSheet.create({
         fontWeight: "500",
     },
     menuEmptyState: {
-        marginTop: "45%",
+        marginTop: 40,
         marginHorizontal: "5%",
         padding: 32,
         borderWidth: 1,
@@ -454,7 +462,7 @@ const styles = StyleSheet.create({
         lineHeight: 20,
     },
     menuContainer: {
-        marginTop: 180,
+        marginTop: 16,
         paddingHorizontal: 20,
         paddingBottom: 24,
     },

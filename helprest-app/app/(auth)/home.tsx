@@ -119,15 +119,15 @@ export default function LoginScreen() {
 const styles = StyleSheet.create({
 	container: {
 		backgroundColor: Colors.light.tint,
-		width: "100%",
-		height: "100%",
-		paddingHorizontal: "30%",
+		flex: 1,
+		paddingHorizontal: "5%",
 	},
 	header: {
 		display: "flex",
+		flex: 1,
 		justifyContent: "center",
 		alignItems: "center",
-		marginTop: 140,
+		gap: 16,
 	},
 	logo: {
 		width: 124,
@@ -141,13 +141,13 @@ const styles = StyleSheet.create({
 	registerContainer: {
 		display: "flex",
 		gap: 12,
-		marginTop: 140,
+		marginBottom: 24,
 	},
 	loginContainer: {
 		display: "flex",
 		alignItems: "center",
 		gap: 8,
-		marginTop: 60,
+		marginBottom: 32,
 	},
 	text: {
 		fontSize: 22,
