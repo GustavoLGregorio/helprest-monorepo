@@ -52,12 +52,12 @@ describe("RecommendationService Unit Tests", () => {
 
         expect(results.length).toBe(3);
         // Est A should be first because it is sponsored and has perfect rating/distance
-        expect(results[0].establishment.companyName).toBe("Est A");
-        expect(results[0].score).toBeGreaterThan(results[1].score);
+        expect(results[0]!.establishment.companyName).toBe("Est A");
+        expect(results[0]!.score).toBeGreaterThan(results[1]!.score);
         // Est B should be second
-        expect(results[1].establishment.companyName).toBe("Est B");
+        expect(results[1]!.establishment.companyName).toBe("Est B");
         // Est C should be last
-        expect(results[2].establishment.companyName).toBe("Est C");
+        expect(results[2]!.establishment.companyName).toBe("Est C");
     });
 
     it("should set score to 0 and ignore sponsored bonus if establishment matches 0 flags when user has flags", () => {
@@ -75,11 +75,11 @@ describe("RecommendationService Unit Tests", () => {
 
         expect(results.length).toBe(2);
         // Est B should be first (matches 1 flag)
-        expect(results[0].establishment.companyName).toBe("Est B");
-        expect(results[0].score).toBeGreaterThan(0);
+        expect(results[0]!.establishment.companyName).toBe("Est B");
+        expect(results[0]!.score).toBeGreaterThan(0);
         // Est A should be second, score should be exactly 0 (no sponsor bonus applied)
-        expect(results[1].establishment.companyName).toBe("Est A");
-        expect(results[1].score).toBe(0);
+        expect(results[1]!.establishment.companyName).toBe("Est A");
+        expect(results[1]!.score).toBe(0);
     });
 
     it("should guarantee that higher flag match ratio dominates lower flag match ratio", () => {
@@ -97,7 +97,7 @@ describe("RecommendationService Unit Tests", () => {
 
         expect(results.length).toBe(2);
         // Est B (2/2 flags) MUST be first despite poor rating, distance, and non-sponsored status
-        expect(results[0].establishment.companyName).toBe("Est B");
-        expect(results[1].establishment.companyName).toBe("Est A");
+        expect(results[0]!.establishment.companyName).toBe("Est B");
+        expect(results[1]!.establishment.companyName).toBe("Est A");
     });
 });
