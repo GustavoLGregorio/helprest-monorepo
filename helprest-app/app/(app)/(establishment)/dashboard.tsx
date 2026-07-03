@@ -1,4 +1,4 @@
-import { StyleSheet, View, Text, ScrollView, Image, TouchableOpacity, ActivityIndicator, RefreshControl } from "react-native";
+import { StyleSheet, View, Text, ScrollView, Image, TouchableOpacity, ActivityIndicator, RefreshControl, Alert } from "react-native";
 import React, { useState, useEffect, useCallback } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
@@ -73,6 +73,28 @@ export default function EstablishmentDashboard() {
                 }
             } else {
                 console.error("Failed to load establishment data:", estRes);
+                Alert.alert(
+                    "Cadastro Incompleto",
+                    "Você ainda não concluiu o cadastro do seu estabelecimento. Vamos fazer isso agora?",
+                    [
+                        {
+                            text: "Concluir Cadastro",
+                            onPress: () => {
+                                router.replace("/(auth)/register-establishment/step1" as never);
+                            }
+                        },
+                        {
+                            text: "Sair",
+                            style: "cancel",
+                            onPress: () => {
+                                clearTokens();
+                                clearUserProfile();
+                                router.replace("/(auth)/home" as never);
+                            }
+                        }
+                    ],
+                    { cancelable: false }
+                );
             }
         } catch (error) {
             console.error("Error loading dashboard data:", error);
@@ -80,7 +102,7 @@ export default function EstablishmentDashboard() {
             setLoading(false);
             setRefreshing(false);
         }
-    }, []);
+    }, [router]);
 
     useEffect(() => {
         loadData();
@@ -121,7 +143,7 @@ export default function EstablishmentDashboard() {
                             {establishment?.companyName || "Minha Empresa"}
                         </Text>
                         <Text style={styles.address} numberOfLines={1}>
-                            {establishment?.location.address}, {establishment?.location.city} - {establishment?.location.state}
+                            {establishment?.location ? `${establishment.location.address}, ${establishment.location.city} - ${establishment.location.state}` : "Sem endereço cadastrado"}
                         </Text>
                     </View>
                 </View>

@@ -66,7 +66,18 @@ export default function LoginScreen() {
 			saveUserProfile(profile);
 
 			if (profile.role === "establishment") {
-				router.replace("/(app)/(establishment)/dashboard" as never);
+				setIsLoading(true);
+				const estRes = await api.get<any>("/api/establishments/my-establishment", {
+					authenticated: true,
+				});
+				setIsLoading(false);
+
+				if (estRes.ok && estRes.data) {
+					router.replace("/(app)/(establishment)/dashboard" as never);
+				} else {
+					saveCompanyOnboardingStatus(true);
+					router.replace("/(auth)/register-establishment/step1" as never);
+				}
 				return;
 			}
 

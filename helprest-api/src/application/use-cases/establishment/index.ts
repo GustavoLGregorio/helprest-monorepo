@@ -6,7 +6,7 @@ import type { ProductRepository } from "@application/repositories/ProductReposit
 import { Establishment } from "@domain/entities/Establishment";
 import { Location } from "@domain/value-objects/Location";
 import { RecommendationService } from "@domain/services/RecommendationService";
-import { NotFoundError } from "@shared/errors";
+import { NotFoundError, ValidationError } from "@shared/errors";
 import type {
     CreateEstablishmentInput,
     ListEstablishmentsInput,
@@ -106,6 +106,9 @@ export class GetEstablishment {
     ) { }
 
     async execute(id: string, userId?: string) {
+        if (!ObjectId.isValid(id)) {
+            throw new ValidationError("ID de estabelecimento inválido");
+        }
         const est = await this.estRepo.findById(new ObjectId(id));
         if (!est) {
             throw new NotFoundError("Establishment", id);
@@ -116,6 +119,9 @@ export class GetEstablishment {
 
         let userFlags: string[] = [];
         if (userId && this.userRepo) {
+            if (!ObjectId.isValid(userId)) {
+                throw new ValidationError("ID de usuário inválido");
+            }
             const user = await this.userRepo.findById(new ObjectId(userId));
             if (user) {
                 userFlags = user.flags.map((f) => f.toHexString());
@@ -273,6 +279,9 @@ export class GetEstablishmentByAdmin {
     ) { }
 
     async execute(adminId: string) {
+        if (!ObjectId.isValid(adminId)) {
+            throw new ValidationError("ID de administrador inválido");
+        }
         const est = await this.estRepo.findByAdminId(new ObjectId(adminId));
         if (!est) {
             throw new NotFoundError("Establishment", `admin ${adminId}`);
