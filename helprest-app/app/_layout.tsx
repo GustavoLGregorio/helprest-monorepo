@@ -30,9 +30,15 @@ export default function RootLayout() {
         if (authState === "loading") return;
 
         switch (authState) {
-            case "authenticated":
-                router.replace("/(app)/(tabs)/(home)");
+            case "authenticated": {
+                const profile = loadUserProfile();
+                if (profile?.role === "establishment") {
+                    router.replace("/(app)/(establishment)/dashboard" as never);
+                } else {
+                    router.replace("/(app)/(tabs)/(home)");
+                }
                 break;
+            }
             case "unauthenticated":
                 router.replace("/(auth)/home");
                 break;
@@ -123,6 +129,7 @@ export default function RootLayout() {
         <QueryClientProvider client={queryClient}>
             <Stack screenOptions={{ headerShown: false }}>
                 <Stack.Screen name="(app)/(tabs)" />
+                <Stack.Screen name="(app)/(establishment)" />
                 <Stack.Screen name="(auth)" />
                 <Stack.Screen name="(app)/product/[id]" options={{ presentation: "modal" }} />
             </Stack>

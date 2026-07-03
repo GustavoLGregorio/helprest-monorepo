@@ -182,7 +182,6 @@ const styles = StyleSheet.create({
         paddingBottom: 20,
     },
     productSheetImageContainer: {
-        width: "100%",
         height: 160,
         overflow: "hidden",
         marginBottom: 16,

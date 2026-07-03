@@ -9,6 +9,7 @@ export interface CachedUserProfile {
     birthDate?: string;
     profilePhoto?: string;
     flags: string[];
+    role?: "user" | "establishment";
     location?: {
         state?: string;
         city?: string;
@@ -60,4 +61,29 @@ export function getIncompleteOnboardingStep(profile: CachedUserProfile): number 
     if (!profile.location?.address && !profile.location?.city) return 3;
     // Step 4 (flags) is optional — user can skip
     return null;
+}
+
+export function saveCompanyOnboardingStatus(isCompany: boolean): void {
+    try {
+        storage.set("is_company_onboarding", isCompany);
+    } catch (error) {
+        console.error("Error saving company onboarding status:", error);
+    }
+}
+
+export function loadCompanyOnboardingStatus(): boolean {
+    try {
+        return storage.getBoolean("is_company_onboarding") ?? false;
+    } catch (error) {
+        console.error("Error loading company onboarding status:", error);
+        return false;
+    }
+}
+
+export function clearCompanyOnboardingStatus(): void {
+    try {
+        storage.delete("is_company_onboarding");
+    } catch (error) {
+        console.error("Error clearing company onboarding status:", error);
+    }
 }

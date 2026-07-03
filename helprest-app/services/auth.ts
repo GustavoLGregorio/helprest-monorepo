@@ -114,6 +114,11 @@ export async function signInWithGoogle(): Promise<{
 export async function signOutGoogle(): Promise<void> {
     try {
         await GoogleSignin.signOut();
+        try {
+            await GoogleSignin.revokeAccess();
+        } catch (e) {
+            // Ignore if already revoked
+        }
     } catch (error) {
         console.error("Google sign-out error:", error);
     }

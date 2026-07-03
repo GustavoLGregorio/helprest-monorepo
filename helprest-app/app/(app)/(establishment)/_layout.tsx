@@ -3,10 +3,9 @@ import { Tabs } from "expo-router";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { Colors } from "@/constants/Colors";
 import { ColorValue } from "react-native";
-import { emitMapRecenter } from "@/utils/mapEvents";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-export default function TabsLayout() {
+export default function EstablishmentLayout() {
     const insets = useSafeAreaInsets();
 
     return (
@@ -14,10 +13,9 @@ export default function TabsLayout() {
             screenOptions={{
                 animation: "shift",
                 headerShown: false,
-                tabBarShowLabel: false,
+                tabBarShowLabel: true,
                 tabBarActiveTintColor: Colors.light.tint,
                 freezeOnBlur: true,
-
                 tabBarStyle: {
                     elevation: 1,
                     height: 60 + insets.bottom,
@@ -28,62 +26,39 @@ export default function TabsLayout() {
             }}
         >
             <Tabs.Screen
-                name="(home)/index"
+                name="dashboard"
                 options={{
-                    title: "Inicio",
-                    tabBarLabel: "Inicio",
+                    title: "Dashboard",
+                    tabBarLabel: "Painel",
                     tabBarIcon: ({ color }: { color: ColorValue }) => (
                         <MaterialCommunityIcons
                             size={28}
-                            name="home"
-                            color={color}
-                        />
-                    ),
-                }}
-                listeners={{
-                    tabPress: () => emitMapRecenter(),
-                }}
-            />
-            <Tabs.Screen
-                name="(places)/index"
-                options={{
-                    title: "Lugares",
-                    tabBarLabel: "Lugares",
-                    tabBarIcon: ({ color }: { color: ColorValue }) => (
-                        <MaterialCommunityIcons
-                            size={28}
-                            name="map-marker"
+                            name="view-dashboard"
                             color={color}
                         />
                     ),
                 }}
             />
             <Tabs.Screen
-                name="(favorites)/index"
+                name="menu"
                 options={{
-                    title: "Favoritos",
-                    tabBarLabel: "Favoritos",
+                    title: "Cardápio",
+                    tabBarLabel: "Cardápio",
                     tabBarIcon: ({ color }: { color: ColorValue }) => (
                         <MaterialCommunityIcons
                             size={28}
-                            name="heart"
+                            name="food-fork-drink"
                             color={color}
                         />
                     ),
                 }}
             />
+            {/* Form screens to edit/add products will be stack pages or sibling screens but we will hide them from the tab bar */}
             <Tabs.Screen
-                name="(social)/index"
+                name="product-form"
                 options={{
-                    title: "Social",
-                    tabBarLabel: "Social",
-                    tabBarIcon: ({ color }: { color: ColorValue }) => (
-                        <MaterialCommunityIcons
-                            size={28}
-                            name="account-circle"
-                            color={color}
-                        />
-                    ),
+                    href: null, // Hides from tab bar
+                    title: "Produto",
                 }}
             />
         </Tabs>

@@ -15,6 +15,7 @@ import UserProgress from "@/components/login/UserProgress";
 import { useRouter } from "expo-router";
 import { api } from "@/services/api";
 import { loadUserName, loadUserBirthDate, loadUserDefaultLocation } from "@/utils/saveUserRegisterInfo";
+import { saveUserProfile, type CachedUserProfile } from "@/storage/userProfile";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { Image } from "expo-image";
 
@@ -89,7 +90,9 @@ export default function Step4() {
                     authenticated: true,
                 });
                 if (!profileRes.ok) {
-                    console.error("Failed to update profile:", profileRes.data);
+                    Alert.alert("Erro", "Não foi possível salvar suas informações de perfil. Tente novamente.");
+                    setIsLoading(false);
+                    return;
                 }
             }
 
@@ -99,8 +102,18 @@ export default function Step4() {
                     authenticated: true,
                 });
                 if (!flagsRes.ok) {
-                    console.error("Failed to update flags:", flagsRes.data);
+                    Alert.alert("Erro", "Não foi possível salvar suas restrições alimentares. Tente novamente.");
+                    setIsLoading(false);
+                    return;
                 }
+            }
+
+            // Fetch final profile to make sure MMKV is in sync with database
+            const userRes = await api.get<CachedUserProfile>("/api/users/me", {
+                authenticated: true,
+            });
+            if (userRes.ok && userRes.data) {
+                saveUserProfile(userRes.data);
             }
 
             router.replace("/(app)/(tabs)/(home)");

@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, ActivityIndicator, ScrollView, Pressable, Modal } from "react-native";
+import { StyleSheet, Text, View, ActivityIndicator, ScrollView, Pressable, Modal, TouchableOpacity } from "react-native";
 import React, { useEffect, useState, useCallback, useMemo } from "react";
 import { BlurView } from "expo-blur";
 import { Image } from "expo-image";
@@ -9,13 +9,14 @@ import StarReview from "@/components/ui/StarReview";
 import MiddleDot from "@/components/atoms/MiddleDot";
 import FlagColoredText from "@/components/ui/FlagColoredText";
 import HeartClicable from "@/components/ui/HeartClicable";
-import { useLocalSearchParams, Link } from "expo-router";
+import { useLocalSearchParams, Link, useRouter } from "expo-router";
 import { useQuery } from "@tanstack/react-query";
 import { api } from "@/services/api";
 import { getCurrentPosition } from "@/services/location";
 import { loadUserProfile } from "@/storage/userProfile";
 import { useFavorites } from "@/hooks/queries/useFavorites";
 import ProductBottomSheet from "@/components/ui/ProductBottomSheet";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 
 const PLACEHOLDER_LOGO = require("@/assets/images/icon.png");
 const PLACEHOLDER_BANNER = require("@/assets/images/places/3.jpeg");
@@ -30,7 +31,6 @@ interface FlagDTO {
 }
 
 export interface ProductDTO {
-    id: string;
     id: string;
     category?: string; // Mantido por retrocompatibilidade se necessário, mas não utilizado agora
     flags: FlagDTO[];
@@ -74,6 +74,7 @@ function formatDistance(meters: number): string {
 }
 
 const PlaceDetailsScreen = () => {
+    const router = useRouter();
     // Tratamos tanto "id" quanto "place" para retrocompatibilidade do router push anterior
     const { id, place } = useLocalSearchParams<{ id?: string; place?: string }>();
     const actualId = id || place;
@@ -226,14 +227,15 @@ const PlaceDetailsScreen = () => {
     );
 
     return (
-        <ScrollView
-            style={styles.container}
-            horizontal={false}
-            showsHorizontalScrollIndicator={false}
-            overScrollMode="never"
-            bounces={false}
-            decelerationRate="normal"
-        >
+        <View style={{ flex: 1, backgroundColor: Colors.light.background }}>
+            <ScrollView
+                style={styles.container}
+                horizontal={false}
+                showsHorizontalScrollIndicator={false}
+                overScrollMode="never"
+                bounces={false}
+                decelerationRate="normal"
+            >
             <Image source={bannerSource} style={styles.banner} />
             
             <View style={styles.card}>
@@ -318,7 +320,7 @@ const PlaceDetailsScreen = () => {
                         otherProducts.length > 0 ? (
                             renderProductList(groupedOthers)
                         ) : (
-                            <Text style={styles.emptyTabText}>Todos os pratos batem com alguma restrição sua. Aproveite o "Para você"!</Text>
+                             <Text style={styles.emptyTabText}>Todos os pratos batem com alguma restrição sua. Aproveite o &quot;Para você&quot;!</Text>
                         )
                     )}
                 </View>
@@ -340,7 +342,16 @@ const PlaceDetailsScreen = () => {
                 setProductSheetTab={setProductSheetTab}
             />
         </ScrollView>
-    );
+        <TouchableOpacity
+            style={styles.floatingVisitButton}
+            onPress={() => router.push(`/(app)/visit/create?establishmentId=${actualId}` as never)}
+            activeOpacity={0.9}
+        >
+            <MaterialCommunityIcons name="camera" size={20} color="#FFF" />
+            <Text style={styles.floatingVisitButtonText}>Registrar Visita</Text>
+        </TouchableOpacity>
+    </View>
+);
 };
 
 const styles = StyleSheet.create({
@@ -547,6 +558,28 @@ const styles = StyleSheet.create({
         color: "#666",
         marginTop: 20,
         fontSize: 14,
+    },
+    floatingVisitButton: {
+        position: "absolute",
+        bottom: 24,
+        alignSelf: "center",
+        flexDirection: "row",
+        alignItems: "center",
+        backgroundColor: Colors.light.tint,
+        paddingHorizontal: 20,
+        paddingVertical: 12,
+        borderRadius: 24,
+        elevation: 6,
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: 3 },
+        shadowOpacity: 0.3,
+        shadowRadius: 4,
+    },
+    floatingVisitButtonText: {
+        color: "#FFF",
+        fontWeight: "bold",
+        fontSize: 15,
+        marginLeft: 8,
     },
 });
 
