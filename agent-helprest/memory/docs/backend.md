@@ -36,6 +36,7 @@ src/
 |---|---|---|
 | `User` | `entities/User.ts` | name, email, passwordHash?, authProvider (local/google), googleId?, birthDate?, flags (ObjectId[]), location, socialLinks, profilePhoto |
 | `Establishment` | `entities/Establishment.ts` | companyName, location (GeoJSON), flags, logo, rating, ratingCount, isSponsored |
+| `Product` | `entities/Product.ts` | establishmentId, category, name, description, price, imageUrl, isActive |
 | `Flag` | `entities/Flag.ts` | type, identifier, description, tag, backgroundColor, textColor |
 | `Visit` | `entities/Visit.ts` | establishmentId, userId, date, review, rating (1-5) |
 
@@ -55,6 +56,7 @@ All entities:
 Abstract contracts implemented by infrastructure layer:
 - `IUserRepository` — CRUD + `findByEmail()`
 - `IEstablishmentRepository` — CRUD + `findNearby()` (geospatial) + `findByFlags()` + `search()` (text) + `findSponsored()`
+- `IProductRepository` — `findByEstablishmentId()`, `save()`, `delete()`
 - `IFlagRepository` — CRUD + `findByIds()` + `findByType()`
 - `IVisitRepository` — CRUD + `findByUserId()` + `findByEstablishmentId()` + `countByEstablishment()`
 
@@ -76,6 +78,7 @@ Abstract contracts implemented by infrastructure layer:
 | `auth/` | `RegisterUser`, `LoginUser`, `RefreshToken`, `GoogleAuthUser` |
 | `user/` | `GetUserProfile`, `UpdateUserProfile`, `UpdateUserFlags` |
 | `establishment/` | `ListEstablishments`, `GetEstablishment`, `GetRecommendedEstablishments`, `GetNearbyEstablishments`, `SearchEstablishments`, `CreateEstablishment` |
+| `product/` | `ListEstablishmentProducts` |
 | `flag/` | `ListFlags`, `CreateFlag` |
 | `visit/` | `CreateVisit` (auto-recalculates establishment rating), `ListUserVisits`, `GetEstablishmentVisits` |
 
@@ -176,6 +179,7 @@ Zod v4 schemas with type inference for each endpoint group:
 | `GET` | `/api/establishments/nearby` | Geospatial proximity |
 | `GET` | `/api/establishments/search` | Text search |
 | `GET` | `/api/establishments/:id` | Detail |
+| `GET` | `/api/establishments/:id/products` | Cardápio (Products) of Establishment |
 | `POST` | `/api/establishments` | Create |
 
 ### Flags (public GET)
