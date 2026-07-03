@@ -46,4 +46,15 @@ export class MongoVisitRepository implements IVisitRepository {
     async countByEstablishment(establishmentId: ObjectId): Promise<number> {
         return getVisitsCollection().countDocuments({ establishmentId });
     }
+
+    async findRecentWithPhotos(limit: number, skip: number): Promise<Visit[]> {
+        const docs = await getVisitsCollection()
+            .find({ photoUrls: { $exists: true, $not: { $size: 0 } } })
+            .sort({ date: -1 })
+            .skip(skip)
+            .limit(limit)
+            .toArray();
+
+        return docs.map((doc) => Visit.fromDocument(doc));
+    }
 }

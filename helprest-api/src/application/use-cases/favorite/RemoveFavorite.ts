@@ -1,5 +1,5 @@
 import { ObjectId } from "mongodb";
-import { IUserFavoriteRepository } from "../../../domain/repositories/IUserFavoriteRepository";
+import type { IUserFavoriteRepository } from "../../../domain/repositories/IUserFavoriteRepository";
 
 export class RemoveFavorite {
     constructor(private favoriteRepo: IUserFavoriteRepository) {}

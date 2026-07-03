@@ -27,6 +27,7 @@ export class RegisterUser {
             birthDate: new Date(input.birthDate),
             flags: flagIds,
             socialLinksEnabled: false,
+            role: input.role,
         });
 
         await this.userRepo.create(user);

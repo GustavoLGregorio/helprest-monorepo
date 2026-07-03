@@ -110,6 +110,11 @@ export class MongoEstablishmentRepository implements IEstablishmentRepository {
         await getEstablishmentsCollection().deleteOne({ _id: id });
     }
 
+    async findByAdminId(adminId: ObjectId): Promise<Establishment | null> {
+        const doc = await getEstablishmentsCollection().findOne({ adminId });
+        return doc ? Establishment.fromDocument(doc) : null;
+    }
+
     async count(): Promise<number> {
         return getEstablishmentsCollection().countDocuments();
     }

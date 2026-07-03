@@ -23,8 +23,8 @@ export interface ScoredEstablishment {
  * 3. Sponsored establishments get a small bonus
  */
 export class RecommendationService {
-    private static readonly WEIGHT_FLAG_MATCH = 0.5;
-    private static readonly WEIGHT_RATING = 0.3;
+    private static readonly WEIGHT_FLAG_MATCH = 0.7;
+    private static readonly WEIGHT_RATING = 0.1;
     private static readonly WEIGHT_PROXIMITY = 0.2;
     private static readonly SPONSOR_BONUS = 0.05;
     private static readonly MAX_DISTANCE_METERS = 50_000; // 50km
@@ -40,7 +40,7 @@ export class RecommendationService {
         const totalUserFlags = userFlagSet.size;
 
         if (totalUserFlags === 0) {
-            // No flags → sort by rating and proximity only
+            // No flags → sort by proximity (70%) and rating (30%)
             return establishments
                 .map((est) => {
                     const distance = this.haversineDistance(
@@ -49,9 +49,13 @@ export class RecommendationService {
                         est.location.coordinates.lat,
                         est.location.coordinates.lng,
                     );
+                    let score = this.proximityScore(distance) * 0.70 + this.normalizeRating(est.rating) * 0.30;
+                    if (est.isSponsored) {
+                        score += this.SPONSOR_BONUS;
+                    }
                     return {
                         establishment: est,
-                        score: this.normalizeRating(est.rating) * 0.6 + this.proximityScore(distance) * 0.4,
+                        score,
                         flagMatchCount: 0,
                         distanceMeters: distance,
                     };
@@ -71,10 +75,21 @@ export class RecommendationService {
                     est.location.coordinates.lng,
                 );
 
+                // If user has dietary restriction flags and establishment matches NONE, score is 0 and sponsor bonus is ignored.
+                if (matchCount === 0) {
+                    return {
+                        establishment: est,
+                        score: 0,
+                        flagMatchCount: 0,
+                        distanceMeters: Math.round(distance),
+                    };
+                }
+
+                // Dominant Flag Match formula
                 let score =
                     flagMatchRatio * this.WEIGHT_FLAG_MATCH +
-                    this.normalizeRating(est.rating) * this.WEIGHT_RATING +
-                    this.proximityScore(distance) * this.WEIGHT_PROXIMITY;
+                    this.proximityScore(distance) * this.WEIGHT_PROXIMITY +
+                    this.normalizeRating(est.rating) * this.WEIGHT_RATING;
 
                 if (est.isSponsored) {
                     score += this.SPONSOR_BONUS;

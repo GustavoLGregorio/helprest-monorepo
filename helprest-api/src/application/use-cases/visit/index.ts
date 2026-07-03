@@ -2,8 +2,9 @@ import { ObjectId } from "mongodb";
 import type { IVisitRepository } from "@domain/repositories/IVisitRepository";
 import type { IEstablishmentRepository } from "@domain/repositories/IEstablishmentRepository";
 import { Visit } from "@domain/entities/Visit";
-import { NotFoundError } from "@shared/errors";
+import { NotFoundError, ValidationError } from "@shared/errors";
 import type { CreateVisitInput, ListVisitsInput } from "@interface/validation/visit.schema";
+import { RecommendationService } from "@domain/services/RecommendationService";
 
 export class CreateVisit {
     constructor(
@@ -19,12 +20,35 @@ export class CreateVisit {
             throw new NotFoundError("Establishment", input.establishmentId);
         }
 
+        // Geofencing validation: only check if photos are uploaded
+        if (input.photoUrls && input.photoUrls.length > 0) {
+            if (!input.coordinates) {
+                throw new ValidationError("Coordenadas de geolocalização são obrigatórias para publicar fotos da visita", {
+                    coordinates: ["Coordenadas GPS ausentes"]
+                });
+            }
+
+            const distance = RecommendationService.haversineDistance(
+                input.coordinates.lat,
+                input.coordinates.lng,
+                establishment.location.coordinates.lat,
+                establishment.location.coordinates.lng
+            );
+
+            if (distance > 100) {
+                throw new ValidationError("Você precisa estar a menos de 100 metros do estabelecimento para publicar fotos da visita", {
+                    coordinates: [`Distância de ${Math.round(distance)}m excede o limite de 100m`]
+                });
+            }
+        }
+
         const visit = Visit.create({
             establishmentId,
             userId: new ObjectId(userId),
             date: input.date ? new Date(input.date) : new Date(),
             review: input.review,
             rating: input.rating,
+            photoUrls: input.photoUrls,
         });
 
         await this.visitRepo.create(visit);
@@ -54,6 +78,7 @@ export class ListUserVisits {
             date: v.date,
             review: v.review,
             rating: v.rating,
+            photoUrls: [...v.photoUrls],
         }));
     }
 }
@@ -75,6 +100,7 @@ export class GetEstablishmentVisits {
             date: v.date,
             review: v.review,
             rating: v.rating,
+            photoUrls: [...v.photoUrls],
         }));
     }
 }

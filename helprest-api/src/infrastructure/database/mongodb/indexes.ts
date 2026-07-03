@@ -1,14 +1,15 @@
 import { getDatabase } from "./connection";
 import { COLLECTION_NAMES } from "./collections";
 import { logger } from "@shared/utils/logger";
+import type { IndexSpecification, CreateIndexesOptions } from "mongodb";
 
 /**
  * Safely creates an index, ignoring "already exists" errors.
  */
 async function ensureIndex(
     collectionName: string,
-    spec: Record<string, unknown>,
-    options: Record<string, unknown>,
+    spec: IndexSpecification,
+    options: CreateIndexesOptions & { name?: string },
 ): Promise<void> {
     try {
         const db = getDatabase();

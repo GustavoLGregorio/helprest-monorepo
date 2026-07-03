@@ -102,9 +102,10 @@ export class GetEstablishment {
         private readonly estRepo: IEstablishmentRepository,
         private readonly flagRepo: IFlagRepository,
         private readonly productRepo: ProductRepository,
+        private readonly userRepo?: IUserRepository,
     ) { }
 
-    async execute(id: string) {
+    async execute(id: string, userId?: string) {
         const est = await this.estRepo.findById(new ObjectId(id));
         if (!est) {
             throw new NotFoundError("Establishment", id);
@@ -112,18 +113,44 @@ export class GetEstablishment {
 
         const flags = await populateFlags(est.flags, this.flagRepo);
         const productsRaw = await this.productRepo.findByEstablishmentId(est.id);
-        const products = await Promise.all(productsRaw.map(async (p) => {
-            const pFlags = await populateFlags(p.flags, this.flagRepo);
-            return {
-                id: p.id.toHexString(),
-                flags: pFlags,
-                name: p.name,
-                description: p.description,
-                price: p.price,
-                imageUrl: p.imageUrl,
-                ingredients: [...p.ingredients]
-            };
-        }));
+
+        let userFlags: string[] = [];
+        if (userId && this.userRepo) {
+            const user = await this.userRepo.findById(new ObjectId(userId));
+            if (user) {
+                userFlags = user.flags.map((f) => f.toHexString());
+            }
+        }
+
+        const products = await Promise.all(
+            productsRaw.map(async (p) => {
+                const pFlags = await populateFlags(p.flags, this.flagRepo);
+                const pFlagIds = p.flags.map((f) => f.toHexString());
+                const matchCount = userFlags.length > 0
+                    ? pFlagIds.filter((fid) => userFlags.includes(fid)).length
+                    : 0;
+
+                return {
+                    id: p.id.toHexString(),
+                    flags: pFlags,
+                    name: p.name,
+                    description: p.description,
+                    price: p.price,
+                    imageUrl: p.imageUrl,
+                    ingredients: [...p.ingredients],
+                    isActive: p.isActive,
+                    matchCount,
+                };
+            }),
+        );
+
+        // Sort products: active ones first, then by matchCount descending (most matching user dietary restrictions first)
+        products.sort((a, b) => {
+            if (a.isActive !== b.isActive) {
+                return a.isActive ? -1 : 1;
+            }
+            return b.matchCount - a.matchCount;
+        });
 
         return {
             ...toEstablishmentDTO(est, flags),
@@ -218,7 +245,7 @@ export class SearchEstablishments {
 export class CreateEstablishment {
     constructor(private readonly estRepo: IEstablishmentRepository) { }
 
-    async execute(input: CreateEstablishmentInput) {
+    async execute(adminId: string, input: CreateEstablishmentInput) {
         const location = Location.create(input.location);
         const flagIds = input.flagIds.map((id) => new ObjectId(id));
 
@@ -230,9 +257,47 @@ export class CreateEstablishment {
             rating: 0,
             ratingCount: 0,
             ratingTotal: 0,
+            adminId: new ObjectId(adminId),
         });
 
         await this.estRepo.create(establishment);
         return { id: establishment.id.toHexString() };
+    }
+}
+
+export class GetEstablishmentByAdmin {
+    constructor(
+        private readonly estRepo: IEstablishmentRepository,
+        private readonly flagRepo: IFlagRepository,
+        private readonly productRepo: ProductRepository,
+    ) { }
+
+    async execute(adminId: string) {
+        const est = await this.estRepo.findByAdminId(new ObjectId(adminId));
+        if (!est) {
+            throw new NotFoundError("Establishment", `admin ${adminId}`);
+        }
+
+        const flags = await populateFlags(est.flags, this.flagRepo);
+        const productsRaw = await this.productRepo.findByEstablishmentId(est.id);
+        const products = await Promise.all(productsRaw.map(async (p) => {
+            const pFlags = await populateFlags(p.flags, this.flagRepo);
+            return {
+                id: p.id.toHexString(),
+                flags: pFlags,
+                name: p.name,
+                description: p.description,
+                price: p.price,
+                imageUrl: p.imageUrl,
+                ingredients: [...p.ingredients],
+                isActive: p.isActive,
+            };
+        }));
+
+        return {
+            ...toEstablishmentDTO(est, flags),
+            products,
+            ratingCount: est.ratingCount,
+        };
     }
 }

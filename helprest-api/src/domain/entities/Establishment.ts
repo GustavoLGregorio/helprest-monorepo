@@ -12,6 +12,7 @@ export interface EstablishmentProps {
     ratingCount: number;
     ratingTotal: number;
     isSponsored?: boolean;
+    adminId?: ObjectId;
     createdAt?: Date;
     updatedAt?: Date;
 }
@@ -26,6 +27,7 @@ export class Establishment {
     readonly ratingCount: number;
     readonly ratingTotal: number;
     readonly isSponsored: boolean;
+    readonly adminId?: ObjectId;
     readonly createdAt: Date;
     readonly updatedAt: Date;
 
@@ -39,6 +41,7 @@ export class Establishment {
         this.ratingCount = props.ratingCount;
         this.ratingTotal = props.ratingTotal;
         this.isSponsored = props.isSponsored ?? false;
+        this.adminId = props.adminId;
         this.createdAt = props.createdAt ?? new Date();
         this.updatedAt = props.updatedAt ?? new Date();
     }
@@ -75,6 +78,7 @@ export class Establishment {
             ratingCount: (doc.ratingCount as number) ?? 0,
             ratingTotal: (doc.ratingTotal as number) ?? 0,
             isSponsored: (doc.isSponsored as boolean) ?? false,
+            adminId: doc.adminId as ObjectId | undefined,
             createdAt: doc.createdAt ? new Date(doc.createdAt as string | number | Date) : undefined,
             updatedAt: doc.updatedAt ? new Date(doc.updatedAt as string | number | Date) : undefined,
         });
@@ -97,6 +101,7 @@ export class Establishment {
             ratingCount: this.ratingCount,
             ratingTotal: this.ratingTotal,
             isSponsored: this.isSponsored,
+            adminId: this.adminId,
             createdAt: this.createdAt,
             updatedAt: this.updatedAt,
         };
@@ -130,6 +135,7 @@ export class Establishment {
             ratingCount: this.ratingCount,
             ratingTotal: this.ratingTotal,
             isSponsored: this.isSponsored,
+            adminId: this.adminId,
             createdAt: this.createdAt,
             updatedAt: this.updatedAt,
         };

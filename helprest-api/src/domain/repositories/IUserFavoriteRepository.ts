@@ -1,5 +1,5 @@
 import { ObjectId } from "mongodb";
-import { UserFavorite, FavoriteType } from "../entities/UserFavorite";
+import type { UserFavorite, FavoriteType } from "../entities/UserFavorite";
 
 export interface IUserFavoriteRepository {
     add(favorite: UserFavorite): Promise<void>;

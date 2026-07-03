@@ -30,6 +30,7 @@ import {
     GetNearbyEstablishments,
     SearchEstablishments,
     CreateEstablishment,
+    GetEstablishmentByAdmin,
 } from "@application/use-cases/establishment";
 
 // Use Cases — Flag
@@ -37,9 +38,10 @@ import { ListFlags, CreateFlag } from "@application/use-cases/flag";
 
 // Use Cases — Visit
 import { CreateVisit, ListUserVisits, GetEstablishmentVisits } from "@application/use-cases/visit";
+import { GetSocialFeed } from "@application/use-cases/visit/GetSocialFeed";
 
 // Use Cases — Product
-import { ListEstablishmentProducts } from "@application/use-cases/product";
+import { ListEstablishmentProducts, CreateProduct, UpdateProduct, DeleteProduct } from "@application/use-cases/product";
 
 // Use Cases — Favorite
 import { AddFavorite } from "@application/use-cases/favorite/AddFavorite";
@@ -56,6 +58,7 @@ import {
     searchEstablishmentsSchema,
 } from "@interface/validation/establishment.schema";
 import { createVisitSchema, listVisitsSchema } from "@interface/validation/visit.schema";
+import { createProductSchema, updateProductSchema } from "@interface/validation/product.schema";
 import { addFavoriteSchema } from "@interface/validation/favorite.schema";
 
 // ── Singleton repository instances ──
@@ -248,20 +251,54 @@ addRoute("GET", "/api/establishments/search", async (req, url) => {
 });
 
 addRoute("GET", "/api/establishments/:id", async (req, _url, params) => {
-    await authenticateRequest(req);
-    const useCase = new GetEstablishment(estRepo, flagRepo, productRepo);
-    const result = await useCase.execute(params.id!);
+    const auth = await authenticateRequest(req);
+    const useCase = new GetEstablishment(estRepo, flagRepo, productRepo, userRepo);
+    const result = await useCase.execute(params.id!, auth.sub);
     return json(result);
 });
 
 
 
+addRoute("GET", "/api/establishments/my-establishment", async (req) => {
+    const auth = await authenticateRequest(req);
+    const useCase = new GetEstablishmentByAdmin(estRepo, flagRepo, productRepo);
+    const result = await useCase.execute(auth.sub);
+    return json(result);
+});
+
 addRoute("POST", "/api/establishments", async (req) => {
-    await authenticateRequest(req);
+    const auth = await authenticateRequest(req);
     const input = await parseBody(req, createEstablishmentSchema);
     const useCase = new CreateEstablishment(estRepo);
-    const result = await useCase.execute(input);
+    const result = await useCase.execute(auth.sub, input);
     return json(result, 201);
+});
+
+// ═══════════════════════════════════════════════════════
+//  PRODUCT ROUTES (establishment admin)
+// ═══════════════════════════════════════════════════════
+
+addRoute("POST", "/api/products", async (req) => {
+    const auth = await authenticateRequest(req);
+    const input = await parseBody(req, createProductSchema);
+    const useCase = new CreateProduct(productRepo, estRepo);
+    const result = await useCase.execute(auth.sub, input);
+    return json(result, 201);
+});
+
+addRoute("PATCH", "/api/products/:id", async (req, _url, params) => {
+    const auth = await authenticateRequest(req);
+    const input = await parseBody(req, updateProductSchema);
+    const useCase = new UpdateProduct(productRepo, estRepo);
+    const result = await useCase.execute(auth.sub, params.id!, input);
+    return json(result);
+});
+
+addRoute("DELETE", "/api/products/:id", async (req, _url, params) => {
+    const auth = await authenticateRequest(req);
+    const useCase = new DeleteProduct(productRepo, estRepo);
+    const result = await useCase.execute(auth.sub, params.id!);
+    return json(result);
 });
 
 // ═══════════════════════════════════════════════════════
@@ -308,6 +345,18 @@ addRoute("GET", "/api/visits/establishment/:id", async (req, url, params) => {
     const input = parseQuery(url, listVisitsSchema);
     const useCase = new GetEstablishmentVisits(visitRepo);
     const result = await useCase.execute(params.id!, input);
+    return json(result);
+});
+
+addRoute("GET", "/api/social/feed", async (req, url) => {
+    await authenticateRequest(req);
+    const lat = parseFloat(url.searchParams.get("lat") || "0");
+    const lng = parseFloat(url.searchParams.get("lng") || "0");
+    const page = parseInt(url.searchParams.get("page") || "1", 10);
+    const limit = parseInt(url.searchParams.get("limit") || "15", 10);
+
+    const useCase = new GetSocialFeed(visitRepo, estRepo, userRepo, flagRepo);
+    const result = await useCase.execute({ lat, lng, page, limit });
     return json(result);
 });
 

@@ -26,6 +26,7 @@ export const updateProfileSchema = z.object({
     socialLinksEnabled: z.boolean().optional(),
     socialLinks: socialLinksSchema.optional(),
     profilePhoto: z.string().optional(),
+    role: z.enum(["user", "establishment"]).optional(),
 });
 
 export const updateFlagsSchema = z.object({

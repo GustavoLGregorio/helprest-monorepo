@@ -379,6 +379,128 @@ async function seed() {
         await db.collection("users").insertMany(users);
         console.log(`Inserted ${users.length} users`);
 
+        // ── Seed Products for all establishments ──
+        const rawProducts = [
+            {
+                name: "Bowl de Quinoa Real",
+                description: "Quinoa tricolor orgânica temperada no ponto, acompanhada de legumes assados e proteína de ervilha.",
+                price: 38.90,
+                imageUrl: "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400&h=400&fit=crop",
+                category: "Saudável",
+                flags: [flagMap.get("vegan")!, flagMap.get("organic")!]
+            },
+            {
+                name: "Hambúrguer de Shiitake",
+                description: "Pão de fermentação natural, blend de cogumelos shiitake e cogumelo paris defumado, com queijo vegano e maionese verde artesanal.",
+                price: 42.50,
+                imageUrl: "https://images.unsplash.com/photo-1520072959219-c595dc870360?w=400&h=400&fit=crop",
+                category: "Lanches",
+                flags: [flagMap.get("vegan")!, flagMap.get("vegetarian")!]
+            },
+            {
+                name: "Nhoque de Batata Doce",
+                description: "Massa leve de batata doce roxa sem glúten, servida ao molho sugo de tomates italianos frescos e manjericão.",
+                price: 45.00,
+                imageUrl: "https://images.unsplash.com/photo-1595295333158-4742f28fbc85?w=400&h=400&fit=crop",
+                category: "Massas",
+                flags: [flagMap.get("gluten-free")!, flagMap.get("celiac")!]
+            },
+            {
+                name: "Salada Tropical Mix",
+                description: "Mix folhas verdes da fazenda, manga palmer, tomate cereja, sementes de girassol tostadas ao molho cítrico especial.",
+                price: 34.90,
+                imageUrl: "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=400&h=400&fit=crop",
+                category: "Saladas",
+                flags: [flagMap.get("vegan")!, flagMap.get("vegetarian")!, flagMap.get("organic")!]
+            },
+            {
+                name: "Risoto de Aspargos",
+                description: "Arroz arbório cozido lentamente no caldo de vinho branco, queijo parmesão ralado na hora e aspargos grelhados perfeitamente crocantes.",
+                price: 52.00,
+                imageUrl: "https://plus.unsplash.com/premium_photo-1663840248384-7fc1e23363cb?w=400&h=400&fit=crop",
+                category: "Risotos",
+                flags: [flagMap.get("gluten-free")!, flagMap.get("vegetarian")!]
+            },
+            {
+                name: "Taco Veggie Gourmet",
+                description: "Tortilhas crocantes recheadas com carne de jaca desfiada moída temperada, guacamole e pico de gallo.",
+                price: 29.90,
+                imageUrl: "https://images.unsplash.com/photo-1551504734-5ee1c4a1479b?w=400&h=400&fit=crop",
+                category: "Mexicanos",
+                flags: [flagMap.get("vegan")!, flagMap.get("halal")!]
+            }
+        ];
+
+        await db.collection("products").deleteMany({});
+
+        const productsToInsert = [];
+        for (const est of establishments) {
+            const estFlags = new Set(est.flags.map(f => f.toHexString()));
+            const compatibleProducts = rawProducts.filter(p => 
+                p.flags.some(f => estFlags.has(f.toHexString()))
+            );
+
+            const sourceProducts = compatibleProducts.length > 0 ? compatibleProducts : rawProducts;
+            
+            for (const prod of sourceProducts) {
+                productsToInsert.push({
+                    _id: new ObjectId(),
+                    establishmentId: est._id,
+                    flags: prod.flags,
+                    name: prod.name,
+                    description: prod.description,
+                    price: prod.price,
+                    imageUrl: prod.imageUrl,
+                    ingredients: prod.name.split(" "),
+                    isActive: true,
+                    createdAt: new Date(),
+                    updatedAt: new Date()
+                });
+            }
+        }
+
+        if (productsToInsert.length > 0) {
+            await db.collection("products").insertMany(productsToInsert);
+            console.log(`Inserted ${productsToInsert.length} products`);
+        }
+
+        // ── Seed Visits (Social reviews with photos) ──
+        const visits = [
+            {
+                _id: new ObjectId(),
+                establishmentId: establishments[0]!._id, // Vegano Bistrô
+                userId: users[0]!._id, // João
+                date: new Date(Date.now() - 3600000 * 24), // 1 day ago
+                review: "Comida vegana sensacional! O hambúrguer de shiitake estava no ponto ideal e a maionese verde artesanal é de outro mundo.",
+                rating: 5,
+                photoUrls: ["https://images.unsplash.com/photo-1520072959219-c595dc870360?w=600&h=400&fit=crop"],
+                createdAt: new Date()
+            },
+            {
+                _id: new ObjectId(),
+                establishmentId: establishments[1]!._id, // Natureba Café
+                userId: users[1]!._id, // Maria
+                date: new Date(Date.now() - 3600000 * 5), // 5 hours ago
+                review: "Muito gostoso o café e as opções sem lactose. O atendimento foi rápido, mas o preço é um pouco elevado.",
+                rating: 4,
+                photoUrls: ["https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=600&h=400&fit=crop"],
+                createdAt: new Date()
+            },
+            {
+                _id: new ObjectId(),
+                establishmentId: establishments[2]!._id, // Green Kitchen
+                userId: users[0]!._id, // João
+                date: new Date(Date.now() - 3600000 * 48), // 2 days ago
+                review: "O nhoque de batata doce é uma delícia e não tem glúten! Perfeito para quem tem intolerâncias.",
+                rating: 5,
+                photoUrls: ["https://images.unsplash.com/photo-1595295333158-4742f28fbc85?w=600&h=400&fit=crop"],
+                createdAt: new Date()
+            }
+        ];
+
+        await db.collection("visits").insertMany(visits);
+        console.log(`Inserted ${visits.length} visits with photos`);
+
         // ── Create indexes ──
         await db.collection("users").createIndex({ email: 1 }, { unique: true });
         await db.collection("establishments").createIndex({ "location.coordinates": "2dsphere" });

@@ -1,6 +1,6 @@
 import { ObjectId } from "mongodb";
 import type { ProductRepository } from "../../repositories/ProductRepository";
-import { EstablishmentRepository } from "../../repositories/EstablishmentRepository";
+import type { IEstablishmentRepository } from "@domain/repositories/IEstablishmentRepository";
 import { NotFoundError } from "@shared/errors";
 
 export interface ProductDTO {
@@ -17,7 +17,7 @@ export interface ProductDTO {
 export class ListEstablishmentProducts {
     constructor(
         private productRepo: ProductRepository,
-        private establishmentRepo: EstablishmentRepository
+        private establishmentRepo: IEstablishmentRepository
     ) { }
 
     async execute(establishmentId: string): Promise<ProductDTO[]> {

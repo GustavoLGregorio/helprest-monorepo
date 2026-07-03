@@ -35,6 +35,7 @@ export class GetUserProfile {
             socialLinksEnabled: user.socialLinksEnabled,
             socialLinks: user.socialLinks ?? null,
             profilePhoto: user.profilePhoto ?? null,
+            role: user.role,
         };
     }
 }
@@ -65,6 +66,7 @@ export class UpdateUserProfile {
                 ? SocialLinks.create(input.socialLinks)
                 : existing.socialLinks,
             profilePhoto: input.profilePhoto ?? existing.profilePhoto,
+            role: input.role ?? existing.role,
             createdAt: existing.createdAt,
         });
 
@@ -106,6 +108,7 @@ export class UpdateUserFlags {
             socialLinksEnabled: user.socialLinksEnabled,
             socialLinks: user.socialLinks,
             profilePhoto: user.profilePhoto,
+            role: user.role,
             createdAt: user.createdAt,
         });
 

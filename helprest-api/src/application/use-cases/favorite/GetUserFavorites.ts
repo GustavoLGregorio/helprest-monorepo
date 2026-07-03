@@ -1,9 +1,9 @@
 import { ObjectId } from "mongodb";
-import { IUserFavoriteRepository } from "../../../domain/repositories/IUserFavoriteRepository";
-import { IEstablishmentRepository } from "../../../domain/repositories/IEstablishmentRepository";
-import { ProductRepository } from "../../repositories/ProductRepository";
-import { IUserRepository } from "../../../domain/repositories/IUserRepository";
-import { IFlagRepository } from "../../../domain/repositories/IFlagRepository";
+import type { IUserFavoriteRepository } from "../../../domain/repositories/IUserFavoriteRepository";
+import type { IEstablishmentRepository } from "../../../domain/repositories/IEstablishmentRepository";
+import type { ProductRepository } from "../../repositories/ProductRepository";
+import type { IUserRepository } from "../../../domain/repositories/IUserRepository";
+import type { IFlagRepository } from "../../../domain/repositories/IFlagRepository";
 
 export class GetUserFavorites {
     constructor(
@@ -38,7 +38,7 @@ export class GetUserFavorites {
         const allFlagsMap = new Map(flags.map(f => [f.id.toHexString(), f]));
         const userFlagStrings = new Set(userFlagIds.map(id => id.toHexString()));
 
-        const countMatches = (entityFlagIds: ObjectId[]) => {
+        const countMatches = (entityFlagIds: ReadonlyArray<ObjectId>) => {
             if (!entityFlagIds) return 0;
             return entityFlagIds.filter(id => userFlagStrings.has(id.toHexString())).length;
         };
@@ -58,7 +58,7 @@ export class GetUserFavorites {
             return matchB - matchA; // Highest matches first
         });
 
-        const mapFlags = (flagIds: any[]) => {
+        const mapFlags = (flagIds: ReadonlyArray<any>) => {
             return (flagIds || []).map(id => {
                 const idStr = id && typeof id.toHexString === "function" ? id.toHexString() : String(id);
                 const f = allFlagsMap.get(idStr);
@@ -88,9 +88,9 @@ export class GetUserFavorites {
                     city: e.location.city,
                     state: e.location.state,
                     neighborhood: e.location.neighborhood,
-                    coordinates: e.location.coordinates?.coordinates ? {
-                        lat: e.location.coordinates.coordinates[1],
-                        lng: e.location.coordinates.coordinates[0],
+                    coordinates: e.location.coordinates ? {
+                        lat: e.location.coordinates.lat,
+                        lng: e.location.coordinates.lng,
                     } : null
                 } : null
             })),

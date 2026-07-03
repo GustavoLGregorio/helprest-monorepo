@@ -1,6 +1,7 @@
 import { ObjectId } from "mongodb";
-import { UserFavorite, FavoriteType } from "../../domain/entities/UserFavorite";
-import { IUserFavoriteRepository } from "../../domain/repositories/IUserFavoriteRepository";
+import { UserFavorite } from "../../domain/entities/UserFavorite";
+import type { FavoriteType } from "../../domain/entities/UserFavorite";
+import type { IUserFavoriteRepository } from "../../domain/repositories/IUserFavoriteRepository";
 import { getUserFavoritesCollection } from "../database/mongodb/collections";
 
 export class MongoUserFavoriteRepository implements IUserFavoriteRepository {
