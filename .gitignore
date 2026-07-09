@@ -92,3 +92,6 @@ helprest-api/.gitignore
 # Força inclusão do agent-slot no versionamento como infraestrutura do projeto.
 # Anti-Nesting Policy: o .git interno foi removido — o slot é parte do repositório host.
 !agent-helprest/
+
+# Credentials and sensitive files
+resources/iniciacao_cientfica/service_account.json
