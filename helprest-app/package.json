@@ -5,17 +5,17 @@
   "scripts": {
     "start": "expo start",
     "start:clear": "expo start --clear",
-    "reset-project": "node ./scripts/reset-project.js",
+    "reset-project": "bun ./scripts/reset-project.js",
     "android": "expo run:android",
     "android:clean": "expo run:android --no-build-cache",
     "ios": "expo run:ios",
     "web": "expo start --web",
     "lint": "expo lint",
-    "prebuild": "expo prebuild --clean && node ./scripts/patch-android-signing.js",
-    "prebuild:android": "expo prebuild --clean --platform android && node ./scripts/patch-android-signing.js",
-    "clean:gradle": "cd android && gradlew clean && cd ..",
-    "clean:cache": "npx rimraf node_modules/.cache .expo",
-    "nuke": "npm run clean:gradle && npm run clean:cache && npm run prebuild:android"
+    "prebuild": "expo prebuild --clean && bun ./scripts/patch-android-signing.js",
+    "prebuild:android": "expo prebuild --clean --platform android && bun ./scripts/patch-android-signing.js",
+    "clean:gradle": "cd android && ./gradlew clean && cd ..",
+    "clean:cache": "bunx rimraf node_modules/.cache .expo",
+    "nuke": "bun run clean:gradle && bun run clean:cache && bun run prebuild:android"
   },
   "dependencies": {
     "@expo/ui": "~0.1.1-alpha.10",

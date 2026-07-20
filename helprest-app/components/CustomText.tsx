@@ -1,5 +1,15 @@
-import { Text, TextProps } from "react-native";
+import { Text, TextProps, StyleSheet } from "react-native";
 
-export default function CustomText({ children }: TextProps) {
-	return <Text className="bg-[hsl(220,100%,20%)]">{children}</Text>;
+export default function CustomText({ children, style, ...props }: TextProps) {
+	return (
+		<Text style={[styles.text, style]} {...props}>
+			{children}
+		</Text>
+	);
 }
+
+const styles = StyleSheet.create({
+	text: {
+		backgroundColor: "hsl(220, 100%, 20%)",
+	},
+});
