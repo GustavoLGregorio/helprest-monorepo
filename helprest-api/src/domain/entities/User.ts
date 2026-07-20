@@ -19,6 +19,7 @@ export interface UserProps {
     socialLinksEnabled: boolean;
     socialLinks?: SocialLinks;
     profilePhoto?: string;
+    role?: "user" | "establishment";
     createdAt?: Date;
     updatedAt?: Date;
 }
@@ -36,6 +37,7 @@ export class User {
     readonly socialLinksEnabled: boolean;
     readonly socialLinks?: SocialLinks;
     readonly profilePhoto?: string;
+    readonly role: "user" | "establishment";
     readonly createdAt: Date;
     readonly updatedAt: Date;
 
@@ -52,6 +54,7 @@ export class User {
         this.socialLinksEnabled = props.socialLinksEnabled;
         this.socialLinks = props.socialLinks;
         this.profilePhoto = props.profilePhoto;
+        this.role = props.role ?? "user";
         this.createdAt = props.createdAt ?? new Date();
         this.updatedAt = props.updatedAt ?? new Date();
     }
@@ -100,6 +103,7 @@ export class User {
                 ? SocialLinks.create(socialLinksDoc as unknown as SocialLinksProps)
                 : undefined,
             profilePhoto: doc.profilePhoto as string | undefined,
+            role: (doc.role as "user" | "establishment") ?? "user",
             createdAt: doc.createdAt ? new Date(doc.createdAt as string | number | Date) : undefined,
             updatedAt: doc.updatedAt ? new Date(doc.updatedAt as string | number | Date) : undefined,
         });
@@ -135,6 +139,7 @@ export class User {
                 }
                 : undefined,
             profilePhoto: this.profilePhoto,
+            role: this.role,
             createdAt: this.createdAt,
             updatedAt: this.updatedAt,
         };

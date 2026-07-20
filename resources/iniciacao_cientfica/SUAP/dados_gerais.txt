@@ -1,0 +1,10 @@
+Título do Projeto
+    HelpRest - Aplicativo dedicado a ajudar pessoas com restrições alimentares a descobrir lugares para se alimentar com segurança.
+Identificador do Projeto
+    3378/2025
+Período do Edital
+    Execução
+Campus do Projeto
+    COLOMBODG
+Supervisor do Projeto
+    Ademir Prado

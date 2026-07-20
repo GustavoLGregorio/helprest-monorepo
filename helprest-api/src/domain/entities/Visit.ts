@@ -7,6 +7,7 @@ export interface VisitProps {
     date: Date;
     review: string;
     rating: number;
+    photoUrls?: string[];
     createdAt?: Date;
 }
 
@@ -17,6 +18,7 @@ export class Visit {
     readonly date: Date;
     readonly review: string;
     readonly rating: number;
+    readonly photoUrls: ReadonlyArray<string>;
     readonly createdAt: Date;
 
     private constructor(props: VisitProps) {
@@ -26,6 +28,7 @@ export class Visit {
         this.date = props.date;
         this.review = props.review;
         this.rating = props.rating;
+        this.photoUrls = Object.freeze([...(props.photoUrls || [])]);
         this.createdAt = props.createdAt ?? new Date();
     }
 
@@ -47,6 +50,7 @@ export class Visit {
             date: new Date(doc.date as string | number | Date),
             review: doc.review as string,
             rating: doc.rating as number,
+            photoUrls: (doc.photoUrls as string[]) ?? [],
             createdAt: doc.createdAt ? new Date(doc.createdAt as string | number | Date) : undefined,
         });
     }
@@ -59,6 +63,7 @@ export class Visit {
             date: this.date,
             review: this.review,
             rating: this.rating,
+            photoUrls: [...this.photoUrls],
             createdAt: this.createdAt,
         };
     }

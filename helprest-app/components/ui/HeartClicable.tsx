@@ -3,19 +3,27 @@ import React, { useState } from "react";
 import { GestureResponderEvent, Pressable, ViewStyle } from "react-native";
 
 type HeartClicableProps = {
-	size: number;
+	size?: number;
 	activateAction: () => void;
 	deactivateAction: () => void;
+	startActivated?: boolean;
 };
 
 const HeartClicable: React.FC<HeartClicableProps> = ({
 	size = 28,
 	activateAction,
 	deactivateAction,
+	startActivated = false,
 }) => {
-	const [buttonClicked, setButtonClicked] = useState<boolean>(false);
-	const [heartIcon, setHeartIcon] = useState<"heart" | "heart-outline">("heart-outline");
-	const [heartColor, setHeartColor] = useState<"gray" | "red">("gray");
+	const [buttonClicked, setButtonClicked] = useState<boolean>(startActivated);
+	const [heartIcon, setHeartIcon] = useState<"heart" | "heart-outline">(startActivated ? "heart" : "heart-outline");
+	const [heartColor, setHeartColor] = useState<"gray" | "red">(startActivated ? "red" : "gray");
+
+	React.useEffect(() => {
+		setButtonClicked(startActivated);
+		setHeartIcon(startActivated ? "heart" : "heart-outline");
+		setHeartColor(startActivated ? "red" : "gray");
+	}, [startActivated]);
 
 	const handleButtonClick = () => {
 		if (!buttonClicked) {
@@ -34,7 +42,7 @@ const HeartClicable: React.FC<HeartClicableProps> = ({
 	};
 
 	return (
-		<Pressable onPress={handleButtonClick} style={{ paddingHorizontal: 4 }}>
+		<Pressable onPress={handleButtonClick} hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }} style={{ paddingHorizontal: 4 }}>
 			<MaterialCommunityIcons
 				size={size}
 				name={heartIcon}

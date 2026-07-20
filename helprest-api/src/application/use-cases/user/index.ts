@@ -35,6 +35,7 @@ export class GetUserProfile {
             socialLinksEnabled: user.socialLinksEnabled,
             socialLinks: user.socialLinks ?? null,
             profilePhoto: user.profilePhoto ?? null,
+            role: user.role,
         };
     }
 }
@@ -53,7 +54,9 @@ export class UpdateUserProfile {
             name: input.name ?? existing.name,
             email: existing.email,
             passwordHash: existing.passwordHash,
-            birthDate: existing.birthDate,
+            authProvider: existing.authProvider,
+            googleId: existing.googleId,
+            birthDate: input.birthDate ? new Date(input.birthDate) : existing.birthDate,
             flags: [...existing.flags],
             location: input.location
                 ? Location.create(input.location)
@@ -63,6 +66,7 @@ export class UpdateUserProfile {
                 ? SocialLinks.create(input.socialLinks)
                 : existing.socialLinks,
             profilePhoto: input.profilePhoto ?? existing.profilePhoto,
+            role: input.role ?? existing.role,
             createdAt: existing.createdAt,
         });
 
@@ -96,12 +100,15 @@ export class UpdateUserFlags {
             name: user.name,
             email: user.email,
             passwordHash: user.passwordHash,
+            authProvider: user.authProvider,
+            googleId: user.googleId,
             birthDate: user.birthDate,
             flags: flagObjectIds,
             location: user.location,
             socialLinksEnabled: user.socialLinksEnabled,
             socialLinks: user.socialLinks,
             profilePhoto: user.profilePhoto,
+            role: user.role,
             createdAt: user.createdAt,
         });
 

@@ -14,6 +14,7 @@ export class ListFlags {
             tag: f.tag,
             backgroundColor: f.backgroundColor,
             textColor: f.textColor,
+            images: f.images,
         }));
     }
 }

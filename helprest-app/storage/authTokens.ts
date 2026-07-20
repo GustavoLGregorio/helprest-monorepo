@@ -76,3 +76,12 @@ export const clearGoogleUserInfo = (): void => {
         console.error("Error clearing google user info:", error);
     }
 };
+
+/**
+ * Clear all auth data (tokens + google user info).
+ * Used on logout.
+ */
+export const clearAll = (): void => {
+    clearTokens();
+    clearGoogleUserInfo();
+};

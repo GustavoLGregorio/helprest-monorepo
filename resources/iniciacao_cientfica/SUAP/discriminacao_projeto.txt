@@ -1,0 +1,378 @@
+Resumo
+
+    Com o aumento do número de pessoas que seguem dietas específicas devido a alergias alimentares, intolerâncias ou preferências pessoais (como veganos e vegetarianos), há uma crescente demanda por soluções que ajudem os consumidores a encontrar estabelecimentos que atendam às suas necessidades alimentares. O objetivo principal é  ajudar essas pessoas com restrições alimentares a encontrar locais adequados para suas necessidades, com o intuito de facilitar a vida de quem sofre dessas restrições alimentares. A proposta do aplicativo visa resolver um problema significativo que afeta tanto os consumidores quanto os estabelecimentos. Ao facilitar a busca por lugares que oferecem opções adequadas, acreditamos que nao apenas melhora a experiência do usuário, mas também ajuda os restaurantes a se conectarem melhor com um público em crescimento.
+Palavras-Chaves
+    aplicativos; restrições alimentares; inclusão
+Introdução
+
+     
+
+    Com o aumento do número de pessoas que seguem dietas específicas devido a alergias alimentares, intolerâncias ou preferências pessoais, como veganos e vegetarianos, surge uma demanda crescente por soluções que ajudem os consumidores a encontrar estabelecimentos que atendam às suas necessidades alimentares. Muitas vezes, essas restrições tornam a experiência de comer fora desafiadora e, em alguns casos, até arriscada.
+
+    Ao proporcionar às pessoas com restrições alimentares uma ferramenta eficaz para localizar locais adequados que respeitem suas necessidades, facilitamos não apenas a vida dos consumidores, mas também promovemos uma maior inclusão no setor de alimentação. Um aplicativo que permite filtrar opções de restaurantes, cafés e mercados de acordo com as preferências dos usuários pode eliminar a ansiedade e a incerteza que muitas vezes acompanham a escolha de onde comer.
+
+    Essas soluções vão além da mera localização de estabelecimentos; elas promovem a conscientização sobre a importância de atender a diferentes necessidades dietéticas. Ao permitir que os usuários compartilhem experiências e avaliações, acredita-se que o aplicativo ajuda a criar um ambiente onde os estabelecimentos são incentivados a oferecer opções seguras e diversificadas. Isso pode, por sua vez, impulsionar uma maior diversidade nos cardápios de muitos restaurantes, atendendo não apenas aqueles com restrições, mas também consumidores que desejam explorar novas opções alimentares.
+
+    Por fim, a crescente demanda por alternativas alimentares adequadas está transformando a forma como interagimos com o setor de alimentação. Soluções que ajudam a encontrar locais que atendam a essas necessidades específicas não apenas facilitam a vida de quem possui restrições, mas também promovem um mercado mais inclusivo e consciente.
+Justificativa
+
+    O aumento significativo de pessoas adotando dietas específicas, evidencia a urgência de soluções que atendam a essa nova realidade. Por exemplo, projeções sugerem que, em 2010, 285 milhões de pessoas com mais de 20 anos conviviam com a diabetes globalmente, e, em 2030, essa cifra pode aumentar para 439 milhões (COSTA, 2018).
+
+    A dificuldade em encontrar estabelecimentos que respeitem essas restrições torna a experiência de comer fora não apenas complicada, mas também potencialmente perigosa. Um aplicativo que possibilita a filtragem de opções de restaurantes e mercados com base nas necessidades alimentares dos usuários pode se tornar  essencial. Além de facilitar a busca, essa ferramenta promoverá uma maior inclusão e respeito no setor de alimentação. Também, ao fomentar a troca de experiências e avaliações, o aplicativo criará um ambiente colaborativo que incentiva os estabelecimentos a oferecer opções mais seguras e variadas. Essa abordagem não só atende aqueles com restrições, mas também enriquece a experiência de todos os consumidores, ampliando as opções disponíveis. Portanto, investir em soluções que ajudem a localizar estabelecimentos adequados é uma estratégia crucial para transformar a interação com o setor alimentar em um espaço mais inclusivo e consciente. 
+
+    Esse tipo de inclusão também pode ter um impacto positivo na cultura alimentar, incentivando um maior respeito pela diversidade. À medida que mais estabelecimentos adotam práticas inclusivas, acredita-se que a comunidade se torna mais consciente das várias dietas e das razões por trás delas, promovendo um diálogo aberto sobre alimentação. Além disso, essa abordagem pode atrair uma clientela mais ampla, beneficiando os negócios e estimulando o crescimento do mercado.
+Fundamentação Teórica
+
+     
+
+    1 - Dietas especiais
+
+    As dietas especiais são elaboradas para atender necessidades específicas de saúde ou preferências pessoais. As dietas especiais são planos alimentares adaptados a necessidades nutricionais específicas ou condições de saúde. Elas podem ser prescritas por médicos ou nutricionistas e visam prevenir, tratar ou gerenciar doenças. 
+
+    1.1 - Doença celíaca e sensibilidade ao glúten não celíaca
+
+    A doença celíaca é uma doença autoimune, crônica e não tem cura, cujo o único tratamento é controle da doença é uma dieta restritiva sem o glúten. O glúten é uma proteína que está presente no trigo, na cevada, no centeio, na aveia e em outras farinhas.
+
+    A ingestão de qualquer alimento que contenha essa proteína pode causar sérios danos ao celíaco, como: desenvolver outras doenças autoimunes (tireoidite de Hashimoto, Doença de Crohn, diabetes mellitus tipo 1, gastrite autoimune), além de colite linfocítica e outras doenças inflamatórias intestinais e até mesmo câncer de intestino (DA FONSECA MARQUES, 2022). Devido a isto, é necessário que o celíaco faça uma dieta totalmente restritiva sem a ingestão do glúten para que a doença entre em remissão, ou seja, esteja controlada para evitar altos danos. 
+
+    A Sensibilidade ao Glúten Não Celíaca (SGNC) é uma síndrome que vem ganhando destaque nas discussões sobre saúde alimentar. Caracterizada por uma variedade de sintomas gastrointestinais e extraintestinais, a SGNC se manifesta em indivíduos que, após a ingestão de alimentos que contêm glúten, apresentam desconfortos que melhoram com a exclusão desses produtos da dieta. É crucial ressaltar que, para um diagnóstico de SGNC, é necessário descartar outras condições, como a doença celíaca e a alergia ao trigo, garantindo que os sintomas sejam realmente atribuídos ao glúten (DE BORBA, 2023).
+
+    As manifestações da SGNC podem incluir distúrbios como dor abdominal, inchaço, fadiga e até alterações de humor, o que pode impactar significativamente a qualidade de vida dos afetados. Embora a doença celíaca e a alergia ao trigo sejam mais amplamente reconhecidas e diagnosticadas, a SGNC representa uma condição que ainda demanda mais atenção e compreensão, tanto por parte dos profissionais de saúde quanto da população em geral.
+
+    1.2 - Intolerância a lactose
+
+     A intolerância à lactose é uma condição digestiva comum que afeta uma parte significativa da população mundial. Ela ocorre quando o organismo não produz quantidades suficientes da enzima lactase, responsável pela digestão da lactose, um açúcar encontrado no leite e em produtos lácteos (TEO, 2002).
+
+    Quando a lactose não é devidamente digerida, pode causar diversos sintomas. A gravidade desses sintomas pode variar de pessoa para pessoa, dependendo da quantidade de lactose consumida e da capacidade individual de tolerância. Os sintomas mais comuns são dor na região abdominal, sensação de distensão, gases, diarreia, ruídos intestinais e, especialmente entre os jovens, vômitos (MATAR, 2010).
+
+    1.3 - Diabetes
+
+    O diabetes é uma condição crônica que afeta a maneira como o corpo processa o açúcar (glicose) no sangue. Uma das principais preocupações para quem vive com diabetes é o controle dos níveis de glicose no sangue. O consumo de alimentos ricos em açúcar pode provocar picos de glicose, que são prejudiciais à saúde.
+
+    Quando uma pessoa com diabetes consome açúcar, a glicose no sangue pode aumentar rapidamente, levando a diversos sintomas. Se esses níveis se mantiverem elevados por um período prolongado, podem causar complicações sérias, como doenças cardíacas, danos nos nervos e problemas nos rins (NATIONAL DIABETES DATA GROUP, 1995).
+
+    1.4 - Vegetarianismo e Veganismo
+
+    O vegetarianismo e o veganismo são duas práticas alimentares que têm ganhado cada vez mais adesão em todo o mundo, refletindo mudanças nos hábitos de consumo e nas preocupações com a saúde, o bem-estar animal e a sustentabilidade ambiental. Ambas as filosofias compartilham a ideia de evitar o consumo de carne, mas diferem significativamente em sua abordagem e abrangência.
+
+    O vegetarianismo é uma dieta que exclui a carne de animais, incluindo carne vermelha, aves e peixes. Por outro lado, o veganismo é uma filosofia de vida que vai muito além da alimentação. Os veganos evitam não apenas a carne, mas também todos os produtos de origem animal, incluindo laticínios, ovos e até mesmo alimentos como mel. Além disso, o veganismo se estende ao consumo de produtos não alimentares, como couro, lã e cosméticos testados em animais (CAVALHEIRO, 2018).
+Objetivo Geral
+
+    Objetivo Geral
+
+    Desenvolver um aplicativo para auxiliar pessoas com restrições alimentares a encontrar restaurantes e estabelecimentos capazes de atendê-los em suas respectivas dietas. 
+
+    Objetivos específicos:
+
+        Desenvolver um sistema de filtragem avançado: Criar um mecanismo que permita aos usuários selecionar múltiplas restrições alimentares (como alergias, intolerâncias e preferências dietéticas) para encontrar estabelecimentos adequados.
+        Integrar funcionalidades de geolocalização: Incorporar mapas e direções para ajudar os usuários a localizar os estabelecimentos mais próximos que atendam às suas necessidades alimentares.
+        Criar um espaço de Comunidade: Estabelecer um fórum ou área de discussão dentro do aplicativo para que os usuários possam trocar dicas, receitas e experiências relacionadas a restrições alimentares.
+        Fomentar parcerias com estabelecimentos: Estabelecer parcerias com restaurantes e mercados para promover a inclusão de opções seguras e diversificadas em seus cardápios, incentivando melhorias baseadas no feedback dos usuários.
+
+Metodologia da Execução do Projeto
+
+    A execução do projeto será dividida em diversas tarefas. Essas tarefas vão desde a concepção inicial do aplicativo até a implantação e disponibilização do mesmo. A criação do aplicativo seguirá a seguinte ordem de tarefas:
+
+    1 - Definição do público-alvo: Será estabelecido o público alvo do aplicativo, ou seja, quais restrições alimentares serão contempladas pelo aplicativo.
+
+    2 - Definição das funcionalidades do aplicativo: Após a definição das restrições alimentares que serão atendidas, as funcionalidades do aplicativo serão definidas. Cada funcionalidade será detalhada, definindo os fluxos que os usuários irão seguir para utilizá-las. Essas funcionalidades serão definidas através de um estudo com aplicativos semelhantes, identificando pontos fortes e fracos de cada um dos aplicativos selecionados.
+
+    3 - Criação dos protótipos: Após a definição das funcionalidades, será desenvolvido protótipos do aplicativo. Essa tarefa tem por objetivo definir como as funcionalidades e telas interagem entre si, fornecendo uma visão inicial de como o aplicativo será e como o mesmo irá funcionar.
+
+    4 - Codificação do aplicativo, tanto no front-end quanto no back-end: As funcionalidades definidas inicialmente serão implementadas.
+
+    5 - Testes de usabilidade, funcionalidade e performance: Após a implementação das funcionalidades, o aplicativo será testado por um grupo de usuários escolhidos. Essa tarefa objetiva encontrar erros e corrigi-los antes da publicação do mesmo.
+
+    6 - Publicação do aplicativo nas lojas (App Store, Google Play): O aplicativo será publicado, disponibilizando-o para download.
+
+    7 - Coleta de feedback dos usuários e melhorias contínuas no aplicativo: Com a publicação, será coletado o feedback dos usuários e as melhorias que forem necessárias serão realizadas.
+
+    O acompanhamento/execução do projeto será feito de acordo com o cronograma abaixo:
+
+      
+    	
+
+    Mês
+    	
+
+    01
+    	
+
+    02
+    	
+
+    03
+    	
+
+    04
+    	
+
+    05
+    	
+
+    06
+    	
+
+    07
+    	
+
+    08
+    	
+
+    09
+    	
+
+    10
+    	
+
+    11
+    	
+
+    12
+
+    Tarefa 1
+    	
+
+     
+    	
+
+    x 
+    	
+
+     
+    	
+
+     
+    	
+
+     
+    	
+
+     
+    	
+
+     
+    	
+
+     
+    	
+
+     
+    	
+
+     
+    	
+
+     
+    	
+
+     
+    	
+
+     
+
+     Tarefa 2
+    	
+
+     
+    	
+
+     x
+    	
+
+     x
+    	
+
+     x
+    	
+
+     x
+    	
+
+     
+    	
+
+     
+    	
+
+     
+    	
+
+     
+    	
+
+     
+    	
+
+     
+    	
+
+     
+    	
+
+     
+
+     Tarefa 3
+    	
+
+     
+    	
+
+     
+    	
+
+    x 
+    	
+
+     x
+    	
+
+     x
+    	
+
+     x
+    	
+
+     
+    	
+
+     
+    	
+
+     
+    	
+
+     
+    	
+
+     
+    	
+
+     
+    	
+
+     
+
+    Tarefa 4 
+    	
+
+     
+    	
+
+     
+    	
+
+     
+    	
+
+     x
+    	
+
+     x
+    	
+
+     x
+    	
+
+     x
+    	
+
+    x 
+    	
+
+     x
+    	
+
+     x
+    	
+
+     
+    	
+
+     
+    	
+
+     
+    Tarefa 5	 	 	 	 	x	x	x	x	x	x	x	 	 
+    Tarefa 6	 	 	 	 	 	 	 	 	 	 	 	x	 
+
+    Tarefa 
+
+    7
+    	 	 	 	 	 	 	 	 	 	 	 	x	x
+
+    Espaço de Trabalho:
+
+    Será utilizado as dependências do campus Colombo:
+
+        Incubadora GrapeTech: Este espaço é ideal para a incubação do projeto, oferecendo suporte a startups e empreendedorismo, além de promover networking e acesso a mentorias.
+
+     
+
+        Necessita de Comitê de Ética em Pesquisa (CEP): ( ) SIM (x) NÃO Caso sim, nº de protocolo ____________________
+        Necessita de Comissão de Ética no Uso de Animais (Ceua): ( ) SIM (x) NÃO Caso sim, nº de protocolo _____________________
+
+    Necessita de cadastro no Sisgen: ( ) SIM (x) NÃO Caso sim, nº de protocolo____________________
+     
+
+     Curso
+    	
+
+    Nível (médio técnico/ graduação/ outros (especificar)
+    	
+
+    Modalidade (presencial/ a distância)
+
+     Tecnologia em Análise de Sistemas
+    	
+
+     Graduação 
+    	
+
+    Presencial 
+
+
+    O aplicativo HelpRest, voltado para ajudar pessoas com restrições alimentares a encontrar locais onde possam se alimentar com segurança, contribui diretamente para diversos Objetivos de Desenvolvimento Sustentável (ODS) da ONU. Abaixo estão os principais ODS que esse tipo de aplicativo pode atender:
+    ODS 3 – Saúde e Bem-Estar
+
+    Promove a saúde ao ajudar pessoas com alergias, intolerâncias ou dietas específicas (como celíacos, diabéticos, veganos etc.) a evitarem riscos alimentares, reduzindo internações, crises alérgicas e outros problemas de saúde relacionados à alimentação inadequada.
+
+    ODS 10 – Redução das Desigualdades
+
+    Facilita o acesso equitativo à alimentação segura para pessoas com necessidades alimentares específicas, promovendo inclusão social e combatendo a marginalização de grupos que frequentemente enfrentam barreiras em restaurantes e outros estabelecimentos.
+    ODS 11 – Cidades e Comunidades Sustentáveis
+
+    Ao mapear e destacar estabelecimentos acessíveis e inclusivos para pessoas com restrições alimentares, o HelpRest promove cidades mais inclusivas e seguras para todos os cidadãos, incentivando também boas práticas no setor alimentício.
+
+    ODS 12 – Consumo e Produção Responsáveis
+
+    Estimula restaurantes e estabelecimentos a adotarem práticas alimentares mais responsáveis, como informar claramente ingredientes, evitar contaminação cruzada e considerar dietas alternativas, contribuindo para um consumo mais consciente.
+Acompanhamento e Avaliação do Projeto Durante a Execução
+
+    Será definido um cronograma com marcos importantes que vão ajudar a acompanhar o progresso do desenvolvimento do projeto.
+
+    Será estabelecido reuniões quinzenais para revisar o andamento do projeto e discutir quaisquer desafios enfrentados.
+
+    Será realizado testes regulares com usuários reais para coletar dados sobre a funcionalidade do aplicativo e a experiência do usuário.
+
+    Será implementado um canal de comunicação onde os usuários possam enviar feedback e sugestões de melhorias.
+
+    Utilizar ferramentas de análise para monitorar como os usuários interagem com o aplicativo (tempo médio de uso, funcionalidades mais utilizadas, etc.).
+Resultados esperados
+
+    O desenvolvimento do aplicativo visa proporcionar uma experiência prática e acessível para pessoas com restrições alimentares, permitindo que encontrem restaurantes e estabelecimentos que atendam às suas necessidades específicas. Com isso, espera-se que o aplicativo contribua para um ambiente social e gastronômico mais inclusivo, promovendo a conscientização sobre a importância de atender a diversas necessidades alimentares e incentivando mais restaurantes a adaptar seus menus para atender diferentes públicos.
+Referências Bibliográficas
+
+    Costa, A. F., Flor, L. S., Campos, M. R., Oliveira, A. F. D., Costa, M. D. F. D. S., Silva, R. S. D., ... & Schramm, J. M. D. A. (2017). Carga do diabetes mellitus tipo 2 no Brasil. Cadernos de Saúde Pública, 33, e00197915.
+
+    da Fonseca Marques, E. T., de Athayde, Í. B., Ribeiro, L. C. P., de Sousa, M. R., & de Siqueira, E. C. (2022). Uma análise acerca das características da Doença Celíaca: revisão de literatura. Revista Eletrônica Acervo Médico, 15, e10722-e10722.
+
+    de Borba, B. C. R., de Oliveira, R. C., & Correa, D. (2023). Doença Celíaca e Sensibilidade ao Glúten: Revisão Narrativa e Desenvolvimento de Material Educativo. Epitaya E-books, 1(27), 96-111.
+
+    Téo, C. R. P. A. (2002). Intolerância à lactose: uma breve revisão para o cuidado nutricional. Arquivos de Ciências da Saúde da UNIPAR, 6(3).
+
+    Mattar, R., & Mazo, D. F. D. C. (2010). Intolerância à lactose: mudança de paradigmas com a biologia molecular. Revista da Associação Médica Brasileira, 56, 230-236.
+
+    National Diabetes Data Group (US), National Institute of Diabetes, Digestive, & Kidney Diseases (US). (1995). Diabetes in America (No. 95). National Institutes of Health, National Institute of Diabetes and Digestive and Kidney Diseases.
+
+    Cavalheiro, C. A., Verdu, F. C., & Amarante, J. M. (2018). Difusão do vegetarianismo e veganismo no brasil a partir de uma perspectiva de transnacionalização. Revista eletrônica ciências da administração e turismo, 6(1), 51-67.

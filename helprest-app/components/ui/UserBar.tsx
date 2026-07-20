@@ -1,26 +1,27 @@
 import { View, StyleSheet, TextInput } from "react-native";
-import React, { useState } from "react";
+import React from "react";
 import { Colors } from "@/constants/Colors";
-import IconCircle from "./IconCircle";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
+import ProfileSheet from "./ProfileSheet";
 
-const UserBar = () => {
-	const [searchText, onChangeSearchText] = useState<string>("Pesquise aqui");
-
+/**
+ * Top search bar with location icon and profile button.
+ * Self-contained — profile button manages its own modal internally.
+ */
+const UserBar: React.FC = () => {
 	return (
-		<View style={[styles.container]}>
+		<View style={styles.container}>
 			<View>
 				<MaterialCommunityIcons name="map-marker" size={42} color={Colors.light.gray} />
 			</View>
-			<View style={{ flexGrow: 2 }}>
-				<TextInput style={styles.searchText} onChangeText={onChangeSearchText} value={searchText} />
-			</View>
-			<View>
-				<IconCircle
-					imageSource={require("@/assets/images/markers/u_min_profile_0.png")}
-					size={42}
+			<View style={styles.searchContainer}>
+				<TextInput
+					style={styles.searchText}
+					placeholder="Pesquise aqui"
+					placeholderTextColor={Colors.light.gray}
 				/>
 			</View>
+			<ProfileSheet />
 		</View>
 	);
 };
@@ -42,6 +43,9 @@ const styles = StyleSheet.create({
 		transform: "translate(-50%)",
 		borderRadius: 1_000,
 		boxShadow: "0px 2px 6px 2px rgba(0, 0, 0, 0.2)",
+	},
+	searchContainer: {
+		flexGrow: 2,
 	},
 	searchText: {
 		color: Colors.light.gray,

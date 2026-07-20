@@ -41,7 +41,7 @@ const styles = StyleSheet.create({
         backgroundColor: "#EEE",
 
         width: "100%",
-        height: "100%",
+        minHeight: "100%",
         padding: 8,
 
         display: "flex",
@@ -50,7 +50,7 @@ const styles = StyleSheet.create({
         justifyContent: "flex-start",
         alignContent: "flex-start",
         rowGap: 12,
-        gap: 12,
+        gap: 10,
 
         boxShadow: "-1px 1px 0px 1px rgba(0, 0, 0, 0.1)",
     },

@@ -6,6 +6,7 @@ export const registerSchema = z.object({
     password: z.string().min(8).max(128),
     birthDate: z.iso.date(),
     flagIds: z.array(z.string()).optional().default([]),
+    role: z.enum(["user", "establishment"]).optional().default("user"),
 });
 
 export const loginSchema = z.object({

@@ -13,6 +13,13 @@ export class MongoEstablishmentRepository implements IEstablishmentRepository {
         return doc ? Establishment.fromDocument(doc) : null;
     }
 
+    async findManyByIds(ids: ObjectId[]): Promise<Establishment[]> {
+        const docs = await getEstablishmentsCollection()
+            .find({ _id: { $in: ids } })
+            .toArray();
+        return docs.map((doc) => Establishment.fromDocument(doc));
+    }
+
     async findAll(limit: number, skip: number): Promise<Establishment[]> {
         const docs = await getEstablishmentsCollection()
             .find()
@@ -101,6 +108,11 @@ export class MongoEstablishmentRepository implements IEstablishmentRepository {
 
     async delete(id: ObjectId): Promise<void> {
         await getEstablishmentsCollection().deleteOne({ _id: id });
+    }
+
+    async findByAdminId(adminId: ObjectId): Promise<Establishment | null> {
+        const doc = await getEstablishmentsCollection().findOne({ adminId });
+        return doc ? Establishment.fromDocument(doc) : null;
     }
 
     async count(): Promise<number> {

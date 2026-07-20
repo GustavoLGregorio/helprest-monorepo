@@ -5,6 +5,11 @@ export const createVisitSchema = z.object({
     rating: z.number().int().min(1).max(5),
     review: z.string().min(1).max(2000),
     date: z.iso.date().optional(),
+    photoUrls: z.array(z.string()).optional(),
+    coordinates: z.object({
+        lat: z.coerce.number().min(-90).max(90),
+        lng: z.coerce.number().min(-180).max(180),
+    }).optional(),
 });
 
 export const listVisitsSchema = z.object({

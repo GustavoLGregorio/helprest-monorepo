@@ -2,10 +2,11 @@ import { ObjectId } from "mongodb";
 import type { IEstablishmentRepository } from "@domain/repositories/IEstablishmentRepository";
 import type { IFlagRepository } from "@domain/repositories/IFlagRepository";
 import type { IUserRepository } from "@domain/repositories/IUserRepository";
+import type { ProductRepository } from "@application/repositories/ProductRepository";
 import { Establishment } from "@domain/entities/Establishment";
 import { Location } from "@domain/value-objects/Location";
 import { RecommendationService } from "@domain/services/RecommendationService";
-import { NotFoundError } from "@shared/errors";
+import { NotFoundError, ValidationError } from "@shared/errors";
 import type {
     CreateEstablishmentInput,
     ListEstablishmentsInput,
@@ -18,9 +19,14 @@ import type { Flag } from "@domain/entities/Flag";
 
 interface FlagDTO {
     id: string;
+    tag: string;
     identifier: string;
     backgroundColor: string;
     textColor: string;
+    images: {
+        tag: string | null;
+        pin: string | null;
+    };
 }
 
 async function populateFlags(
@@ -31,9 +37,11 @@ async function populateFlags(
     const flags = await flagRepo.findByIds([...flagIds]);
     return flags.map((f) => ({
         id: f.id.toHexString(),
+        tag: f.tag,
         identifier: f.identifier,
         backgroundColor: f.backgroundColor,
         textColor: f.textColor,
+        images: f.images,
     }));
 }
 
@@ -93,17 +101,66 @@ export class GetEstablishment {
     constructor(
         private readonly estRepo: IEstablishmentRepository,
         private readonly flagRepo: IFlagRepository,
+        private readonly productRepo: ProductRepository,
+        private readonly userRepo?: IUserRepository,
     ) { }
 
-    async execute(id: string) {
+    async execute(id: string, userId?: string) {
+        if (!ObjectId.isValid(id)) {
+            throw new ValidationError("ID de estabelecimento inválido");
+        }
         const est = await this.estRepo.findById(new ObjectId(id));
         if (!est) {
             throw new NotFoundError("Establishment", id);
         }
 
         const flags = await populateFlags(est.flags, this.flagRepo);
+        const productsRaw = await this.productRepo.findByEstablishmentId(est.id);
+
+        let userFlags: string[] = [];
+        if (userId && this.userRepo) {
+            if (!ObjectId.isValid(userId)) {
+                throw new ValidationError("ID de usuário inválido");
+            }
+            const user = await this.userRepo.findById(new ObjectId(userId));
+            if (user) {
+                userFlags = user.flags.map((f) => f.toHexString());
+            }
+        }
+
+        const products = await Promise.all(
+            productsRaw.map(async (p) => {
+                const pFlags = await populateFlags(p.flags, this.flagRepo);
+                const pFlagIds = p.flags.map((f) => f.toHexString());
+                const matchCount = userFlags.length > 0
+                    ? pFlagIds.filter((fid) => userFlags.includes(fid)).length
+                    : 0;
+
+                return {
+                    id: p.id.toHexString(),
+                    flags: pFlags,
+                    name: p.name,
+                    description: p.description,
+                    price: p.price,
+                    imageUrl: p.imageUrl,
+                    ingredients: [...p.ingredients],
+                    isActive: p.isActive,
+                    matchCount,
+                };
+            }),
+        );
+
+        // Sort products: active ones first, then by matchCount descending (most matching user dietary restrictions first)
+        products.sort((a, b) => {
+            if (a.isActive !== b.isActive) {
+                return a.isActive ? -1 : 1;
+            }
+            return b.matchCount - a.matchCount;
+        });
+
         return {
             ...toEstablishmentDTO(est, flags),
+            products,
             ratingCount: est.ratingCount,
         };
     }
@@ -194,7 +251,7 @@ export class SearchEstablishments {
 export class CreateEstablishment {
     constructor(private readonly estRepo: IEstablishmentRepository) { }
 
-    async execute(input: CreateEstablishmentInput) {
+    async execute(adminId: string, input: CreateEstablishmentInput) {
         const location = Location.create(input.location);
         const flagIds = input.flagIds.map((id) => new ObjectId(id));
 
@@ -206,9 +263,50 @@ export class CreateEstablishment {
             rating: 0,
             ratingCount: 0,
             ratingTotal: 0,
+            adminId: new ObjectId(adminId),
         });
 
         await this.estRepo.create(establishment);
         return { id: establishment.id.toHexString() };
+    }
+}
+
+export class GetEstablishmentByAdmin {
+    constructor(
+        private readonly estRepo: IEstablishmentRepository,
+        private readonly flagRepo: IFlagRepository,
+        private readonly productRepo: ProductRepository,
+    ) { }
+
+    async execute(adminId: string) {
+        if (!ObjectId.isValid(adminId)) {
+            throw new ValidationError("ID de administrador inválido");
+        }
+        const est = await this.estRepo.findByAdminId(new ObjectId(adminId));
+        if (!est) {
+            throw new NotFoundError("Establishment", `admin ${adminId}`);
+        }
+
+        const flags = await populateFlags(est.flags, this.flagRepo);
+        const productsRaw = await this.productRepo.findByEstablishmentId(est.id);
+        const products = await Promise.all(productsRaw.map(async (p) => {
+            const pFlags = await populateFlags(p.flags, this.flagRepo);
+            return {
+                id: p.id.toHexString(),
+                flags: pFlags,
+                name: p.name,
+                description: p.description,
+                price: p.price,
+                imageUrl: p.imageUrl,
+                ingredients: [...p.ingredients],
+                isActive: p.isActive,
+            };
+        }));
+
+        return {
+            ...toEstablishmentDTO(est, flags),
+            products,
+            ratingCount: est.ratingCount,
+        };
     }
 }

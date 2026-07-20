@@ -19,10 +19,12 @@ export interface FindByFlagsOptions {
 export interface IEstablishmentRepository {
     findById(id: ObjectId): Promise<Establishment | null>;
     findAll(limit: number, skip: number): Promise<Establishment[]>;
+    findManyByIds(ids: ObjectId[]): Promise<Establishment[]>;
     findNearby(options: FindNearbyOptions): Promise<Establishment[]>;
     findByFlags(options: FindByFlagsOptions): Promise<Establishment[]>;
     findSponsored(limit: number): Promise<Establishment[]>;
     search(query: string, limit: number, skip: number): Promise<Establishment[]>;
+    findByAdminId(adminId: ObjectId): Promise<Establishment | null>;
     create(establishment: Establishment): Promise<void>;
     update(establishment: Establishment): Promise<void>;
     delete(id: ObjectId): Promise<void>;

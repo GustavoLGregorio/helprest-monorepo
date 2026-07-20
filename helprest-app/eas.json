@@ -10,7 +10,8 @@
         "preview": {
             "android": {
                 "buildType": "apk"
-            }
+            },
+            "credentialsSource": "local"
         },
         "production": {
             "android": {
@@ -20,6 +21,7 @@
             "ios": {
                 "buildConfiguration": "Release"
             },
+            "credentialsSource": "local",
             "env": {
                 "NODE_ENV": "production"
             }
@@ -29,6 +31,7 @@
                 "buildType": "apk",
                 "gradleCommand": ":app:assembleRelease"
             },
+            "credentialsSource": "local",
             "env": {
                 "NODE_ENV": "production"
             },
@@ -38,6 +41,7 @@
             "android": {
                 "buildType": "app-bundle"
             },
+            "credentialsSource": "local",
             "env": {
                 "NODE_ENV": "production"
             }

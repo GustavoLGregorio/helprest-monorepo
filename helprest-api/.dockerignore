@@ -1,0 +1,12 @@
+node_modules/
+.git/
+.env
+
+# Tests and scripts are not needed for the production API
+tests/
+scripts/
+
+# Ignore Docker-related files
+Dockerfile
+.dockerignore
+bunfig.toml

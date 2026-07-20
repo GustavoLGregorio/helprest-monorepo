@@ -3,18 +3,26 @@ import { Tabs } from "expo-router";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { Colors } from "@/constants/Colors";
 import { ColorValue } from "react-native";
+import { emitMapRecenter } from "@/utils/mapEvents";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-export default function RootLayout() {
+export default function TabsLayout() {
+    const insets = useSafeAreaInsets();
+
     return (
         <Tabs
             screenOptions={{
                 animation: "shift",
                 headerShown: false,
+                tabBarShowLabel: false,
                 tabBarActiveTintColor: Colors.light.tint,
+                freezeOnBlur: true,
+
                 tabBarStyle: {
                     elevation: 1,
-                    height: 76,
+                    height: 60 + insets.bottom,
                     paddingTop: 8,
+                    paddingBottom: insets.bottom > 0 ? insets.bottom : 8,
                     boxShadow: "0 0px 16px 1px rgba(0, 0, 0, 0.2)",
                 },
             }}
@@ -32,6 +40,9 @@ export default function RootLayout() {
                         />
                     ),
                 }}
+                listeners={{
+                    tabPress: () => emitMapRecenter(),
+                }}
             />
             <Tabs.Screen
                 name="(places)/index"
@@ -42,6 +53,20 @@ export default function RootLayout() {
                         <MaterialCommunityIcons
                             size={28}
                             name="map-marker"
+                            color={color}
+                        />
+                    ),
+                }}
+            />
+            <Tabs.Screen
+                name="(favorites)/index"
+                options={{
+                    title: "Favoritos",
+                    tabBarLabel: "Favoritos",
+                    tabBarIcon: ({ color }: { color: ColorValue }) => (
+                        <MaterialCommunityIcons
+                            size={28}
+                            name="heart"
                             color={color}
                         />
                     ),

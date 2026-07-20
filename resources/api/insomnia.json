@@ -264,6 +264,25 @@
             "body": {}
         },
         {
+            "_id": "req_get_establishment_products",
+            "_type": "request",
+            "parentId": "fld_establishments",
+            "name": "Get Establishment Products",
+            "method": "GET",
+            "url": "{{ _.baseUrl }}/establishments/REPLACE_WITH_ID/products",
+            "headers": [
+                {
+                    "name": "Content-Type",
+                    "value": "application/json"
+                },
+                {
+                    "name": "Authorization",
+                    "value": "Bearer {{ _.accessToken }}"
+                }
+            ],
+            "body": {}
+        },
+        {
             "_id": "req_recommended",
             "_type": "request",
             "parentId": "fld_establishments",

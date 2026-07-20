@@ -1,5 +1,10 @@
 import { ObjectId } from "mongodb";
 
+export interface FlagImages {
+    tag: string | null;
+    pin: string | null;
+}
+
 export interface FlagProps {
     id?: ObjectId;
     type: string;
@@ -8,6 +13,7 @@ export interface FlagProps {
     tag: string;
     backgroundColor: string;
     textColor: string;
+    images?: FlagImages;
 }
 
 export class Flag {
@@ -18,6 +24,7 @@ export class Flag {
     readonly tag: string;
     readonly backgroundColor: string;
     readonly textColor: string;
+    readonly images: FlagImages;
 
     private constructor(props: FlagProps) {
         this.id = props.id ?? new ObjectId();
@@ -27,6 +34,7 @@ export class Flag {
         this.tag = props.tag;
         this.backgroundColor = props.backgroundColor;
         this.textColor = props.textColor;
+        this.images = props.images ?? { tag: null, pin: null };
     }
 
     static create(props: FlagProps): Flag {
@@ -37,6 +45,7 @@ export class Flag {
     }
 
     static fromDocument(doc: Record<string, unknown>): Flag {
+        const rawImages = doc.images as Record<string, unknown> | undefined;
         return new Flag({
             id: doc._id as ObjectId,
             type: doc.type as string,
@@ -45,6 +54,12 @@ export class Flag {
             tag: doc.tag as string,
             backgroundColor: (doc.backgroundColor as string) ?? "#888888",
             textColor: (doc.textColor as string) ?? "#FFFFFF",
+            images: rawImages
+                ? {
+                    tag: (rawImages.tag as string) ?? null,
+                    pin: (rawImages.pin as string) ?? null,
+                }
+                : { tag: null, pin: null },
         });
     }
 
@@ -57,6 +72,7 @@ export class Flag {
             tag: this.tag,
             backgroundColor: this.backgroundColor,
             textColor: this.textColor,
+            images: this.images,
         };
     }
 }
