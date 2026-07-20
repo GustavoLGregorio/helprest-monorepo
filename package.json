@@ -1,0 +1,28 @@
+{
+  "name": "helprest-monorepo",
+  "private": true,
+  "workspaces": [
+    "helprest-api",
+    "helprest-app"
+  ],
+  "scripts": {
+    "dev:infra": "docker compose up -d mongodb redis",
+    "dev:up": "docker compose up -d",
+    "dev:down": "docker compose down",
+    "dev:logs": "docker compose logs -f api",
+    "api:seed": "docker exec helprest-api bun run seed",
+    "api:test": "docker exec helprest-api bun test",
+    "app:start": "cd helprest-app && bun run start",
+    "app:start:clear": "cd helprest-app && bun run start:clear",
+    "app:android": "cd helprest-app && bun run android",
+    "app:ios": "cd helprest-app && bun run ios",
+    "app:nuke-android": "cd helprest-app && rm -rf android && bun run prebuild:android",
+    "app:clean": "cd helprest-app && bun run nuke",
+    "app:eas:login": "cd helprest-app && bunx eas-cli login",
+    "app:eas:build-apk-cloud": "cd helprest-app && bunx eas-cli build --platform android --profile preview",
+    "app:eas:build-apk-local": "cd helprest-app && bunx eas-cli build --platform android --profile preview --local",
+    "app:eas:build-aab": "cd helprest-app && bunx eas-cli build --platform android --profile production-aab",
+    "typecheck:app": "cd helprest-app && bunx tsc --noEmit",
+    "typecheck:api": "docker exec helprest-api bunx tsc --noEmit"
+  }
+}

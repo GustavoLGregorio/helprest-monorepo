@@ -1,12 +1,16 @@
 # -------------------------------------------------------------------------------------------------
+# GLOBAL IGNORES
+# -------------------------------------------------------------------------------------------------
+node_modules/
+.DS_Store
+*.log
+
+# -------------------------------------------------------------------------------------------------
 # FRONTEND
 # -------------------------------------------------------------------------------------------------
 
 # Git
 helprest-app/.gitignore
-
-# Dependencies
-helprest-app/node_modules/
 
 # Expo
 helprest-app/.expo/
@@ -95,3 +99,12 @@ helprest-api/.gitignore
 
 # Credentials and sensitive files
 resources/iniciacao_cientfica/service_account.json
+oauth-client.json
+
+# Centralized Environment Files
+.env
+.env.production
+.env.development
+.env.local
+helprest-app/.env
+helprest-api/.env
