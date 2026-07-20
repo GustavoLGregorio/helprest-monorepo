@@ -14,7 +14,7 @@
 
 ### 1.1 Sistema de Roles & Permissões
 
-- [ ] Criar entidade `Role` com níveis hierárquicos: `user`, `establishment_admin`, `admin`, `superadmin`
+- [x] Criar entidade `Role` com níveis hierárquicos: `user`, `establishment_admin`, `admin`, `superadmin`
 - [ ] Implementar middleware de autorização por role no backend
 - [ ] `superadmin` tem acesso total ao sistema (gestão de todas as entidades)
 - [ ] `admin` pode gerenciar estabelecimentos, flags e usuários dentro de um escopo
