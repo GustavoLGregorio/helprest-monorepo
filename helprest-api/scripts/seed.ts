@@ -502,14 +502,14 @@ async function seed() {
         console.log(`Inserted ${visits.length} visits with photos`);
 
         // ── Create indexes ──
-        await db.collection("users").createIndex({ email: 1 }, { unique: true });
-        await db.collection("establishments").createIndex({ "location.coordinates": "2dsphere" });
-        await db.collection("establishments").createIndex({ flags: 1 });
-        await db.collection("establishments").createIndex({ companyName: "text" });
-        await db.collection("establishments").createIndex({ isSponsored: 1, rating: -1 });
-        await db.collection("visits").createIndex({ userId: 1, date: -1 });
-        await db.collection("visits").createIndex({ establishmentId: 1, date: -1 });
-        await db.collection("flags").createIndex({ type: 1 });
+        await db.collection("users").createIndex({ email: 1 }, { unique: true, name: "idx_users_email" });
+        await db.collection("establishments").createIndex({ "location.coordinates": "2dsphere" }, { name: "idx_establishments_geo" });
+        await db.collection("establishments").createIndex({ flags: 1 }, { name: "idx_establishments_flags" });
+        await db.collection("establishments").createIndex({ companyName: "text" }, { name: "idx_establishments_text" });
+        await db.collection("establishments").createIndex({ isSponsored: 1, rating: -1 }, { name: "idx_establishments_sponsored" });
+        await db.collection("visits").createIndex({ userId: 1, date: -1 }, { name: "idx_visits_user" });
+        await db.collection("visits").createIndex({ establishmentId: 1, date: -1 }, { name: "idx_visits_establishment" });
+        await db.collection("flags").createIndex({ type: 1 }, { name: "idx_flags_type" });
         console.log("Created indexes");
 
         console.log("\n✅ Seed completed successfully!");
