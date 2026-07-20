@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HelpRest — Diagrama de Casos de Uso MVP</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Inter','Segoe UI',system-ui,sans-serif;overflow:hidden;height:100vh;transition:background .3s}
+body.dark{background:#0d1117;color:#e6edf3}
+body.light{background:#ffffff;color:#1a1a1a}
+canvas{display:block;cursor:grab}
+canvas.grabbing{cursor:grabbing}
+#controls{position:fixed;top:16px;left:16px;display:flex;gap:8px;z-index:10;flex-wrap:wrap;max-width:500px}
+.dark #controls button{background:rgba(22,27,34,.9);border:1px solid #30363d;color:#e6edf3}
+.dark #controls button:hover{background:rgba(48,54,61,.9);border-color:#58a6ff}
+.light #controls button{background:rgba(255,255,255,.95);border:1px solid #ccc;color:#1a1a1a}
+.light #controls button:hover{background:rgba(240,240,240,.95);border-color:#333}
+#controls button{padding:8px 14px;border-radius:8px;cursor:pointer;font-size:13px;backdrop-filter:blur(10px);transition:all .2s}
+#controls button.active{background:#58a6ff!important;color:#fff!important;border-color:#58a6ff!important}
+.light #controls button.active{background:#1a1a1a!important;color:#fff!important;border-color:#1a1a1a!important}
+#legend{position:fixed;bottom:16px;left:16px;border-radius:12px;padding:14px 18px;backdrop-filter:blur(10px);z-index:10;max-width:340px;font-size:11px;transition:all .3s}
+.dark #legend{background:rgba(22,27,34,.92);border:1px solid #30363d}
+.light #legend{background:rgba(255,255,255,.95);border:1px solid #ccc}
+#legend h3{font-size:13px;font-weight:600;margin-bottom:10px}
+.dark #legend h3{color:#58a6ff}
+.light #legend h3{color:#1a1a1a}
+.lg{display:grid;grid-template-columns:1fr;gap:4px 14px}
+.li{display:flex;align-items:center;gap:6px}
+.ld{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+#info{position:fixed;top:16px;right:16px;border-radius:12px;padding:10px 16px;backdrop-filter:blur(10px);z-index:10;font-size:12px;transition:all .3s}
+.dark #info{background:rgba(22,27,34,.92);border:1px solid #30363d;color:#8b949e}
+.light #info{background:rgba(255,255,255,.95);border:1px solid #ccc;color:#666}
+#tooltip{position:fixed;display:none;padding:10px 14px;border-radius:8px;font-size:12px;pointer-events:none;z-index:20;max-width:320px;line-height:1.5}
+.dark #tooltip{background:rgba(13,17,23,.95);border:1px solid #58a6ff;color:#e6edf3}
+.light #tooltip{background:rgba(255,255,255,.97);border:1px solid #333;color:#1a1a1a}
+.legend-sep{margin-top:8px;padding-top:8px}
+.dark .legend-sep{border-top:1px solid #30363d}
+.light .legend-sep{border-top:1px solid #ddd}
+</style>
+</head>
+<body class="dark">
+<div id="controls">
+  <button onclick="resetView()">⟲ Reset</button>
+  <button onclick="zoomIn()">＋</button>
+  <button onclick="zoomOut()">－</button>
+  <button onclick="fitToScreen()">⊞ Fit</button>
+  <button id="umlToggle" onclick="toggleUML()">📐 UML Mode</button>
+  <button onclick="exportPNG()">💾 Save PNG</button>
+</div>
+<div id="info">Scroll: zoom · Drag: pan · Hover: highlight</div>
+<div id="legend">
+  <h3>◆ Pacotes MVP</h3>
+  <div class="lg" id="legendGrid"></div>
+  <div class="legend-sep">
+    <div class="li" style="margin-bottom:3px"><span id="assocLine" style="display:inline-block;width:22px;height:2px;background:#e6edf3"></span><span>Associação</span></div>
+    <div class="li"><span id="extLine" style="display:inline-block;width:22px;border-top:2px dashed #f0883e"></span><span>«extend»</span></div>
+  </div>
+</div>
+<div id="tooltip"></div>
+<canvas id="canvas"></canvas>
+
+<script>
+// ============ DATA (MVP) ============
+const PKG_COLORS = {
+  auth:'#3498db', search:'#2ecc71', social:'#e91e63', mgmt:'#ff9800'
+};
+const packages = [
+  {id:'auth',label:'Autenticação & Perfil',color:PKG_COLORS.auth,x:270,y:100,w:320,h:180},
+  {id:'search',label:'Descoberta',color:PKG_COLORS.search,x:270,y:310,w:320,h:180},
+  {id:'social',label:'Social',color:PKG_COLORS.social,x:650,y:100,w:320,h:180},
+  {id:'mgmt',label:'Gestão',color:PKG_COLORS.mgmt,x:650,y:310,w:320,h:180}
+];
+const RX=120, RY=20;
+const useCases = [
+  {id:'UC01',label:'Autenticação Básica',pkg:'auth',x:430,y:145},
+  {id:'UC02',label:'Configurar Restrições/Flags',pkg:'auth',x:430,y:225},
+  
+  {id:'UC03',label:'Mapa de Estabelecimentos',pkg:'search',x:430,y:355},
+  {id:'UC04',label:'Visualizar Perfil e Cardápio',pkg:'search',x:430,y:435},
+  
+  {id:'UC05',label:'Feed Social Básico',pkg:'social',x:810,y:145},
+  {id:'UC06',label:'Publicar no Feed',pkg:'social',x:810,y:225},
+  
+  {id:'UC07',label:'Editar Perfil do Estab.',pkg:'mgmt',x:810,y:355},
+  {id:'UC08',label:'Gerenciar Cardápio e Flags',pkg:'mgmt',x:810,y:435}
+];
+
+const actors = [
+  {id:'user',label:'Usuário',x:100,y:290,side:'left'},
+  {id:'estAdmin',label:'Estab. Admin',x:1140,y:290,side:'right'}
+];
+
+const associations = [
+  {actor:'user',uc:'UC01'}, {actor:'user',uc:'UC02'},
+  {actor:'user',uc:'UC03'}, {actor:'user',uc:'UC04'},
+  {actor:'user',uc:'UC05'},
+  {actor:'estAdmin',uc:'UC06'}, {actor:'estAdmin',uc:'UC07'},
+  {actor:'estAdmin',uc:'UC08'}
+];
+
+const relationships = [
+  {from:'UC03',to:'UC04',type:'extend'}
+];
+
+const inheritance = [];
+const systemBoundary = {x:230,y:60,w:780,h:460,label:'HelpRest'};
+
+// ============ STATE ============
+const canvas = document.getElementById('canvas');
+let ctx = canvas.getContext('2d');
+let W, H, dpr;
+let scale = 0.85, offsetX = 0, offsetY = 0;
+let dragging = false, dragStartX, dragStartY;
+let hoveredActor = null, hoveredUC = null;
+let umlMode = false;
+const ucMap = {}; useCases.forEach(u => ucMap[u.id] = u);
+const actorMap = {}; actors.forEach(a => actorMap[a.id] = a);
+
+// ============ LEGEND ============
+const grid = document.getElementById('legendGrid');
+packages.forEach(p => {
+  grid.innerHTML += `<div class="li"><div class="ld" style="background:${p.color}"></div><span>${p.label}</span></div>`;
+});
+
+// ============ UML TOGGLE ============
+function toggleUML() {
+  umlMode = !umlMode;
+  document.body.className = umlMode ? 'light' : 'dark';
+  document.getElementById('umlToggle').classList.toggle('active', umlMode);
+  const al = document.getElementById('assocLine');
+  al.style.background = umlMode ? '#1a1a1a' : '#e6edf3';
+  const el = document.getElementById('extLine');
+  el.style.borderTopColor = umlMode ? '#555' : '#f0883e';
+  render();
+}
+
+// ============ EXPORT PNG ============
+function exportPNG() {
+  const pad = 60;
+  const expScale = 2;
+  const minX = Math.min(systemBoundary.x, ...actors.map(a=>a.x-30)) - pad;
+  const minY = Math.min(systemBoundary.y, ...actors.map(a=>a.y-50)) - pad;
+  const maxX = Math.max(systemBoundary.x+systemBoundary.w, ...actors.map(a=>a.x+30)) + pad;
+  const maxY = Math.max(systemBoundary.y+systemBoundary.h, ...actors.map(a=>a.y+70)) + pad;
+  const cw = (maxX-minX)*expScale, ch = (maxY-minY)*expScale;
+
+  const offCanvas = document.createElement('canvas');
+  offCanvas.width = cw; offCanvas.height = ch;
+  const origCtx = ctx, offCtx = offCanvas.getContext('2d');
+
+  const origUml = umlMode, origHovA = hoveredActor, origHovU = hoveredUC;
+  umlMode = true; hoveredActor = null; hoveredUC = null;
+
+  window._origCtx = ctx; ctx = offCtx;
+  const origW = W, origH = H, origDpr = dpr;
+  W = cw; H = ch; dpr = 1;
+
+  ctx.setTransform(1,0,0,1,0,0);
+  ctx.fillStyle = '#ffffff'; ctx.fillRect(0,0,cw,ch);
+  ctx.save(); ctx.scale(expScale, expScale); ctx.translate(-minX, -minY);
+  scale = 1; offsetX = 0; offsetY = 0;
+
+  // Render Background Outline
+  const sb = systemBoundary, br = 12;
+  ctx.beginPath();
+  ctx.moveTo(sb.x+br,sb.y); ctx.lineTo(sb.x+sb.w-br,sb.y);
+  ctx.quadraticCurveTo(sb.x+sb.w,sb.y,sb.x+sb.w,sb.y+br);
+  ctx.lineTo(sb.x+sb.w,sb.y+sb.h-br);
+  ctx.quadraticCurveTo(sb.x+sb.w,sb.y+sb.h,sb.x+sb.w-br,sb.y+sb.h);
+  ctx.lineTo(sb.x+br,sb.y+sb.h);
+  ctx.quadraticCurveTo(sb.x,sb.y+sb.h,sb.x,sb.y+sb.h-br);
+  ctx.lineTo(sb.x,sb.y+br);
+  ctx.quadraticCurveTo(sb.x,sb.y,sb.x+br,sb.y);
+  ctx.closePath();
+  ctx.fillStyle = '#fafafa'; ctx.fill();
+  ctx.strokeStyle = '#1a1a1a'; ctx.lineWidth = 2; ctx.stroke();
+  ctx.font = '700 16px Inter,sans-serif'; ctx.fillStyle = '#1a1a1a';
+  ctx.textAlign = 'center'; ctx.textBaseline = 'top';
+  ctx.fillText(sb.label, sb.x+sb.w/2, sb.y+6);
+
+  packages.forEach(drawPkg);
+  associations.forEach(({actor,uc})=>{ const a=actorMap[actor],u=ucMap[uc]; if(a&&u) drawAssocLine(a.x,a.y,u,true,actor); });
+  relationships.forEach(({from,to,type})=>{ const f=ucMap[from],t=ucMap[to]; if(f&&t) drawRelLine(f,t,type,true); });
+  useCases.forEach(uc=>drawUCEllipse(uc,true));
+  actors.forEach(a=>drawStick(a.x,a.y,a.label,true));
+
+  ctx.restore();
+
+  const link = document.createElement('a');
+  link.download = 'helprest-mvp-diagram.png';
+  link.href = offCanvas.toDataURL('image/png');
+  link.click();
+
+  ctx = window._origCtx;
+  umlMode = origUml; hoveredActor = origHovA; hoveredUC = origHovU;
+  W = origW; H = origH; dpr = origDpr;
+  render();
+}
+
+// ============ RESIZE & TRANSFORMS ============
+function resize() {
+  dpr = window.devicePixelRatio || 1;
+  W = window.innerWidth; H = window.innerHeight;
+  canvas.width = W * dpr; canvas.height = H * dpr;
+  canvas.style.width = W + 'px'; canvas.style.height = H + 'px';
+  render();
+}
+window.addEventListener('resize', resize);
+function toWorld(sx, sy) { return { x: (sx - offsetX) / scale, y: (sy - offsetY) / scale }; }
+
+// ============ HELPERS & ROUTING ============
+function hexAlpha(hex, a) {
+  const r = parseInt(hex.slice(1,3),16), g = parseInt(hex.slice(3,5),16), b = parseInt(hex.slice(5,7),16);
+  return `rgba(${r},${g},${b},${a})`;
+}
+function ellipseEdge(cx, cy, fx, fy) {
+  const a = Math.atan2(fy - cy, fx - cx);
+  return { x: cx + RX * Math.cos(a), y: cy + RY * Math.sin(a) };
+}
+function segmentHitsEllipse(x1,y1,x2,y2,uc) {
+  for(let i=1;i<8;i++){
+    const t=i/8, px=x1+(x2-x1)*t, py=y1+(y2-y1)*t;
+    const dx=(px-uc.x)/(RX+8), dy=(py-uc.y)/(RY+6);
+    if(dx*dx+dy*dy<1) return true;
+  }
+  return false;
+}
+function getBlockingUCs(x1,y1,x2,y2,excludeIds) {
+  return useCases.filter(uc => !excludeIds.includes(uc.id) && segmentHitsEllipse(x1,y1,x2,y2,uc));
+}
+function computeControlPoint(x1, y1, x2, y2, excludeIds, actorId) {
+  const blockers = getBlockingUCs(x1, y1, x2, y2, excludeIds);
+  if (blockers.length === 0) return null;
+  const mx=(x1+x2)/2, my=(y1+y2)/2;
+  const dx=x2-x1, dy=y2-y1, len=Math.hypot(dx,dy)||1;
+  let nx=-dy/len, ny=dx/len;
+  if(actorId){
+    const q=associations.filter(a=>a.actor===actorId).findIndex(a=>a.uc===excludeIds[excludeIds.length-1]);
+    if(q%2===0){ nx=-nx; ny=-ny; }
+  }
+  const offset = RY*2.5 + blockers.length*10;
+  return { x: mx+nx*offset, y: my+ny*offset };
+}
+
+// ============ DRAWING ============
+function drawStick(x, y, label, highlight) {
+  const c = umlMode ? '#1a1a1a' : (highlight ? '#58a6ff' : '#c9d1d9');
+  ctx.strokeStyle = c; ctx.fillStyle = c; ctx.lineWidth = 2;
+  ctx.beginPath(); ctx.arc(x, y-28, 11, 0, Math.PI*2); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(x, y-17); ctx.lineTo(x, y+12); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(x-16, y-4); ctx.lineTo(x+16, y-4); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(x, y+12); ctx.lineTo(x-13, y+35);
+  ctx.moveTo(x, y+12); ctx.lineTo(x+13, y+35); ctx.stroke();
+  ctx.font = '600 12px Inter,sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'top';
+  label.split('\n').forEach((l, i) => ctx.fillText(l, x, y + 42 + i * 14));
+}
+function drawUCEllipse(uc, highlight) {
+  const pkg = packages.find(p => p.id === uc.pkg);
+  const col = pkg ? pkg.color : '#888';
+  ctx.beginPath(); ctx.ellipse(uc.x, uc.y, RX, RY, 0, 0, Math.PI*2);
+  if (umlMode) {
+    ctx.fillStyle = '#ffffff'; ctx.fill();
+    ctx.strokeStyle = '#1a1a1a'; ctx.lineWidth = 1.8; ctx.stroke();
+    ctx.fillStyle = '#1a1a1a';
+  } else {
+    ctx.fillStyle = hexAlpha(col, highlight?0.55:0.2); ctx.fill();
+    ctx.strokeStyle = highlight ? col : hexAlpha(col, 0.6); ctx.lineWidth = highlight?2.5:1.2; ctx.stroke();
+    ctx.fillStyle = highlight ? '#fff' : '#c9d1d9';
+  }
+  ctx.font = '11px Inter,sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  ctx.fillText(uc.label, uc.x, uc.y);
+}
+function drawPkg(pkg) {
+  const r=6; ctx.beginPath();
+  ctx.moveTo(pkg.x+r,pkg.y); ctx.lineTo(pkg.x+pkg.w-r,pkg.y);
+  ctx.quadraticCurveTo(pkg.x+pkg.w,pkg.y,pkg.x+pkg.w,pkg.y+r);
+  ctx.lineTo(pkg.x+pkg.w,pkg.y+pkg.h-r);
+  ctx.quadraticCurveTo(pkg.x+pkg.w,pkg.y+pkg.h,pkg.x+pkg.w-r,pkg.y+pkg.h);
+  ctx.lineTo(pkg.x+r,pkg.y+pkg.h);
+  ctx.quadraticCurveTo(pkg.x,pkg.y+pkg.h,pkg.x,pkg.y+pkg.h-r);
+  ctx.lineTo(pkg.x,pkg.y+r);
+  ctx.quadraticCurveTo(pkg.x,pkg.y,pkg.x+r,pkg.y);
+  ctx.closePath();
+  if (umlMode) {
+    ctx.fillStyle='rgba(245,245,245,0.5)'; ctx.fill();
+    ctx.strokeStyle='#999'; ctx.lineWidth=1; ctx.stroke();
+    ctx.font='600 11px Inter,sans-serif'; ctx.fillStyle='#555';
+  } else {
+    ctx.strokeStyle=hexAlpha(pkg.color,0.35); ctx.lineWidth=1.5;
+    ctx.fillStyle=hexAlpha(pkg.color,0.04); ctx.fill(); ctx.stroke();
+    ctx.font='600 11px Inter,sans-serif'; ctx.fillStyle=hexAlpha(pkg.color,0.7);
+  }
+  ctx.textAlign='left'; ctx.textBaseline='top'; ctx.fillText(pkg.label,pkg.x+8,pkg.y+5);
+}
+function drawAssocLine(ax, ay, uc, highlight, actorId) {
+  const edge = ellipseEdge(uc.x, uc.y, ax, ay);
+  if (umlMode) {
+    const cp = computeControlPoint(ax, ay, edge.x, edge.y, [uc.id], actorId);
+    ctx.beginPath(); ctx.strokeStyle='rgba(30,30,30,0.55)'; ctx.lineWidth=1;
+    if(cp){ ctx.moveTo(ax,ay); ctx.quadraticCurveTo(cp.x,cp.y,edge.x,edge.y); }
+    else{ ctx.moveTo(ax,ay); ctx.lineTo(edge.x,edge.y); }
+    ctx.stroke();
+  } else {
+    ctx.beginPath(); ctx.moveTo(ax,ay); ctx.lineTo(edge.x,edge.y);
+    ctx.strokeStyle=highlight?'rgba(200,220,255,0.65)':'rgba(200,220,255,0.06)';
+    ctx.lineWidth=highlight?1.8:0.7; ctx.stroke();
+  }
+}
+function drawRelLine(from, to, type, highlight) {
+  const e1=ellipseEdge(from.x,from.y,to.x,to.y), e2=ellipseEdge(to.x,to.y,from.x,from.y);
+  let col = umlMode ? '#555' : '#f0883e';
+  const cp = umlMode ? computeControlPoint(e1.x, e1.y, e2.x, e2.y, [from.id,to.id], null) : null;
+  
+  ctx.beginPath(); ctx.setLineDash([6,4]);
+  if(cp){ ctx.moveTo(e1.x,e1.y); ctx.quadraticCurveTo(cp.x,cp.y,e2.x,e2.y); }
+  else{ ctx.moveTo(e1.x,e1.y); ctx.lineTo(e2.x,e2.y); }
+  ctx.strokeStyle=umlMode?col:(highlight?col:hexAlpha(col,0.25));
+  ctx.lineWidth=umlMode?1.5:(highlight?2:1); ctx.stroke(); ctx.setLineDash([]);
+  
+  const endX=e2.x, endY=e2.y, angle=cp?Math.atan2(endY-cp.y,endX-cp.x):Math.atan2(e2.y-e1.y,e2.x-e1.x);
+  ctx.beginPath(); ctx.moveTo(endX,endY);
+  ctx.lineTo(endX-10*Math.cos(angle-0.35), endY-10*Math.sin(angle-0.35));
+  ctx.lineTo(endX-10*Math.cos(angle+0.35), endY-10*Math.sin(angle+0.35));
+  ctx.closePath(); ctx.fillStyle=umlMode?col:hexAlpha(col,highlight?1:0.3); ctx.fill();
+  
+  let mx=cp?0.25*e1.x+0.5*cp.x+0.25*e2.x:(e1.x+e2.x)/2;
+  let my=cp?0.25*e1.y+0.5*cp.y+0.25*e2.y-10:(e1.y+e2.y)/2-8;
+  ctx.font='600 9px Inter,sans-serif'; ctx.fillStyle=umlMode?'#333':(highlight?col:hexAlpha(col,0.5));
+  ctx.textAlign='center'; ctx.textBaseline='bottom'; ctx.fillText('«extend»',mx,my);
+}
+
+// ============ INTERACTIVITY ============
+function hitTest(wx, wy) {
+  for (const a of actors) if (Math.abs(wx-a.x)<25 && wy>a.y-45 && wy<a.y+65) return {type:'actor',id:a.id};
+  for (const u of useCases) {
+    const dx=(wx-u.x)/RX, MathPI=Math.PI, dy=(wy-u.y)/RY;
+    if (dx*dx+dy*dy<=1) return {type:'uc',id:u.id};
+  }
+  return null;
+}
+function isHighlighted(type, id) {
+  if (!hoveredActor && !hoveredUC) return false;
+  if (hoveredActor) {
+    if (type==='actor' && id===hoveredActor) return true;
+    if (type==='uc') return associations.some(a=>a.actor===hoveredActor && a.uc===id);
+  }
+  if (hoveredUC) {
+    if (type==='uc' && id===hoveredUC) return true;
+    if (type==='actor') return associations.some(a=>a.actor===id && a.uc===hoveredUC);
+    if (type==='uc') return relationships.some(r=>(r.from===hoveredUC&&r.to===id)||(r.to===hoveredUC&&r.from===id));
+  }
+  return false;
+}
+function render() {
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  ctx.clearRect(0, 0, W, H);
+  if (umlMode) { ctx.fillStyle='#ffffff'; ctx.fillRect(0,0,W,H); }
+
+  ctx.save(); ctx.translate(offsetX, offsetY); ctx.scale(scale, scale);
+
+  const sb = systemBoundary, br = 12;
+  ctx.beginPath();
+  ctx.moveTo(sb.x+br,sb.y); ctx.lineTo(sb.x+sb.w-br,sb.y);
+  ctx.quadraticCurveTo(sb.x+sb.w,sb.y,sb.x+sb.w,sb.y+br);
+  ctx.lineTo(sb.x+sb.w,sb.y+sb.h-br);
+  ctx.quadraticCurveTo(sb.x+sb.w,sb.y+sb.h,sb.x+sb.w-br,sb.y+sb.h);
+  ctx.lineTo(sb.x+br,sb.y+sb.h);
+  ctx.quadraticCurveTo(sb.x,sb.y+sb.h,sb.x,sb.y+sb.h-br);
+  ctx.lineTo(sb.x,sb.y+br);
+  ctx.quadraticCurveTo(sb.x,sb.y,sb.x+br,sb.y);
+  ctx.closePath();
+  if (umlMode) { ctx.fillStyle='#fafafa'; ctx.fill(); ctx.strokeStyle='#1a1a1a'; ctx.lineWidth=2; ctx.stroke(); }
+  else { ctx.fillStyle='rgba(22,27,34,0.6)'; ctx.fill(); ctx.strokeStyle='#30363d'; ctx.lineWidth=2; ctx.stroke(); }
+  ctx.font='700 16px Inter,sans-serif'; ctx.fillStyle=umlMode?'#1a1a1a':'#58a6ff';
+  ctx.textAlign='center'; ctx.textBaseline='top'; ctx.fillText(sb.label,sb.x+sb.w/2,sb.y+6);
+
+  packages.forEach(drawPkg);
+  associations.forEach(({actor,uc})=>{
+    const a=actorMap[actor], u=ucMap[uc]; if(!a||!u) return;
+    drawAssocLine(a.x, a.y, u, umlMode||(hasHover&&(hoveredActor===actor||hoveredUC===uc)), actor);
+  });
+  relationships.forEach(({from,to,type})=>{
+    const f=ucMap[from], t=ucMap[to]; if(!f||!t) return;
+    drawRelLine(f, t, type, umlMode||!hasHover||(hasHover&&(hoveredUC===from||hoveredUC===to)));
+  });
+  useCases.forEach(uc => drawUCEllipse(uc, umlMode||!hasHover||isHighlighted('uc', uc.id)));
+  actors.forEach(a => drawStick(a.x, a.y, a.label, umlMode||!hasHover||isHighlighted('actor', a.id)));
+  ctx.restore();
+}
+
+let hasHover = false;
+canvas.addEventListener('mousedown', e => { dragging=true; dragStartX=e.clientX-offsetX; dragStartY=e.clientY-offsetY; canvas.classList.add('grabbing'); });
+canvas.addEventListener('mousemove', e => {
+  if (dragging) { offsetX=e.clientX-dragStartX; offsetY=e.clientY-dragStartY; render(); return; }
+  const w=toWorld(e.clientX,e.clientY), hit=hitTest(w.x,w.y);
+  const prevHovA=hoveredActor, prevHovU=hoveredUC;
+  hoveredActor=null; hoveredUC=null;
+  if(hit){ if(hit.type==='actor') hoveredActor=hit.id; else hoveredUC=hit.id; }
+  hasHover = !!(hoveredActor||hoveredUC);
+  if (hoveredActor!==prevHovA || hoveredUC!==prevHovU) render();
+
+  const tt=document.getElementById('tooltip');
+  if(hit){
+    let html='';
+    if(hit.type==='uc'){
+      const u=ucMap[hit.id];
+      const conns=associations.filter(a=>a.uc===hit.id).map(a=>actorMap[a.actor].label);
+      html=`<strong>${u.id}: ${u.label}</strong><br>Pacote: ${packages.find(p=>p.id===u.pkg).label}<br>Atores: ${conns.join(', ')}`;
+    } else {
+      const ucs=associations.filter(as=>as.actor===hit.id).length;
+      html=`<strong>${actorMap[hit.id].label}</strong><br>${ucs} casos de uso`;
+    }
+    tt.innerHTML=html; tt.style.display='block'; tt.style.left=(e.clientX+16)+'px'; tt.style.top=(e.clientY+16)+'px';
+  } else tt.style.display='none';
+});
+canvas.addEventListener('mouseup', () => { dragging=false; canvas.classList.remove('grabbing'); });
+canvas.addEventListener('mouseleave', () => { dragging=false; hoveredActor=null; hoveredUC=null; hasHover=false; canvas.classList.remove('grabbing'); render(); document.getElementById('tooltip').style.display='none'; });
+canvas.addEventListener('wheel', e => {
+  e.preventDefault(); const z=e.deltaY<0?1.1:0.9, wx=(e.clientX-offsetX)/scale, wy=(e.clientY-offsetY)/scale;
+  scale=Math.max(0.15,Math.min(3,scale*z)); offsetX=e.clientX-wx*scale; offsetY=e.clientY-wy*scale; render();
+}, {passive:false});
+
+function fitToScreen() {
+  const pad=80, dw=systemBoundary.w+300, dh=systemBoundary.h+100;
+  scale = Math.min((W-pad*2)/dw, (H-pad*2)/dh);
+  offsetX = (W - dw*scale)/2 - (systemBoundary.x-130)*scale;
+  offsetY = (H - dh*scale)/2 - (systemBoundary.y-20)*scale;
+  render();
+}
+function resetView() { scale=0.85; offsetX=0; offsetY=0; render(); }
+function zoomIn() { scale=Math.min(3,scale*1.2); render(); }
+function zoomOut() { scale=Math.max(0.15,scale/1.2); render(); }
+
+resize(); fitToScreen();
+</script>
+</body>
+</html>
