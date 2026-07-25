@@ -39,7 +39,7 @@ This skill provides AI agents with comprehensive instructions for running, testi
 - `bun run app:start:clear`: Start Expo dev server clearing cache.
 - `bun run app:android`: Run Android app on device or emulator.
 - `bun run app:android:clean`: Run Android app without Gradle build cache.
-- `bun run app:android:nuke`: Clean Gradle, clear cache, re-run `expo prebuild --clean`, and apply `scripts/patch-android-signing.js`.
+- `bun run app:android:nuke`: Clean Gradle, clear cache, re-run `expo prebuild --clean`, and apply `scripts/patch-android-signing.ts`.
 
 ### 5. Local Android APK Compilation (Linux)
 - `bun run app:build:apk:debug`: Build debug APK at `helprest-app/android/app/build/outputs/apk/debug/app-debug.apk`.
@@ -53,7 +53,7 @@ This skill provides AI agents with comprehensive instructions for running, testi
 2. **Native Re-build Trigger (`app:android:nuke`)**:
    - Only execute `bun run app:android:nuke` when adding new Expo native packages, modifying `app.json` native plugins, or upgrading Expo SDK versions.
 3. **Automated Linux Environment Handling**:
-   - `build-apk.sh` automatically detects JDK 21 (`/opt/android-studio/jbr`), sets `ANDROID_HOME`, creates an `npm` CLI shim if `npm` is missing in `PATH`, patches `local.properties` (`sdk.dir`), and sets `CI=1` to guarantee non-interactive execution.
+   - `build-apk.ts` automatically detects JDK 21 (`/opt/android-studio/jbr`), sets `ANDROID_HOME`, creates an `npm` CLI shim if `npm` is missing in `PATH`, patches `local.properties` (`sdk.dir`), and sets `CI=1` to guarantee non-interactive execution.
 
 ## Reference Material
 

@@ -23,7 +23,7 @@
       "source": "local",
       "sourceType": "workspace",
       "skillPath": ".agents/skills/helprest-orchestration/SKILL.md",
-      "computedHash": "08a6c25242a2c5c28e8cdec81624116eb13d4c1fc5ca517e0923709eb4c22842"
+      "computedHash": "acef6688f269043e92f27e2757414a6240fdc07b0a87dec8d0512fefb4313303"
     },
     "expo-api-routes": {
       "source": "expo/skills",
