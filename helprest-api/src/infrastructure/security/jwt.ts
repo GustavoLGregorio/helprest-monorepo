@@ -1,4 +1,5 @@
 import * as jose from "jose";
+import type { RoleType } from "@domain/value-objects/Role";
 
 const ACCESS_EXPIRATION = process.env.JWT_ACCESS_EXPIRATION ?? "15m";
 const REFRESH_EXPIRATION = process.env.JWT_REFRESH_EXPIRATION ?? "7d";
@@ -18,6 +19,7 @@ function getRefreshSecret(): Uint8Array {
 export interface TokenPayload {
     sub: string; // User ID
     email: string;
+    role?: RoleType;
 }
 
 export interface TokenPair {
@@ -29,7 +31,10 @@ export interface TokenPair {
  * Generates a JWT access + refresh token pair.
  */
 export async function generateTokens(payload: TokenPayload): Promise<TokenPair> {
-    const accessToken = await new jose.SignJWT({ email: payload.email })
+    const accessToken = await new jose.SignJWT({ 
+        email: payload.email,
+        role: payload.role ?? "user",
+    })
         .setProtectedHeader({ alg: "HS256" })
         .setSubject(payload.sub)
         .setIssuedAt()
@@ -59,6 +64,7 @@ export async function verifyAccessToken(token: string): Promise<TokenPayload> {
     return {
         sub: payload.sub!,
         email: payload.email as string,
+        role: (payload.role as RoleType) ?? "user",
     };
 }
 

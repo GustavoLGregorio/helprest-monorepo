@@ -19,7 +19,7 @@ describe("User Entity (OAuth-Only)", () => {
         expect(user.email).toBe("john@example.com");
         expect(user.authProvider).toBe("google");
         expect(user.googleId).toBe("google-oauth-id-123");
-        expect(user.role).toBe("user");
+        expect(user.role.value).toBe("user");
         expect(user.flags).toHaveLength(1);
         expect(user.flags[0]).toEqual(flagId);
     });

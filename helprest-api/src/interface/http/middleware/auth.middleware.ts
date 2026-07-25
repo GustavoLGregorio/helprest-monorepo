@@ -1,6 +1,8 @@
 import { verifyAccessToken } from "@infra/security/jwt";
-import { UnauthorizedError } from "@shared/errors";
+import { UnauthorizedError, ForbiddenError } from "@shared/errors";
 import type { TokenPayload } from "@infra/security/jwt";
+import { Role } from "@domain/value-objects/Role";
+import type { RoleType } from "@domain/value-objects/Role";
 
 /**
  * Extracts and verifies the JWT token from the Authorization header.
@@ -17,5 +19,16 @@ export async function authenticateRequest(request: Request): Promise<TokenPayloa
         return await verifyAccessToken(token);
     } catch {
         throw new UnauthorizedError("Invalid or expired token");
+    }
+}
+
+/**
+ * Verifies that the authenticated request carries at least the required role permission.
+ * Throws ForbiddenError if the role hierarchy level is insufficient.
+ */
+export function authorizeRole(payload: TokenPayload, requiredRole: RoleType): void {
+    const userRole = Role.create(payload.role);
+    if (!userRole.hasPermission(requiredRole)) {
+        throw new ForbiddenError(`Insufficient permissions. Required role level: ${requiredRole}`);
     }
 }

@@ -14,8 +14,8 @@
 
 ### 1.1 Sistema de Roles & Permissões
 
-- [ ] Criar entidade `Role` com níveis hierárquicos: `user`, `establishment_admin`, `admin`, `superadmin`
-- [ ] Implementar middleware de autorização por role no backend
+- [x] Criar entidade `Role` com níveis hierárquicos: `user`, `establishment_admin`, `admin`, `superadmin`
+- [x] Implementar middleware de autorização por role no backend
 - [ ] `superadmin` tem acesso total ao sistema (gestão de todas as entidades)
 - [ ] `admin` pode gerenciar estabelecimentos, flags e usuários dentro de um escopo
 - [ ] `establishment_admin` gerencia apenas seu estabelecimento e filiais vinculadas
@@ -186,6 +186,7 @@
 
 ### 7.3 Melhorias Arquiteturais no Frontend (helprest-app)
 
+- [ ] **Mapeamento Arquitetural & Diagramação do Frontend**: Elaborar especificação detalhada da aplicação mobile (Expo Router), incluindo mapa de telas, fluxos de navegação/onboarding, arquitetura de componentes atômicos e mapa de integração com a API.
 - [ ] **Query Key Factory para TanStack Query**: Centralizar todas as chaves de query em uma fábrica fortemente tipada (ex: `establishmentKeys`, `userKeys`) eliminando strings mágicas.
 - [ ] **Mutex no Auto-Refresh Token Flow (`services/api.ts`)**: Implementar fila de requisições / mutex para evitar chamadas de refresh duplicadas ou concorrentes quando múltiplos requests retornarem status 401.
 - [ ] **Tipagem Estrita de Storage MMKV**: Encapsular acessos ao `react-native-mmkv` com chaves e tipos fortemente definidos no módulo `storage/`.

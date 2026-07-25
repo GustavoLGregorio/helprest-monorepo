@@ -17,6 +17,10 @@ export class RefreshToken {
             throw new UnauthorizedError("User not found");
         }
 
-        return generateTokens({ sub: user.id.toHexString(), email: user.email });
+        return generateTokens({ 
+            sub: user.id.toHexString(), 
+            email: user.email,
+            role: user.role.value,
+        });
     }
 }

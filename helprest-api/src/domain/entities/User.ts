@@ -1,6 +1,8 @@
 import { ObjectId } from "mongodb";
 import { Location } from "../value-objects/Location";
 import { SocialLinks } from "../value-objects/SocialLinks";
+import { Role } from "../value-objects/Role";
+import type { RoleType } from "../value-objects/Role";
 import type { LocationProps } from "../value-objects/Location";
 import type { SocialLinksProps } from "../value-objects/SocialLinks";
 
@@ -18,7 +20,7 @@ export interface UserProps {
     socialLinksEnabled: boolean;
     socialLinks?: SocialLinks;
     profilePhoto?: string;
-    role?: "user" | "establishment";
+    role?: Role | RoleType | string;
     createdAt?: Date;
     updatedAt?: Date;
 }
@@ -35,11 +37,11 @@ export class User {
     readonly socialLinksEnabled: boolean;
     readonly socialLinks?: SocialLinks;
     readonly profilePhoto?: string;
-    readonly role: "user" | "establishment";
+    readonly role: Role;
     readonly createdAt: Date;
     readonly updatedAt: Date;
 
-    private constructor(props: UserProps) {
+    private constructor(props: Omit<UserProps, "role"> & { role: Role }) {
         this.id = props.id ?? new ObjectId();
         this.name = props.name;
         this.email = props.email;
@@ -51,7 +53,7 @@ export class User {
         this.socialLinksEnabled = props.socialLinksEnabled;
         this.socialLinks = props.socialLinks;
         this.profilePhoto = props.profilePhoto;
-        this.role = props.role ?? "user";
+        this.role = props.role;
         this.createdAt = props.createdAt ?? new Date();
         this.updatedAt = props.updatedAt ?? new Date();
     }
@@ -70,14 +72,21 @@ export class User {
             throw new Error("Invalid email format");
         }
 
-        return new User(props);
+        const roleInstance = props.role instanceof Role 
+            ? props.role 
+            : Role.create(props.role);
+
+        return new User({
+            ...props,
+            role: roleInstance,
+        });
     }
 
     static fromDocument(doc: Record<string, unknown>): User {
         const locationDoc = doc.location as Record<string, unknown> | undefined;
         const socialLinksDoc = doc.socialLinks as Record<string, unknown> | undefined;
 
-        return new User({
+        return User.create({
             id: doc._id as ObjectId,
             name: doc.name as string,
             email: doc.email as string,
@@ -95,7 +104,7 @@ export class User {
                 ? SocialLinks.create(socialLinksDoc as unknown as SocialLinksProps)
                 : undefined,
             profilePhoto: doc.profilePhoto as string | undefined,
-            role: (doc.role as "user" | "establishment") ?? "user",
+            role: doc.role as string | undefined,
             createdAt: doc.createdAt ? new Date(doc.createdAt as string | number | Date) : undefined,
             updatedAt: doc.updatedAt ? new Date(doc.updatedAt as string | number | Date) : undefined,
         });
@@ -130,7 +139,7 @@ export class User {
                 }
                 : undefined,
             profilePhoto: this.profilePhoto,
-            role: this.role,
+            role: this.role.value,
             createdAt: this.createdAt,
             updatedAt: this.updatedAt,
         };

@@ -110,6 +110,7 @@ export class GoogleAuthUser {
         const tokens: TokenPair = await generateTokens({
             sub: user.id.toHexString(),
             email: user.email,
+            role: user.role.value,
         });
 
         return {

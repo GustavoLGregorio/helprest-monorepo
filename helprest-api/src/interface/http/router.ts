@@ -3,7 +3,7 @@ import { logger, generateRequestId } from "@shared/utils/logger";
 import { handlePreflight, applyCorsHeaders } from "./middleware/cors.middleware";
 import { applySecurityHeaders } from "./middleware/security.middleware";
 import { handleError } from "./middleware/error.middleware";
-import { authenticateRequest } from "./middleware/auth.middleware";
+import { authenticateRequest, authorizeRole } from "./middleware/auth.middleware";
 import { ValidationError } from "@shared/errors";
 import type { ZodType } from "zod/v4";
 
@@ -251,6 +251,7 @@ addRoute("GET", "/api/establishments/search", async (req, url) => {
 
 addRoute("GET", "/api/establishments/my-establishment", async (req) => {
     const auth = await authenticateRequest(req);
+    authorizeRole(auth, "establishment_admin");
     const useCase = new GetEstablishmentByAdmin(estRepo, flagRepo, productRepo);
     const result = await useCase.execute(auth.sub);
     return json(result);
@@ -266,6 +267,7 @@ addRoute("GET", "/api/establishments/:id", async (req, _url, params) => {
 
 addRoute("POST", "/api/establishments", async (req) => {
     const auth = await authenticateRequest(req);
+    authorizeRole(auth, "establishment_admin");
     const input = await parseBody(req, createEstablishmentSchema);
     const useCase = new CreateEstablishment(estRepo);
     const result = await useCase.execute(auth.sub, input);
@@ -278,6 +280,7 @@ addRoute("POST", "/api/establishments", async (req) => {
 
 addRoute("POST", "/api/products", async (req) => {
     const auth = await authenticateRequest(req);
+    authorizeRole(auth, "establishment_admin");
     const input = await parseBody(req, createProductSchema);
     const useCase = new CreateProduct(productRepo, estRepo);
     const result = await useCase.execute(auth.sub, input);
@@ -286,6 +289,7 @@ addRoute("POST", "/api/products", async (req) => {
 
 addRoute("PATCH", "/api/products/:id", async (req, _url, params) => {
     const auth = await authenticateRequest(req);
+    authorizeRole(auth, "establishment_admin");
     const validId = validateParamId(params.id, "id");
     const input = await parseBody(req, updateProductSchema);
     const useCase = new UpdateProduct(productRepo, estRepo);
@@ -295,6 +299,7 @@ addRoute("PATCH", "/api/products/:id", async (req, _url, params) => {
 
 addRoute("DELETE", "/api/products/:id", async (req, _url, params) => {
     const auth = await authenticateRequest(req);
+    authorizeRole(auth, "establishment_admin");
     const validId = validateParamId(params.id, "id");
     const useCase = new DeleteProduct(productRepo, estRepo);
     const result = await useCase.execute(auth.sub, validId);
@@ -312,7 +317,8 @@ addRoute("GET", "/api/flags", async () => {
 });
 
 addRoute("POST", "/api/flags", async (req) => {
-    await authenticateRequest(req);
+    const auth = await authenticateRequest(req);
+    authorizeRole(auth, "admin");
     const input = await parseBody(req, createFlagSchema);
     const useCase = new CreateFlag(flagRepo);
     const result = await useCase.execute(input);
