@@ -22,12 +22,15 @@ COPY tsconfig.json .
 # Define production environment
 ENV NODE_ENV=production
 
-# Render automatically assigns the PORT environment variable.
-# We expose a default of 3000 here for local testing or fallback.
+# Expose default port (Render dynamically overrides PORT)
 EXPOSE 3000
 
-# Run the app as a non-root "bun" user for security
+# Health check endpoint verification
+HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
+  CMD bun run -e "fetch('http://localhost:' + (process.env.PORT || 3000) + '/api/health').then(r => r.ok ? process.exit(0) : process.exit(1)).catch(() => process.exit(1))"
+
+# Run the app as non-root "bun" user for security
 USER bun
 
-# Start the application using properly structured CMD
+# Start application
 CMD ["bun", "run", "start"]
