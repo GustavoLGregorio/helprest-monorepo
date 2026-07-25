@@ -31,30 +31,43 @@ function hasCommand(cmd: string): boolean {
 
 if (!hasCommand("npm")) {
     const npmShimPath = path.join(binDir, "npm");
-    const npmShimCode = `#!/usr/bin/env node
-const { execSync } = require('child_process');
-const https = require('https');
+    const npmShimCode = `#!/usr/bin/env bun
+import { execSync } from "node:child_process";
+import https from "node:https";
+
 const [,, cmd, pkg, field] = process.argv;
 
-if (cmd === 'view' && pkg) {
-    const sanitizedPkg = pkg.includes('/') && !pkg.startsWith('@') ? pkg : pkg.replace(/@([^/]+)$/, '/$1');
-    const url = \`https://registry.npmjs.org/\${sanitizedPkg}\`;
-    https.get(url, (res) => {
-        let data = '';
-        res.on('data', chunk => data += chunk);
-            res.on('end', () => {
-                try {
-                    const parsed = JSON.parse(data);
-                    if (field && parsed[field]) console.log(JSON.stringify(parsed[field]));
-                    else console.log(data);
-                } catch (e) { console.error(e); process.exit(1); }
-            });
-        }).on('error', (e) => { console.error(e); process.exit(1); });
-    } else {
-        try {
-        const args = process.argv.slice(2).join(' ');
-        execSync(\`bun \${args}\`, { stdio: 'inherit' });
-    } catch (e) { process.exit(e.status || 1); }
+if (cmd === "view" && pkg) {
+  const sanitizedPkg = pkg.includes("/") && !pkg.startsWith("@") ? pkg : pkg.replace(/@([^/]+)$/, "/$1");
+  const url = \`https://registry.npmjs.org/\${sanitizedPkg}\`;
+  https.get(url, (res) => {
+    let data = "";
+    res.on("data", (chunk: Buffer | string) => { data += chunk; });
+    res.on("end", () => {
+      try {
+        const parsed = JSON.parse(data);
+        if (field && parsed[field]) {
+          console.log(JSON.stringify(parsed[field]));
+        } else {
+          console.log(data);
+        }
+      } catch (e) {
+        console.error(e);
+        process.exit(1);
+      }
+    });
+  }).on("error", (e) => {
+    console.error(e);
+    process.exit(1);
+  });
+} else {
+  try {
+    const args = process.argv.slice(2).join(" ");
+    execSync(\`bun \${args}\`, { stdio: "inherit" });
+  } catch (e: unknown) {
+    const status = (e && typeof e === "object" && "status" in e) ? (e as { status?: number }).status : 1;
+    process.exit(status || 1);
+  }
 }
 `;
     fs.writeFileSync(npmShimPath, npmShimCode, { mode: 0o755 });
