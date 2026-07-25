@@ -19,6 +19,12 @@
       "skillPath": "elysia/SKILL.md",
       "computedHash": "1f8cdb3c66e6127bd7e31fd5478bf912d976059896629cc58eec031f9bae0c74"
     },
+    "helprest-orchestration": {
+      "source": "local",
+      "sourceType": "workspace",
+      "skillPath": ".agents/skills/helprest-orchestration/SKILL.md",
+      "computedHash": "3b55b786af069ed7cdbd4ef3e08524c9fd4947ea5684b52cbdf38aae983bce88"
+    },
     "expo-api-routes": {
       "source": "expo/skills",
       "sourceType": "github",
