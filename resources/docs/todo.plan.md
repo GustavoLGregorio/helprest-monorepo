@@ -207,16 +207,21 @@
 > 1. **Modularidade por Domínio**: Organização dos controllers em sub-módulos encapsulados (`src/interface/modules/*`).
 > 2. **Validação de Schema Unificada**: Validação automática de `body`, `query`, `params` e `response` via TypeBox ou Zod nativo.
 > 3. **Documentação Swagger/OpenAPI Automática**: Geração em tempo de execução via `@elysiajs/swagger` no endpoint `/swagger`.
-> 4. **Tratamento Global de Erros Elegante**: Mapeamento centralizado no gancho `.onError()` convertendo `AppError` em respostas JSON padronizadas.
-> 5. **Macros & Guards Nativos**: Simplificação de autenticação Bearer JWT e checagem hierárquica de `Role`.
+> **Estratégia de Adoção do Ecossistema Oficial (Primeira Classe):**  
+> Priorizar as ferramentas oficiais desenvolvidas pela equipe do ElysiaJS em substituição aos utilitários manuais da codebase:
+> - **`@elysiajs/jwt` & `@elysiajs/bearer`**: Substituem o wrapper manual `jose` em `jwt.ts` e o parse imperativo de cabeçalho Bearer.
+> - **`@elysiajs/cors`**: Substitui o manipulador manual `cors.middleware.ts`.
+> - **`@elysiajs/swagger`**: Documentação Swagger/OpenAPI viva em `/swagger`.
+> - **Macros Nativas (`.macro({ role: ... })`)**: Validação declarativa de autorização por `Role` sem poluir as funções de controller.
+> - **Estudo Detalhado**: Ver [Análise Profunda do Ecossistema ElysiaJS](./elysia-refactoring-analysis.md).
 
 ### 8.2 Sub-tarefas de Implementação
 
 - [x] **Setup de Dependências ElysiaJS**: Instalar `elysia`, `@elysiajs/cors`, `@elysiajs/swagger` e `@elysiajs/jwt` em `helprest-api/package.json`.
-- [ ] **Plugins Globais & Middleware Lifecycle**:
+- [ ] **Plugins Globais Nativo-Primeiros**:
   - Criar `errorPlugin`: Interceptador `.onError()` para capturar `NotFoundError`, `ValidationError`, `ForbiddenError`, `UnauthorizedError`, `ConflictError`, `RateLimitError` e formatar respostas JSON padronizadas.
-  - Criar `securityPlugin`: Aplicar sanitização NoSQL (`sanitize`), HSTS, X-Content-Type-Options e CORS.
-  - Criar `authPlugin`: Macro/Guard para validação Bearer JWT e extração de `sub`, `email`, `role`.
+  - Criar `securityPlugin`: Aplicar sanitização NoSQL (`sanitize`), HSTS e `@elysiajs/cors`.
+  - Criar `authPlugin`: Macro/Guard nativo via `@elysiajs/bearer` + `@elysiajs/jwt` com extração de `sub`, `email` e macro declarativo de `role`.
 - [ ] **Migração dos Módulos de Rota / Controllers**:
   - [ ] `authModule`: Rotas `POST /api/auth/google`, `POST /api/auth/refresh`.
   - [ ] `userModule`: Rotas `GET /api/users/me`, `PATCH /api/users/me`, `PATCH /api/users/me/flags`.
@@ -251,5 +256,7 @@
 - [Backend — Arquitetura e Padrões](./backend.md)
 - [Frontend — Arquitetura e Padrões](./frontend.md)
 - [Diretrizes de Arquitetura & Padrões de Qualidade Contínua](./continuous-architecture-standards.md)
+- [Análise Profunda do Ecossistema ElysiaJS](./elysia-refactoring-analysis.md)
+
 
 
