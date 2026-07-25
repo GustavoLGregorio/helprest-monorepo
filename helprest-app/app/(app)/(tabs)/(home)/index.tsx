@@ -31,7 +31,6 @@ import {
     Text,
     TouchableOpacity,
     ActivityIndicator,
-    Image,
 } from "react-native";
 import MapView, { Marker } from "react-native-maps";
 import { useQuery } from "@tanstack/react-query";
@@ -325,7 +324,7 @@ export default function HomeScreen() {
         setLocationReady(true);
     }, [permissions.locationForeground]);
 
-    useEffect(() => { requestLocationPermission(); }, []);
+    useEffect(() => { requestLocationPermission(); }, [requestLocationPermission]);
     useEffect(() => { resolveLocation(); }, [resolveLocation]);
 
     useEffect(() => {

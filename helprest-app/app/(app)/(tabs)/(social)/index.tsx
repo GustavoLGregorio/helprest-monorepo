@@ -104,7 +104,7 @@ export default function SocialFeed() {
 
     useEffect(() => {
         loadFeed(1);
-    }, []);
+    }, [loadFeed]);
 
     const handleRefresh = async () => {
         setRefreshing(true);

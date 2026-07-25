@@ -66,7 +66,7 @@ export default function CreateVisit() {
         };
 
         loadEstablishment();
-    }, [establishmentId]);
+    }, [establishmentId, router]);
 
     const checkUserDistance = async (est: Establishment) => {
         setCheckingLocation(true);
@@ -164,7 +164,7 @@ export default function CreateVisit() {
                     [{ text: "OK", onPress: () => router.back() }]
                 );
             } else {
-                const errorData = res.data as any;
+                const errorData = res.data as { message?: string } | null;
                 Alert.alert(
                     "Erro ao publicar", 
                     errorData?.message || "Ocorreu um erro ao salvar a sua visita."

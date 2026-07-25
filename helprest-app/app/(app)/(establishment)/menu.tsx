@@ -1,5 +1,5 @@
 import { StyleSheet, View, Text, FlatList, Image, TouchableOpacity, Switch, ActivityIndicator, Alert, RefreshControl } from "react-native";
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useCallback } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useRouter, useFocusEffect } from "expo-router";
@@ -33,7 +33,6 @@ interface Establishment {
 export default function EstablishmentMenu() {
     const router = useRouter();
     const [products, setProducts] = useState<Product[]>([]);
-    const [establishmentId, setEstablishmentId] = useState<string>("");
     const [loading, setLoading] = useState<boolean>(true);
     const [refreshing, setRefreshing] = useState<boolean>(false);
 
@@ -44,7 +43,6 @@ export default function EstablishmentMenu() {
             });
 
             if (res.ok && res.data) {
-                setEstablishmentId(res.data.id);
                 setProducts(res.data.products || []);
             } else {
                 console.error("Failed to load establishment menu:", res);

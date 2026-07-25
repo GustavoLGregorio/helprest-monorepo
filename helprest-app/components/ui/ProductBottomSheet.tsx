@@ -34,7 +34,7 @@ export default function ProductBottomSheet({
                 useNativeDriver: true,
             }).start();
         }
-    }, [visible]);
+    }, [visible, panY]);
 
     const panResponder = React.useRef(
         PanResponder.create({

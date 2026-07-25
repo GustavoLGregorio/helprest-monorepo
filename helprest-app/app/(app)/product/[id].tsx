@@ -7,7 +7,7 @@ import HeartClicable from "@/components/ui/HeartClicable";
 import { Ionicons } from "@expo/vector-icons";
 
 export default function ProductDetailsModal() {
-    const { id, data } = useLocalSearchParams<{ id: string; data: string }>();
+    const { data } = useLocalSearchParams<{ id: string; data: string }>();
     const router = useRouter();
 
     if (!data) return <View><Text>Produto não encontrado</Text></View>;

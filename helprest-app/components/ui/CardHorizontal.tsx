@@ -6,7 +6,6 @@ import FlagColoredText from "./FlagColoredText";
 import HeartClicable from "./HeartClicable";
 import IconCircle from "./IconCircle";
 import StarReview from "./StarReview";
-import TextDistance from "../atoms/TextDistance";
 import { useFavorites } from "@/hooks/queries/useFavorites";
 
 type CardHorizontalProps = {

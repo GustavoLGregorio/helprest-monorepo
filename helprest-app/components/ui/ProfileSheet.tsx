@@ -26,15 +26,6 @@ interface FlagItem {
     textColor: string;
 }
 
-interface VisitsResponse {
-    data: unknown[];
-    pagination: { total: number };
-}
-
-/**
- * Self-contained profile sheet modal.
- * Manages its own visibility and fetches its own data.
- */
 const ProfileSheet: React.FC = () => {
     const router = useRouter();
     const queryClient = useQueryClient();
@@ -53,7 +44,7 @@ const ProfileSheet: React.FC = () => {
                 useNativeDriver: true,
             }).start();
         }
-    }, [visible]);
+    }, [visible, panY]);
 
     const panResponder = React.useRef(
         PanResponder.create({

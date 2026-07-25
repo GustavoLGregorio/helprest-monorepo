@@ -38,7 +38,7 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useQuery } from "@tanstack/react-query";
 import ImageRounded from "@/components/ui/ImageRounded";
-import { useRouter, useFocusEffect } from "expo-router";
+import { useRouter } from "expo-router";
 import { api } from "@/services/api";
 import { loadUserProfile } from "@/storage/userProfile";
 import { getCurrentPosition } from "@/services/location";

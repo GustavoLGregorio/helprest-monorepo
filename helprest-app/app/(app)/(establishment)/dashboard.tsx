@@ -5,7 +5,7 @@ import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { api } from "@/services/api";
 import { clearTokens } from "@/storage/authTokens";
-import { clearUserProfile, loadUserProfile } from "@/storage/userProfile";
+import { clearUserProfile } from "@/storage/userProfile";
 import { Colors } from "@/constants/Colors";
 
 interface Flag {

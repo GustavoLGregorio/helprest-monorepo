@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { Stack, useRouter } from "expo-router";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { View, ActivityIndicator } from "react-native";
@@ -21,34 +21,7 @@ export default function RootLayout() {
     const [authState, setAuthState] = useState<AuthState>("loading");
     const [onboardingStep, setOnboardingStep] = useState<number>(1);
 
-    // Initial validation on mount
-    useEffect(() => {
-        validateSession();
-    }, []);
-
-    useEffect(() => {
-        if (authState === "loading") return;
-
-        switch (authState) {
-            case "authenticated": {
-                const profile = loadUserProfile();
-                if (profile?.role === "establishment") {
-                    router.replace("/(app)/(establishment)/dashboard" as never);
-                } else {
-                    router.replace("/(app)/(tabs)/(home)");
-                }
-                break;
-            }
-            case "unauthenticated":
-                router.replace("/(auth)/home");
-                break;
-            case "onboarding":
-                router.replace(`/(auth)/register/step${onboardingStep}` as never);
-                break;
-        }
-    }, [authState, onboardingStep]);
-
-    async function validateSession() {
+    const validateSession = useCallback(async () => {
         setAuthState("loading");
         const tokens = loadTokens();
 
@@ -115,7 +88,34 @@ export default function RootLayout() {
                 setAuthState("unauthenticated");
             }
         }
-    }
+    }, []);
+
+    // Initial validation on mount
+    useEffect(() => {
+        validateSession();
+    }, [validateSession]);
+
+    useEffect(() => {
+        if (authState === "loading") return;
+
+        switch (authState) {
+            case "authenticated": {
+                const profile = loadUserProfile();
+                if (profile?.role === "establishment") {
+                    router.replace("/(app)/(establishment)/dashboard" as never);
+                } else {
+                    router.replace("/(app)/(tabs)/(home)");
+                }
+                break;
+            }
+            case "unauthenticated":
+                router.replace("/(auth)/home");
+                break;
+            case "onboarding":
+                router.replace(`/(auth)/register/step${onboardingStep}` as never);
+                break;
+        }
+    }, [authState, onboardingStep, router]);
 
     if (authState === "loading") {
         return (

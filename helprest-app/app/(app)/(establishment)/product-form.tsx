@@ -54,10 +54,8 @@ export default function ProductForm() {
             try {
                 // 1. Fetch flags
                 const flagsRes = await api.get<Flag[]>("/api/flags", { authenticated: true });
-                let loadedFlags: Flag[] = [];
                 if (flagsRes.ok && flagsRes.data) {
                     setAllFlags(flagsRes.data);
-                    loadedFlags = flagsRes.data;
                 }
 
                 // 2. Fetch establishment details and check if editing
@@ -100,7 +98,7 @@ export default function ProductForm() {
         };
 
         loadFormData();
-    }, [editProductId, isEditMode]);
+    }, [editProductId, isEditMode, router]);
 
     const pickImage = async () => {
         // Request media library permission
@@ -213,7 +211,7 @@ export default function ProductForm() {
                     [{ text: "OK", onPress: () => router.back() }]
                 );
             } else {
-                const errorData = res.data as any;
+                const errorData = res.data as { message?: string } | null;
                 Alert.alert("Erro", errorData?.message || "Não foi possível salvar o produto.");
             }
         } catch (error) {

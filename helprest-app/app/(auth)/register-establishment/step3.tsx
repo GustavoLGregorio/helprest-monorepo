@@ -92,7 +92,7 @@ export default function CompanyStep3() {
             });
 
             if (!estRes.ok) {
-                const errorData = estRes.data as any;
+                const errorData = estRes.data as { message?: string } | null;
                 Alert.alert(
                     "Erro ao cadastrar",
                     errorData?.message || "Ocorreu um erro ao criar o perfil do estabelecimento."

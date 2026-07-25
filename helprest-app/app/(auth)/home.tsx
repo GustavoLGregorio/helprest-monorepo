@@ -47,7 +47,7 @@ export default function LoginScreen() {
 					Alert.alert("Erro", result.error || "Falha ao fazer login");
 				}
 			}
-		} catch (error) {
+		} catch {
 			Alert.alert("Erro", "Ocorreu um erro inesperado");
 		} finally {
 			setIsLoading(false);

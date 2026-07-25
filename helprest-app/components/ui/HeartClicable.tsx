@@ -1,6 +1,6 @@
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import React, { useState } from "react";
-import { GestureResponderEvent, Pressable, ViewStyle } from "react-native";
+import { Pressable } from "react-native";
 
 type HeartClicableProps = {
 	size?: number;
