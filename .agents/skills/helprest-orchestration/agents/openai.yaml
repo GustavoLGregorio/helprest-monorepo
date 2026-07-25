@@ -1,0 +1,4 @@
+interface:
+  display_name: "HelpRest Orchestration"
+  short_description: "High-level orchestration guide, Docker management, script execution, local Android APK builds, and environment setup for HelpRest monorepo"
+  default_prompt: "Use $helprest-orchestration to manage Docker containers, execute root package scripts, compile local Android APKs, and verify HelpRest API and App code quality."
