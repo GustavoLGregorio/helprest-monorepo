@@ -212,7 +212,7 @@
 
 ### 8.2 Sub-tarefas de Implementação
 
-- [ ] **Setup de Dependências ElysiaJS**: Instalar `elysia`, `@elysiajs/cors`, `@elysiajs/swagger` e `@elysiajs/jwt` em `helprest-api/package.json`.
+- [x] **Setup de Dependências ElysiaJS**: Instalar `elysia`, `@elysiajs/cors`, `@elysiajs/swagger` e `@elysiajs/jwt` em `helprest-api/package.json`.
 - [ ] **Plugins Globais & Middleware Lifecycle**:
   - Criar `errorPlugin`: Interceptador `.onError()` para capturar `NotFoundError`, `ValidationError`, `ForbiddenError`, `UnauthorizedError`, `ConflictError`, `RateLimitError` e formatar respostas JSON padronizadas.
   - Criar `securityPlugin`: Aplicar sanitização NoSQL (`sanitize`), HSTS, X-Content-Type-Options e CORS.

@@ -17,13 +17,7 @@
       "source": "elysiajs/skills",
       "sourceType": "github",
       "skillPath": "elysia/SKILL.md",
-      "computedHash": "1f8cdb3c66e6127bd7e31fd5478bf912d976059896629cc58eec031f9bae0c74"
-    },
-    "helprest-orchestration": {
-      "source": "local",
-      "sourceType": "workspace",
-      "skillPath": ".agents/skills/helprest-orchestration/SKILL.md",
-      "computedHash": "acef6688f269043e92f27e2757414a6240fdc07b0a87dec8d0512fefb4313303"
+      "computedHash": "55268e69a2c766ed67e56a0db57544f60cc52dba0c7f024a974baf965e525e1b"
     },
     "expo-api-routes": {
       "source": "expo/skills",
@@ -54,6 +48,12 @@
       "sourceType": "github",
       "skillPath": ".claude/skills/expo-skill-eval/SKILL.md",
       "computedHash": "6c7a537957248be7cff8f7a497deb2f07374dcf8f730526f8366f13433c31656"
+    },
+    "helprest-orchestration": {
+      "source": "local",
+      "sourceType": "workspace",
+      "skillPath": ".agents/skills/helprest-orchestration/SKILL.md",
+      "computedHash": "acef6688f269043e92f27e2757414a6240fdc07b0a87dec8d0512fefb4313303"
     },
     "upgrading-expo": {
       "source": "expo/skills",
