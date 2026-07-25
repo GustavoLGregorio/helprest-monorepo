@@ -207,4 +207,3 @@
 - [Arquitetura do Sistema](./base.system.md)
 - [Backend — Arquitetura e Padrões](./backend.md)
 - [Frontend — Arquitetura e Padrões](./frontend.md)
-
