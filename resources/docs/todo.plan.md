@@ -193,15 +193,55 @@
 
 ---
 
+## 8. Refatoração Arquitetural e Migração do Backend para ElysiaJS (Elysia + Bun)
+
+### 8.1 Contexto e Justificativa (Como & Por quê)
+
+> **Diagnóstico da Arquitetura Atual (`helprest-api`):**  
+> Atualmente, a camada de entrega HTTP é manipulada via roteador customizado baseado em expressões regulares sobre `Bun.serve` concentrado em [router.ts](file:///home/gustavo/Dev/helprest/helprest-monorepo/helprest-api/src/interface/http/router.ts) (440+ linhas). Embora rápido, a ausência de um framework estruturado facilita o crescimento desordenado de boilerplate, duplicidade em parsers de query/body, checagens manuais de ObjectId e acoplamento de middlewares.
+
+> **Objetivo da Migração para ElysiaJS:**  
+> Migrar a camada de **Interface HTTP** para o framework **ElysiaJS** mantendo o servidor executando nativamente no **Bun** runtime. A arquitetura de **Clean Architecture & DDD** será rigorosamente preservada: as camadas de **Domínio** (`domain/entities`, `domain/value-objects`, `domain/services`), **Aplicação** (`application/use-cases`) e **Infraestrutura** (`infrastructure/repositories`, `infrastructure/database`) **não serão alteradas**.
+
+> **Vantagens Técnicas Garantidas:**  
+> 1. **Modularidade por Domínio**: Organização dos controllers em sub-módulos encapsulados (`src/interface/modules/*`).
+> 2. **Validação de Schema Unificada**: Validação automática de `body`, `query`, `params` e `response` via TypeBox ou Zod nativo.
+> 3. **Documentação Swagger/OpenAPI Automática**: Geração em tempo de execução via `@elysiajs/swagger` no endpoint `/swagger`.
+> 4. **Tratamento Global de Erros Elegante**: Mapeamento centralizado no gancho `.onError()` convertendo `AppError` em respostas JSON padronizadas.
+> 5. **Macros & Guards Nativos**: Simplificação de autenticação Bearer JWT e checagem hierárquica de `Role`.
+
+### 8.2 Sub-tarefas de Implementação
+
+- [ ] **Setup de Dependências ElysiaJS**: Instalar `elysia`, `@elysiajs/cors`, `@elysiajs/swagger` e `@elysiajs/jwt` em `helprest-api/package.json`.
+- [ ] **Plugins Globais & Middleware Lifecycle**:
+  - Criar `errorPlugin`: Interceptador `.onError()` para capturar `NotFoundError`, `ValidationError`, `ForbiddenError`, `UnauthorizedError`, `ConflictError`, `RateLimitError` e formatar respostas JSON padronizadas.
+  - Criar `securityPlugin`: Aplicar sanitização NoSQL (`sanitize`), HSTS, X-Content-Type-Options e CORS.
+  - Criar `authPlugin`: Macro/Guard para validação Bearer JWT e extração de `sub`, `email`, `role`.
+- [ ] **Migração dos Módulos de Rota / Controllers**:
+  - [ ] `authModule`: Rotas `POST /api/auth/google`, `POST /api/auth/refresh`.
+  - [ ] `userModule`: Rotas `GET /api/users/me`, `PATCH /api/users/me`, `PATCH /api/users/me/flags`.
+  - [ ] `establishmentModule`: Rotas `GET /api/establishments`, `GET /api/establishments/recommended`, `GET /api/establishments/nearby`, `GET /api/establishments/search`, `GET /api/establishments/my-establishment`, `GET /api/establishments/:id`, `POST /api/establishments`.
+  - [ ] `productModule`: Rotas `POST /api/products`, `PATCH /api/products/:id`, `DELETE /api/products/:id`.
+  - [ ] `flagModule`: Rotas `GET /api/flags`, `POST /api/flags`.
+  - [ ] `visitModule`: Rotas `POST /api/visits`, `GET /api/visits/user/:userId`, `GET /api/visits/establishment/:id`, `GET /api/social/feed`.
+  - [ ] `favoriteModule`: Rotas `GET /api/favorites`, `POST /api/favorites`, `DELETE /api/favorites/:id`.
+- [ ] **Geração de Documentação OpenAPI/Swagger**: Habilitar a rota `/swagger` no servidor principal com metadados do projeto.
+- [ ] **Atualização do Entrypoint `src/index.ts` & Suíte de Testes**:
+  - Refatorar `src/index.ts` para inicializar a instância principal do Elysia (`app.listen(PORT)`), integrando o Graceful Shutdown com `app.stop()`.
+  - Atualizar os testes de integração para disparar requisições via `app.handle(new Request(...))`.
+
+---
+
 ## Priorização Sugerida
 
 | Fase | Módulos | Justificativa |
 |---|---|---|
 | **Fase 0 (Imediata)** | Atualização de Pacotes & Graceful Shutdown | Manter estabilidade do ecossistema e compatibilidade do Expo SDK 53 |
 | **Fase 1** | Roles & Permissões, Painel do Estabelecimento, Gestão de Flags | Fundação para todas as features de gestão |
-| **Fase 2** | Sistema Matriz/Filiais, Cardápio e Alimentos | Valor direto para estabelecimentos |
-| **Fase 3** | Analytics e Métricas | Retenção e engajamento de estabelecimentos |
-| **Fase 4** | Painel Admin (SuperAdmin), Favoritos, Social, Notificações | Escala e engajamento de usuários |
+| **Fase 2** | Migração do Backend para ElysiaJS (Elysia + Bun) | Padronização e robustez arquitetural para suportar escala |
+| **Fase 3** | Sistema Matriz/Filiais, Cardápio e Alimentos | Valor direto para estabelecimentos |
+| **Fase 4** | Analytics e Métricas | Retenção e engajamento de estabelecimentos |
+| **Fase 5** | Painel Admin (SuperAdmin), Favoritos, Social, Notificações | Escala e engajamento de usuários |
 
 ---
 
@@ -210,4 +250,6 @@
 - [Arquitetura do Sistema](./base.system.md)
 - [Backend — Arquitetura e Padrões](./backend.md)
 - [Frontend — Arquitetura e Padrões](./frontend.md)
+- [Diretrizes de Arquitetura & Padrões de Qualidade Contínua](./continuous-architecture-standards.md)
+
 
