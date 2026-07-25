@@ -5,8 +5,6 @@ export type UserRegisterInfo = {
     birthDate: string;
     defaultLocation: string;
     flags: string | string[];
-    email: string;
-    password: string;
 };
 
 const storage = new MMKV();
@@ -18,6 +16,7 @@ export const saveUserName = (name: string) => {
         console.error("Error writing userName: ", error);
     }
 };
+
 export const loadUserName = (): string | undefined => {
     try {
         const name = storage.getString("userName");
@@ -34,6 +33,7 @@ export const saveUserBirthDate = (date: string) => {
         console.error("Error writing userBirthDate: ", error);
     }
 };
+
 export const loadUserBirthDate = (): string | undefined => {
     try {
         const birthDate = storage.getString("userBirthDate");
@@ -50,6 +50,7 @@ export const saveUserDefaultLocation = (defaultLocation: string) => {
         console.error("Error writing userDefaultLocation: ", error);
     }
 };
+
 export const loadUserDefaultLocation = (): string | undefined => {
     try {
         const defaultLocation = storage.getString("userDefaultLocation");
