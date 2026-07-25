@@ -289,9 +289,296 @@ bun run dev               # Starts with --watch
 1. **No ODM (Mongoose)** — Uses official MongoDB driver for performance and control
 2. **Jose over jsonwebtoken** — Modern ESM-native JWT library, smaller bundle
 3. **Zod v4** — Runtime validation with TypeScript type inference
-4. **Argon2id** — Winner of Password Hashing Competition, recommended over bcrypt
+4. **OAuth-Only Authentication** — Centralized via Google OAuth ID Token verification server-side using `jose.createRemoteJWKSet`, eliminating local password storage/hashing overhead and reducing attack surface
 5. **Repositories as singletons** — Stateless, instantiated once in router
 6. **Use cases per-request** — Created fresh per handler call for isolation
 7. **Immutable entities** — Updates return new instances (`withNewRating()`)
-8. **Google OAuth server-side** — Uses `jose.createRemoteJWKSet` to verify Google ID tokens with Google’s public JWK set; no Google SDK required on backend
-9. **Multi-provider auth** — `User.authProvider` field allows `"local"` (email/password) and `"google"` to coexist. `passwordHash` is optional for Google users
+8. **Google OAuth server-side** — Uses `jose.createRemoteJWKSet` to verify Google ID tokens with Google's public JWK set; no Google SDK required on backend
+
+---
+
+## Visual Architecture Diagrams (Mermaid)
+
+### Domain Class Diagram (Entities, Value Objects & Domain Services)
+
+```mermaid
+classDiagram
+    class User {
+        +ObjectId id
+        +string name
+        +string email
+        +AuthProvider authProvider
+        +string googleId
+        +Date birthDate
+        +ReadonlyArray~ObjectId~ flags
+        +Location location
+        +boolean socialLinksEnabled
+        +SocialLinks socialLinks
+        +string profilePhoto
+        +string role
+        +Date createdAt
+        +Date updatedAt
+        +create(props: UserProps) User
+        +fromDocument(doc: Record) User
+        +toDocument() Record
+    }
+
+    class Establishment {
+        +ObjectId id
+        +string companyName
+        +Location location
+        +ReadonlyArray~ObjectId~ flags
+        +string logo
+        +Rating rating
+        +boolean isSponsored
+        +Date createdAt
+        +Date updatedAt
+        +create(props: EstablishmentProps) Establishment
+        +withNewRating(newRating: number) Establishment
+        +fromDocument(doc: Record) Establishment
+        +toDocument() Record
+    }
+
+    class Product {
+        +ObjectId id
+        +ObjectId establishmentId
+        +string name
+        +string description
+        +number price
+        +string imageUrl
+        +string category
+        +ReadonlyArray~ObjectId~ flags
+        +boolean isActive
+        +Date createdAt
+        +Date updatedAt
+        +create(props: ProductProps) Product
+        +fromDocument(doc: Record) Product
+        +toDocument() Record
+    }
+
+    class Flag {
+        +ObjectId id
+        +string type
+        +string identifier
+        +string description
+        +string tag
+        +string backgroundColor
+        +string textColor
+        +create(props: FlagProps) Flag
+        +fromDocument(doc: Record) Flag
+        +toDocument() Record
+    }
+
+    class Visit {
+        +ObjectId id
+        +ObjectId establishmentId
+        +ObjectId userId
+        +Date date
+        +string review
+        +number rating
+        +ReadonlyArray~string~ photoUrls
+        +Date createdAt
+        +create(props: VisitProps) Visit
+        +fromDocument(doc: Record) Visit
+        +toDocument() Record
+    }
+
+    class Location {
+        +string state
+        +string city
+        +string neighborhood
+        +string address
+        +number lat
+        +number lng
+        +create(props: LocationProps) Location
+        +toGeoJSON() Record
+        +equals(other: Location) boolean
+    }
+
+    class SocialLinks {
+        +string instagram
+        +string facebook
+        +string twitter
+        +string tiktok
+        +string website
+        +create(props: SocialLinksProps) SocialLinks
+    }
+
+    class Rating {
+        +number value
+        +number count
+        +number total
+        +fromAverage(total: number, count: number) Rating
+        +recalculate(newRating: number) Rating
+    }
+
+    class RecommendationService {
+        +rank(userFlags: ObjectId[], userLat: number, userLng: number, establishments: Establishment[]) RankedEstablishment[]
+        +haversineDistance(lat1: number, lon1: number, lat2: number, lon2: number) number
+    }
+
+    User "1" *-- "0..1" Location
+    User "1" *-- "0..1" SocialLinks
+    User "1" o-- "*" Flag
+
+    Establishment "1" *-- "1" Location
+    Establishment "1" *-- "1" Rating
+    Establishment "1" o-- "*" Flag
+
+    Product "1" o-- "*" Flag
+    Product "*" --o "1" Establishment
+
+    Visit "*" --o "1" Establishment
+    Visit "*" --o "1" User
+
+    RecommendationService ..> Establishment : ranks
+    RecommendationService ..> Location : calculates distance
+```
+
+### NoSQL DER Diagram (MongoDB Collections & Relationships)
+
+```mermaid
+erDiagram
+    users {
+        objectId _id PK
+        string name
+        string email UK
+        string authProvider "google | apple"
+        string googleId
+        date birthDate
+        objectId_array flags FK
+        object location "GeoJSON Point"
+        boolean socialLinksEnabled
+        object socialLinks
+        string profilePhoto
+        string role "user | establishment"
+        date createdAt
+        date updatedAt
+    }
+
+    establishments {
+        objectId _id PK
+        string companyName
+        object location "GeoJSON 2dsphere"
+        objectId_array flags FK
+        string logo
+        number rating
+        number ratingCount
+        number ratingTotal
+        boolean isSponsored
+        date createdAt
+        date updatedAt
+    }
+
+    products {
+        objectId _id PK
+        objectId establishmentId FK
+        string name
+        string description
+        number price
+        string imageUrl
+        string category
+        objectId_array flags FK
+        boolean isActive
+        date createdAt
+        date updatedAt
+    }
+
+    flags {
+        objectId _id PK
+        string type "dietary"
+        string identifier "vegan | celiac | lactose-free..."
+        string description
+        string tag
+        string backgroundColor
+        string textColor
+    }
+
+    visits {
+        objectId _id PK
+        objectId establishmentId FK
+        objectId userId FK
+        date date
+        string review
+        number rating "1..5"
+        string_array photoUrls
+        date createdAt
+    }
+
+    user_favorites {
+        objectId _id PK
+        objectId userId FK
+        objectId referenceId FK
+        string type "establishment | product"
+        date createdAt
+    }
+
+    users ||--o{ visits : "writes reviews"
+    establishments ||--o{ visits : "receives reviews"
+    establishments ||--o{ products : "offers"
+    users }|--|{ flags : "selects restrictions"
+    establishments }|--|{ flags : "supports restrictions"
+    products }|--|{ flags : "compatible restrictions"
+    users ||--o{ user_favorites : "saves"
+```
+
+### Data Flow & Sequence Diagrams
+
+#### 1. Google OAuth Authentication Flow
+
+```mermaid
+sequenceDiagram
+    autonumber
+    actor User as Mobile App (Expo)
+    participant AuthSDK as Google Sign-In SDK
+    participant Router as Bun HTTP Router
+    participant AuthUseCase as GoogleAuthUser UseCase
+    participant GoogleJWK as Google Public JWK API
+    participant UserRepo as MongoUserRepository
+    participant JWT as JWT Service (Jose)
+
+    User->>AuthSDK: Tap "Continuar com o Google"
+    AuthSDK-->>User: Returns googleIdToken
+    User->>Router: POST /api/auth/google { googleIdToken }
+    Router->>AuthUseCase: execute({ googleIdToken })
+    AuthUseCase->>GoogleJWK: Fetch & Verify RS256 Signature (jwks.json)
+    GoogleJWK-->>AuthUseCase: Token Validated (sub, email, name, picture)
+    AuthUseCase->>UserRepo: findByGoogleId(sub)
+    alt User exists
+        UserRepo-->>AuthUseCase: Returns existing User
+    else User does not exist
+        AuthUseCase->>UserRepo: create(User.create({ googleId, email, name }))
+        UserRepo-->>AuthUseCase: Returns new User
+    end
+    AuthUseCase->>JWT: generateTokens({ sub: userId, email })
+    JWT-->>AuthUseCase: { accessToken (15m), refreshToken (7d) }
+    AuthUseCase-->>Router: Response { accessToken, refreshToken, isNewUser, user }
+    Router-->>User: HTTP 200 OK + Tokens saved securely in MMKV
+```
+
+#### 2. Recommendation & Proximity Algorithm Flow
+
+```mermaid
+sequenceDiagram
+    autonumber
+    actor User as Mobile App
+    participant Router as Router & Middleware
+    participant RecUseCase as GetRecommendedEstablishments
+    participant UserRepo as MongoUserRepository
+    participant EstRepo as MongoEstablishmentRepository
+    participant Service as RecommendationService
+
+    User->>Router: GET /api/establishments/recommended?lat=-25.4412&lng=-49.2894
+    Router->>Router: Authenticate Bearer JWT
+    Router->>RecUseCase: execute(userId, lat, lng, limit)
+    RecUseCase->>UserRepo: findById(userId)
+    UserRepo-->>RecUseCase: Returns User with dietary flags
+    RecUseCase->>EstRepo: findNearby(lat, lng, maxDistance=50km)
+    EstRepo-->>RecUseCase: Returns nearby Establishments (2dsphere)
+    RecUseCase->>Service: rank(userFlags, userLat, userLng, establishments)
+    Note over Service: Calculates Haversine distance,<br/>Flag match ratio, Rating weight,<br/>and Sponsored bonus.
+    Service-->>RecUseCase: Returns Sorted RankedEstablishment[]
+    RecUseCase-->>Router: Returns formatted DTOs
+    Router-->>User: HTTP 200 OK JSON
+```
+

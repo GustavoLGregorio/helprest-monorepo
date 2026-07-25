@@ -182,7 +182,7 @@
 - [x] **Suíte de Testes Unitários Isolados**: Criar testes unitários em `tests/unit/` cobrindo regras de negócio puras (entidades do domínio, value objects e `RecommendationService`) sem dependência de banco de dados ativo.
 - [x] **Reforço de Sanitização NoSQL**: Auditar e garantir sanitização estrita via Zod em todos os endpoints de busca/query para eliminar o risco de operadores NoSQL injetados (`$gt`, `$ne`, `$where`).
 - [x] **Remoção de Autenticação Local (OAuth-Only)**: Remover endpoints, DTOs e fluxos de cadastro/login local (senha/argon2) para unificar autenticação exclusivamente via provedores de identidade (Google OAuth), reduzindo a complexidade do servidor.
-- [ ] **Mapeamento Arquitetural & Diagramação Visual**: Elaborar especificação detalhada da arquitetura (Frontend, Backend e Banco de Dados), incluindo diagramas Mermaid de classes de domínio, Diagrama de Entidade-Relacionamento (DER NoSQL) e fluxos de dados.
+- [x] **Mapeamento Arquitetural & Diagramação Visual**: Elaborar especificação detalhada da arquitetura (Frontend, Backend e Banco de Dados), incluindo diagramas Mermaid de classes de domínio, Diagrama de Entidade-Relacionamento (DER NoSQL) e fluxos de dados.
 
 ### 7.3 Melhorias Arquiteturais no Frontend (helprest-app)
 
