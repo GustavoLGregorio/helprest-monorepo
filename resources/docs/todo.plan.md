@@ -179,7 +179,7 @@
 ### 7.2 Melhorias Arquiteturais no Backend (helprest-api)
 
 - [x] **Graceful Shutdown do Servidor Bun & Conexões**: Implementar manipulação de sinais `SIGINT`/`SIGTERM` no entrypoint `src/index.ts` para encerrar graciosamente os pools do MongoDB Atlas e Redis.
-- [ ] **Suíte de Testes Unitários Isolados**: Criar testes unitários em `tests/unit/` cobrindo regras de negócio puras (entidades do domínio, value objects e `RecommendationService`) sem dependência de banco de dados ativo.
+- [x] **Suíte de Testes Unitários Isolados**: Criar testes unitários em `tests/unit/` cobrindo regras de negócio puras (entidades do domínio, value objects e `RecommendationService`) sem dependência de banco de dados ativo.
 - [ ] **Reforço de Sanitização NoSQL**: Auditar e garantir sanitização estrita via Zod em todos os endpoints de busca/query para eliminar o risco de operadores NoSQL injetados (`$gt`, `$ne`, `$where`).
 
 ### 7.3 Melhorias Arquiteturais no Frontend (helprest-app)

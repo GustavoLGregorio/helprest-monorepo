@@ -8,6 +8,7 @@
     "start": "bun run src/index.ts",
     "seed": "bun run scripts/seed.ts",
     "test": "bun test",
+    "test:unit": "bun test tests/unit",
     "typecheck": "bunx tsc --noEmit",
     "lint": "bunx --bun eslint src/",
     "format": "bunx --bun prettier --write src/"

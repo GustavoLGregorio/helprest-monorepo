@@ -17,6 +17,7 @@
     "api:seed": "cd helprest-api && bun run seed",
     "api:seed:docker": "docker exec helprest-api bun run seed",
     "api:test": "cd helprest-api && bun run test",
+    "api:test:unit": "cd helprest-api && bun run test:unit",
     "app:start": "cd helprest-app && bun run start",
     "app:start:clear": "cd helprest-app && bun run start:clear",
     "app:android": "cd helprest-app && bun run android",
