@@ -317,22 +317,13 @@ async function seed() {
         //  USERS (test accounts)
         // ═══════════════════════════════════════════════════════
 
-        // Password: "teste123" hashed with Argon2id
-        // To generate: bun -e "import argon2 from 'argon2'; console.log(await argon2.hash('teste123', {type: argon2.argon2id}))"
-        const argon2 = await import("argon2");
-        const testPasswordHash = await argon2.hash("teste123", {
-            type: argon2.argon2id,
-            memoryCost: 65536,
-            timeCost: 3,
-            parallelism: 2,
-        });
-
         const users = [
             {
                 _id: new ObjectId(),
                 name: "João Teste",
                 email: "joao@teste.com",
-                passwordHash: testPasswordHash,
+                authProvider: "google",
+                googleId: "google-joao-123",
                 birthDate: new Date("1995-03-15"),
                 flags: [flagMap.get("vegan")!, flagMap.get("gluten-free")!],
                 location: {
@@ -352,7 +343,8 @@ async function seed() {
                 _id: new ObjectId(),
                 name: "Maria Teste",
                 email: "maria@teste.com",
-                passwordHash: testPasswordHash,
+                authProvider: "google",
+                googleId: "google-maria-456",
                 birthDate: new Date("1998-07-22"),
                 flags: [flagMap.get("vegetarian")!, flagMap.get("lactose-free")!, flagMap.get("celiac")!],
                 location: {

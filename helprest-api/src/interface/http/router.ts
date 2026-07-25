@@ -16,8 +16,7 @@ import { MongoProductRepository } from "@infra/repositories/MongoProductReposito
 import { MongoUserFavoriteRepository } from "@infra/repositories/MongoUserFavoriteRepository";
 
 // Use Cases — Auth
-import { RegisterUser, LoginUser, RefreshToken } from "@application/use-cases/auth";
-import { GoogleAuthUser } from "@application/use-cases/auth/GoogleAuthUser";
+import { RefreshToken, GoogleAuthUser } from "@application/use-cases/auth";
 
 // Use Cases — User
 import { GetUserProfile, UpdateUserProfile, UpdateUserFlags } from "@application/use-cases/user";
@@ -49,7 +48,7 @@ import { RemoveFavorite } from "@application/use-cases/favorite/RemoveFavorite";
 import { GetUserFavorites } from "@application/use-cases/favorite/GetUserFavorites";
 
 // Validation schemas
-import { registerSchema, loginSchema, refreshTokenSchema, googleAuthSchema } from "@interface/validation/auth.schema";
+import { refreshTokenSchema, googleAuthSchema } from "@interface/validation/auth.schema";
 import { updateProfileSchema, updateFlagsSchema } from "@interface/validation/user.schema";
 import {
     createEstablishmentSchema,
@@ -172,20 +171,6 @@ function matchRoute(method: string, pathname: string) {
 // ═══════════════════════════════════════════════════════
 //  AUTH ROUTES (public)
 // ═══════════════════════════════════════════════════════
-
-addRoute("POST", "/api/auth/register", async (req) => {
-    const input = await parseBody(req, registerSchema);
-    const useCase = new RegisterUser(userRepo);
-    const tokens = await useCase.execute(input);
-    return json(tokens, 201);
-});
-
-addRoute("POST", "/api/auth/login", async (req) => {
-    const input = await parseBody(req, loginSchema);
-    const useCase = new LoginUser(userRepo);
-    const tokens = await useCase.execute(input);
-    return json(tokens);
-});
 
 addRoute("POST", "/api/auth/refresh", async (req) => {
     const input = await parseBody(req, refreshTokenSchema);

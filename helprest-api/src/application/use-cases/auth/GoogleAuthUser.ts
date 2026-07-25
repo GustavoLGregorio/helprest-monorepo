@@ -78,7 +78,6 @@ export class GoogleAuthUser {
                     id: user.id,
                     name: user.name,
                     email: user.email,
-                    passwordHash: user.passwordHash,
                     authProvider: "google",
                     googleId,
                     birthDate: user.birthDate,

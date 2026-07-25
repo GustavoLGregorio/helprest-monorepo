@@ -23,7 +23,6 @@
     "typescript": "^5.9.3"
   },
   "dependencies": {
-    "argon2": "^0.45.1",
     "ioredis": "^5.9.3",
     "jose": "^6.2.4",
     "mongodb": "^7.1.0",

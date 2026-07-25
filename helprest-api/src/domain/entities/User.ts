@@ -4,13 +4,12 @@ import { SocialLinks } from "../value-objects/SocialLinks";
 import type { LocationProps } from "../value-objects/Location";
 import type { SocialLinksProps } from "../value-objects/SocialLinks";
 
-export type AuthProvider = "local" | "google";
+export type AuthProvider = "google" | "apple";
 
 export interface UserProps {
     id?: ObjectId;
     name: string;
     email: string;
-    passwordHash?: string;
     authProvider: AuthProvider;
     googleId?: string;
     birthDate?: Date;
@@ -28,7 +27,6 @@ export class User {
     readonly id: ObjectId;
     readonly name: string;
     readonly email: string;
-    readonly passwordHash?: string;
     readonly authProvider: AuthProvider;
     readonly googleId?: string;
     readonly birthDate?: Date;
@@ -45,7 +43,6 @@ export class User {
         this.id = props.id ?? new ObjectId();
         this.name = props.name;
         this.email = props.email;
-        this.passwordHash = props.passwordHash;
         this.authProvider = props.authProvider;
         this.googleId = props.googleId;
         this.birthDate = props.birthDate;
@@ -62,10 +59,6 @@ export class User {
     static create(props: UserProps): User {
         if (!props.name || !props.email) {
             throw new Error("User requires name and email");
-        }
-
-        if (props.authProvider === "local" && !props.passwordHash) {
-            throw new Error("Local auth users require a passwordHash");
         }
 
         if (props.authProvider === "google" && !props.googleId) {
@@ -88,8 +81,7 @@ export class User {
             id: doc._id as ObjectId,
             name: doc.name as string,
             email: doc.email as string,
-            passwordHash: doc.passwordHash as string | undefined,
-            authProvider: (doc.authProvider as AuthProvider) ?? "local",
+            authProvider: (doc.authProvider as AuthProvider) ?? "google",
             googleId: doc.googleId as string | undefined,
             birthDate: doc.birthDate
                 ? new Date(doc.birthDate as string | number | Date)
@@ -114,7 +106,6 @@ export class User {
             _id: this.id,
             name: this.name,
             email: this.email,
-            passwordHash: this.passwordHash,
             authProvider: this.authProvider,
             googleId: this.googleId,
             birthDate: this.birthDate,
