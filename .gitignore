@@ -18,6 +18,7 @@ helprest-app/dist/
 helprest-app/web-build/
 helprest-app/android/
 helprest-app/ios/
+helprest-app/scripts/.bin/
 helprest-app/expo-env.d.ts
 
 # Native

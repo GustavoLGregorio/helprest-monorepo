@@ -17,8 +17,8 @@
     "clean:gradle": "test -d android && (cd android && ./gradlew clean) || true",
     "clean:cache": "bunx rimraf node_modules/.cache .expo",
     "nuke": "bun run clean:gradle && bun run clean:cache && bun run prebuild:android",
-    "build:apk:debug": "bun run prebuild:android && cd android && ./gradlew assembleDebug",
-    "build:apk:release": "bun run prebuild:android && cd android && ./gradlew assembleRelease"
+    "build:apk:debug": "bash ./scripts/build-apk.sh debug",
+    "build:apk:release": "bash ./scripts/build-apk.sh release"
   },
   "dependencies": {
     "@expo/ui": "~0.1.1-alpha.10",

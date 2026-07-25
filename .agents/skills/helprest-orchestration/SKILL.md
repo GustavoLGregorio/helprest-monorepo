@@ -45,6 +45,16 @@ This skill provides AI agents with comprehensive instructions for running, testi
 - `bun run app:build:apk:debug`: Build debug APK at `helprest-app/android/app/build/outputs/apk/debug/app-debug.apk`.
 - `bun run app:build:apk:release`: Build signed release APK at `helprest-app/android/app/build/outputs/apk/release/app-release.apk`.
 
+## Build Cache & Environment Auto-Resolution
+
+1. **Incremental JS/UI Changes (Fast Re-build)**:
+   - When modifying React Native screens, components, hooks, or API services, Gradle's incremental build engine re-uses **100% of pre-compiled native C++/NDK libraries and AAR dependencies**.
+   - Subsequent APK compilation takes **~20-30 seconds** instead of full native re-compilation.
+2. **Native Re-build Trigger (`app:android:nuke`)**:
+   - Only execute `bun run app:android:nuke` when adding new Expo native packages, modifying `app.json` native plugins, or upgrading Expo SDK versions.
+3. **Automated Linux Environment Handling**:
+   - `build-apk.sh` automatically detects JDK 21 (`/opt/android-studio/jbr`), sets `ANDROID_HOME`, creates an `npm` CLI shim if `npm` is missing in `PATH`, patches `local.properties` (`sdk.dir`), and sets `CI=1` to guarantee non-interactive execution.
+
 ## Reference Material
 
 - For detailed script definitions, see [scripts-guide.md](file:///home/gustavo/Dev/helprest/helprest-monorepo/.agents/skills/helprest-orchestration/references/scripts-guide.md).
