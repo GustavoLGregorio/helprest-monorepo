@@ -42,19 +42,19 @@ if (cmd === 'view' && pkg) {
     https.get(url, (res) => {
         let data = '';
         res.on('data', chunk => data += chunk);
-        res.on('end', () => {
+            res.on('end', () => {
+                try {
+                    const parsed = JSON.parse(data);
+                    if (field && parsed[field]) console.log(JSON.stringify(parsed[field]));
+                    else console.log(data);
+                } catch (e) { console.error(e); process.exit(1); }
+            });
+        }).on('error', (e) => { console.error(e); process.exit(1); });
+    } else {
         try {
-            const parsed = JSON.parse(data);
-            if (field && parsed[field]) console.log(JSON.stringify(parsed[field]));
-            else console.log(data);
-        } catch (e) { console.error(e); process.exit(1); }
-    });
-}).on('error', (e) => { console.error(e); process.exit(1); });
-} else {
-  try {
-    const args = process.argv.slice(2).join(' ');
-    execSync(\`bun \${args}\`, { stdio: 'inherit' });
-  } catch (e) { process.exit(e.status || 1); }
+        const args = process.argv.slice(2).join(' ');
+        execSync(\`bun \${args}\`, { stdio: 'inherit' });
+    } catch (e) { process.exit(e.status || 1); }
 }
 `;
     fs.writeFileSync(npmShimPath, npmShimCode, { mode: 0o755 });

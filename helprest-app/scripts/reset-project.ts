@@ -12,24 +12,24 @@ const exampleDirPath = path.join(root, exampleDir);
 const indexContent = `import { Text, View } from "react-native";
 
 export default function Index() {
-  return (
-    <View
-      style={{
-        flex: 1,
-        justifyContent: "center",
-        alignItems: "center",
-      }}
-    >
-      <Text>Edit app/index.tsx to edit this screen.</Text>
+    return (
+        <View
+            style={{
+            flex: 1,
+            justifyContent: "center",
+            alignItems: "center",
+        }}
+        >
+        <Text>Edit app/index.tsx to edit this screen.</Text>
     </View>
-  );
+    );
 }
 `;
 
 const layoutContent = `import { Stack } from "expo-router";
 
 export default function RootLayout() {
-  return <Stack />;
+    return <Stack />;
 }
 `;
 
@@ -53,7 +53,10 @@ async function moveDirectories(userInput: string): Promise<void> {
                     await fs.promises.rename(oldDirPath, newDirPath);
                     log.info(`Moved /${dir} to /${exampleDir}/${dir}.`);
                 } else {
-                    await fs.promises.rm(oldDirPath, { recursive: true, force: true });
+                    await fs.promises.rm(oldDirPath, {
+                        recursive: true,
+                        force: true,
+                    });
                     log.info(`Deleted /${dir}.`);
                 }
             } else {
@@ -74,10 +77,16 @@ async function moveDirectories(userInput: string): Promise<void> {
         log.info("Created app/_layout.tsx.");
 
         log.success("Project reset complete. Next steps:");
-        console.log(`1. Run ${color.cyan("bun run start")} to start the development server.`);
-        console.log(`2. Edit ${color.cyan("app/index.tsx")} to modify the main screen.`);
+        console.log(
+            `1. Run ${color.cyan("bun run start")} to start the development server.`,
+        );
+        console.log(
+            `2. Edit ${color.cyan("app/index.tsx")} to modify the main screen.`,
+        );
         if (userInput === "y") {
-            console.log(`3. Delete the /${exampleDir} directory when finished referencing it.`);
+            console.log(
+                `3. Delete the /${exampleDir} directory when finished referencing it.`,
+            );
         }
     } catch (error: unknown) {
         const message = error instanceof Error ? error.message : String(error);
