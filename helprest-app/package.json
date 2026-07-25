@@ -11,11 +11,14 @@
     "ios": "expo run:ios",
     "web": "expo start --web",
     "lint": "expo lint",
+    "typecheck": "bunx tsc --noEmit",
     "prebuild": "expo prebuild --clean && bun ./scripts/patch-android-signing.js",
     "prebuild:android": "expo prebuild --clean --platform android && bun ./scripts/patch-android-signing.js",
-    "clean:gradle": "cd android && ./gradlew clean && cd ..",
+    "clean:gradle": "test -d android && (cd android && ./gradlew clean) || true",
     "clean:cache": "bunx rimraf node_modules/.cache .expo",
-    "nuke": "bun run clean:gradle && bun run clean:cache && bun run prebuild:android"
+    "nuke": "bun run clean:gradle && bun run clean:cache && bun run prebuild:android",
+    "build:apk:debug": "bun run prebuild:android && cd android && ./gradlew assembleDebug",
+    "build:apk:release": "bun run prebuild:android && cd android && ./gradlew assembleRelease"
   },
   "dependencies": {
     "@expo/ui": "~0.1.1-alpha.10",
