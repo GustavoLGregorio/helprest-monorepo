@@ -120,7 +120,33 @@ function patchStyles() {
     console.log("[patch-styles] ✅ Patched styles.xml with Theme.EdgeToEdge definition.");
 }
 
+// ─── Patch 3: local.properties — define sdk.dir ─────────────────────────────
+
+const LOCAL_PROPERTIES_PATH = path.join(
+    __dirname,
+    "..",
+    "android",
+    "local.properties",
+);
+
+function patchLocalProperties() {
+    const defaultSdkDir = process.env.ANDROID_HOME || process.env.ANDROID_SDK_ROOT || "/home/gustavo/Android/Sdk";
+    if (!fs.existsSync(LOCAL_PROPERTIES_PATH)) {
+        fs.writeFileSync(LOCAL_PROPERTIES_PATH, `sdk.dir=${defaultSdkDir}\n`, "utf8");
+        console.log(`[patch-local-properties] ✅ Created local.properties with sdk.dir=${defaultSdkDir}`);
+        return;
+    }
+
+    let content = fs.readFileSync(LOCAL_PROPERTIES_PATH, "utf8");
+    if (!content.includes("sdk.dir=")) {
+        content += `\nsdk.dir=${defaultSdkDir}\n`;
+        fs.writeFileSync(LOCAL_PROPERTIES_PATH, content, "utf8");
+        console.log(`[patch-local-properties] ✅ Added sdk.dir to local.properties.`);
+    }
+}
+
 // ─── Run all patches ──────────────────────────────────────────────────────────
 
 patchSigning();
 patchStyles();
+patchLocalProperties();
