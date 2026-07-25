@@ -45,7 +45,7 @@ export class GoogleAuthUser {
                 audience: clientId,
             });
             payload = result.payload;
-        } catch (error) {
+        } catch {
             throw new UnauthorizedError("Invalid Google ID token");
         }
 

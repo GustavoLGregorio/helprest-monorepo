@@ -4,7 +4,7 @@ import { User } from "@domain/entities/User";
 import { hashPassword, verifyPassword } from "@infra/security/password";
 import { generateTokens, verifyRefreshToken } from "@infra/security/jwt";
 import type { TokenPair } from "@infra/security/jwt";
-import { ConflictError, UnauthorizedError, ValidationError } from "@shared/errors";
+import { ConflictError, UnauthorizedError } from "@shared/errors";
 import type { RegisterInput, LoginInput } from "@interface/validation/auth.schema";
 
 export class RegisterUser {

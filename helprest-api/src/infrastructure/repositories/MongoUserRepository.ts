@@ -25,7 +25,7 @@ export class MongoUserRepository implements IUserRepository {
 
     async update(user: User): Promise<void> {
         const doc = user.toDocument();
-        const { _id, ...updateData } = doc;
+        const { _id: _, ...updateData } = doc;
         await getUsersCollection().updateOne(
             { _id: user.id },
             { $set: { ...updateData, updatedAt: new Date() } },

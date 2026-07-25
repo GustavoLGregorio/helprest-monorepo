@@ -99,7 +99,7 @@ export class MongoEstablishmentRepository implements IEstablishmentRepository {
 
     async update(establishment: Establishment): Promise<void> {
         const doc = establishment.toDocument();
-        const { _id, ...updateData } = doc;
+        const { _id: _, ...updateData } = doc;
         await getEstablishmentsCollection().updateOne(
             { _id: establishment.id },
             { $set: { ...updateData, updatedAt: new Date() } },

@@ -1,4 +1,3 @@
-import { ObjectId } from "mongodb";
 import type { IVisitRepository } from "@domain/repositories/IVisitRepository";
 import type { IEstablishmentRepository } from "@domain/repositories/IEstablishmentRepository";
 import type { IUserRepository } from "@domain/repositories/IUserRepository";

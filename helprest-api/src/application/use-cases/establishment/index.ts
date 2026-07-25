@@ -13,7 +13,6 @@ import type {
     NearbyEstablishmentsInput,
     SearchEstablishmentsInput,
 } from "@interface/validation/establishment.schema";
-import type { Flag } from "@domain/entities/Flag";
 
 // ── Shared DTO builder ──
 

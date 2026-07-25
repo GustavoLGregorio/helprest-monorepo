@@ -1,5 +1,3 @@
-import { ObjectId } from "mongodb";
-
 export interface LocationProps {
     state: string;
     city: string;

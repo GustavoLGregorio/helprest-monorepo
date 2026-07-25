@@ -41,7 +41,7 @@ import { CreateVisit, ListUserVisits, GetEstablishmentVisits } from "@applicatio
 import { GetSocialFeed } from "@application/use-cases/visit/GetSocialFeed";
 
 // Use Cases — Product
-import { ListEstablishmentProducts, CreateProduct, UpdateProduct, DeleteProduct } from "@application/use-cases/product";
+import { CreateProduct, UpdateProduct, DeleteProduct } from "@application/use-cases/product";
 
 // Use Cases — Favorite
 import { AddFavorite } from "@application/use-cases/favorite/AddFavorite";
