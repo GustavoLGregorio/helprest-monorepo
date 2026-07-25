@@ -180,7 +180,8 @@
 
 - [x] **Graceful Shutdown do Servidor Bun & Conexões**: Implementar manipulação de sinais `SIGINT`/`SIGTERM` no entrypoint `src/index.ts` para encerrar graciosamente os pools do MongoDB Atlas e Redis.
 - [x] **Suíte de Testes Unitários Isolados**: Criar testes unitários em `tests/unit/` cobrindo regras de negócio puras (entidades do domínio, value objects e `RecommendationService`) sem dependência de banco de dados ativo.
-- [ ] **Reforço de Sanitização NoSQL**: Auditar e garantir sanitização estrita via Zod em todos os endpoints de busca/query para eliminar o risco de operadores NoSQL injetados (`$gt`, `$ne`, `$where`).
+- [x] **Reforço de Sanitização NoSQL**: Auditar e garantir sanitização estrita via Zod em todos os endpoints de busca/query para eliminar o risco de operadores NoSQL injetados (`$gt`, `$ne`, `$where`).
+- [ ] **Remoção de Autenticação Local (OAuth-Only)**: Remover endpoints, DTOs e fluxos de cadastro/login local (senha/argon2) para unificar autenticação exclusivamente via provedores de identidade (Google OAuth), reduzindo a complexidade do servidor.
 
 ### 7.3 Melhorias Arquiteturais no Frontend (helprest-app)
 

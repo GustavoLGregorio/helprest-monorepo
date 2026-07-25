@@ -1,4 +1,4 @@
-import { sanitize } from "@shared/utils/sanitize";
+import { sanitize, isValidObjectId } from "@shared/utils/sanitize";
 import { logger, generateRequestId } from "@shared/utils/logger";
 import { handlePreflight, applyCorsHeaders } from "./middleware/cors.middleware";
 import { applySecurityHeaders } from "./middleware/security.middleware";
@@ -57,9 +57,10 @@ import {
     nearbyEstablishmentsSchema,
     searchEstablishmentsSchema,
 } from "@interface/validation/establishment.schema";
-import { createVisitSchema, listVisitsSchema } from "@interface/validation/visit.schema";
+import { createVisitSchema, listVisitsSchema, socialFeedSchema } from "@interface/validation/visit.schema";
 import { createProductSchema, updateProductSchema } from "@interface/validation/product.schema";
 import { addFavoriteSchema } from "@interface/validation/favorite.schema";
+import { createFlagSchema } from "@interface/validation/flag.schema";
 
 // ── Singleton repository instances ──
 const userRepo = new MongoUserRepository();
@@ -90,9 +91,13 @@ async function parseBody<T>(request: Request, schema: ZodType<T>): Promise<T> {
 function parseQuery<T>(url: URL, schema: ZodType<T>): T {
     const params: Record<string, string> = {};
     url.searchParams.forEach((value, key) => {
-        params[key] = value;
+        // Strip NoSQL operator keys or dot-notation injection from query params
+        if (!key.startsWith("$") && !key.includes(".")) {
+            params[key] = value;
+        }
     });
-    const result = schema.safeParse(params);
+    const sanitized = sanitize(params);
+    const result = schema.safeParse(sanitized);
     if (!result.success) {
         const fieldErrors: Record<string, string[]> = {};
         for (const issue of result.error.issues) {
@@ -103,6 +108,15 @@ function parseQuery<T>(url: URL, schema: ZodType<T>): T {
         throw new ValidationError("Invalid query parameters", fieldErrors);
     }
     return result.data;
+}
+
+function validateParamId(id: string | undefined, paramName = "id"): string {
+    if (!id || !isValidObjectId(id)) {
+        throw new ValidationError(`Invalid ${paramName} format`, {
+            [paramName]: [`${paramName} must be a valid 24-character hexadecimal ObjectId`],
+        });
+    }
+    return id;
 }
 
 function json(data: unknown, status = 200): Response {
@@ -250,19 +264,18 @@ addRoute("GET", "/api/establishments/search", async (req, url) => {
     return json(result);
 });
 
-addRoute("GET", "/api/establishments/:id", async (req, _url, params) => {
-    const auth = await authenticateRequest(req);
-    const useCase = new GetEstablishment(estRepo, flagRepo, productRepo, userRepo);
-    const result = await useCase.execute(params.id!, auth.sub);
-    return json(result);
-});
-
-
-
 addRoute("GET", "/api/establishments/my-establishment", async (req) => {
     const auth = await authenticateRequest(req);
     const useCase = new GetEstablishmentByAdmin(estRepo, flagRepo, productRepo);
     const result = await useCase.execute(auth.sub);
+    return json(result);
+});
+
+addRoute("GET", "/api/establishments/:id", async (req, _url, params) => {
+    const auth = await authenticateRequest(req);
+    const validId = validateParamId(params.id, "id");
+    const useCase = new GetEstablishment(estRepo, flagRepo, productRepo, userRepo);
+    const result = await useCase.execute(validId, auth.sub);
     return json(result);
 });
 
@@ -288,16 +301,18 @@ addRoute("POST", "/api/products", async (req) => {
 
 addRoute("PATCH", "/api/products/:id", async (req, _url, params) => {
     const auth = await authenticateRequest(req);
+    const validId = validateParamId(params.id, "id");
     const input = await parseBody(req, updateProductSchema);
     const useCase = new UpdateProduct(productRepo, estRepo);
-    const result = await useCase.execute(auth.sub, params.id!, input);
+    const result = await useCase.execute(auth.sub, validId, input);
     return json(result);
 });
 
 addRoute("DELETE", "/api/products/:id", async (req, _url, params) => {
     const auth = await authenticateRequest(req);
+    const validId = validateParamId(params.id, "id");
     const useCase = new DeleteProduct(productRepo, estRepo);
-    const result = await useCase.execute(auth.sub, params.id!);
+    const result = await useCase.execute(auth.sub, validId);
     return json(result);
 });
 
@@ -313,10 +328,9 @@ addRoute("GET", "/api/flags", async () => {
 
 addRoute("POST", "/api/flags", async (req) => {
     await authenticateRequest(req);
-    const body = await req.json() as Record<string, unknown>;
-    const sanitized = sanitize(body) as { type: string; identifier: string; description: string; tag: string; backgroundColor: string; textColor: string };
+    const input = await parseBody(req, createFlagSchema);
     const useCase = new CreateFlag(flagRepo);
-    const result = await useCase.execute(sanitized);
+    const result = await useCase.execute(input);
     return json(result, 201);
 });
 
@@ -334,29 +348,27 @@ addRoute("POST", "/api/visits", async (req) => {
 
 addRoute("GET", "/api/visits/user/:userId", async (req, url, params) => {
     await authenticateRequest(req);
+    const validUserId = validateParamId(params.userId, "userId");
     const input = parseQuery(url, listVisitsSchema);
     const useCase = new ListUserVisits(visitRepo);
-    const result = await useCase.execute(params.userId!, input);
+    const result = await useCase.execute(validUserId, input);
     return json(result);
 });
 
 addRoute("GET", "/api/visits/establishment/:id", async (req, url, params) => {
     await authenticateRequest(req);
+    const validId = validateParamId(params.id, "id");
     const input = parseQuery(url, listVisitsSchema);
     const useCase = new GetEstablishmentVisits(visitRepo);
-    const result = await useCase.execute(params.id!, input);
+    const result = await useCase.execute(validId, input);
     return json(result);
 });
 
 addRoute("GET", "/api/social/feed", async (req, url) => {
     await authenticateRequest(req);
-    const lat = parseFloat(url.searchParams.get("lat") || "0");
-    const lng = parseFloat(url.searchParams.get("lng") || "0");
-    const page = parseInt(url.searchParams.get("page") || "1", 10);
-    const limit = parseInt(url.searchParams.get("limit") || "15", 10);
-
+    const query = parseQuery(url, socialFeedSchema);
     const useCase = new GetSocialFeed(visitRepo, estRepo, userRepo, flagRepo);
-    const result = await useCase.execute({ lat, lng, page, limit });
+    const result = await useCase.execute(query);
     return json(result);
 });
 
@@ -375,14 +387,15 @@ addRoute("POST", "/api/favorites", async (req) => {
     const auth = await authenticateRequest(req);
     const input = await parseBody(req, addFavoriteSchema);
     const useCase = new AddFavorite(favoriteRepo);
-    await useCase.execute(auth.sub, input.referenceId, input.type as 'establishment' | 'product');
+    await useCase.execute(auth.sub, input.referenceId, input.type as "establishment" | "product");
     return json({ success: true }, 201);
 });
 
 addRoute("DELETE", "/api/favorites/:id", async (req, _url, params) => {
     const auth = await authenticateRequest(req);
+    const validId = validateParamId(params.id, "id");
     const useCase = new RemoveFavorite(favoriteRepo);
-    await useCase.execute(auth.sub, params.id!);
+    await useCase.execute(auth.sub, validId);
     return json({ success: true });
 });
 
