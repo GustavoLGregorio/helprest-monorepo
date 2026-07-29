@@ -19,6 +19,20 @@ export const authPlugin = new Elysia({ name: "auth-plugin" })
             secret: process.env.JWT_SECRET ?? "helprest-jwt-secret-default",
         })
     )
+    .derive({ as: "global" }, async ({ bearer, jwtService }) => {
+        if (!bearer) return { user: null };
+        const payload = await jwtService.verify(bearer);
+        if (!payload || typeof payload !== "object" || !payload.sub) {
+            return { user: null };
+        }
+        return {
+            user: {
+                sub: payload.sub as string,
+                email: (payload.email as string) ?? "",
+                role: (payload.role as RoleType) ?? "user",
+            } as AuthenticatedUserPayload,
+        };
+    })
     .macro({
         role(requiredRole: RoleType) {
             return {
