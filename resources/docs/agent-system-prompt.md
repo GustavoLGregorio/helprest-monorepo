@@ -28,7 +28,18 @@ Antes de planejar ou alterar qualquer código, consulte proativamente os documen
 
 ---
 
-## 3. Loop Obrigatório de Validação e Verificação Empírica
+## 3. Exploração Proativa da Codebase e Alinhamento de Estilo (Codebase Study & Discovery)
+
+Incentivamos fortemente a inspeção profunda e proativa dos arquivos da codebase antes de escrever novas implementações:
+
+- **Inspeção de Padrões Existentes**: Explore arquivos correlatos no mesmo domínio ou camada (ex: `src/domain/entities/`, `src/application/use-cases/`, `app/` no frontend) para absorver o estilo de escrita, estrutura de arquivos e decisões arquiteturais adotadas no projeto.
+- **Convenção de Nomenclaturas**: Siga rigorosamente as convenções estabelecidas no repositório: `PascalCase` para classes, interfaces, tipos e componentes UI; `camelCase` para métodos, funções, variáveis e hooks; `kebab-case` para nomes de arquivos e diretórios; e `UPPER_SNAKE_CASE` para constantes globais.
+- **Reutilização Inteligente de Componentes e Utilidades**: Valorize e reutilize componentes visuais atômicos, hooks utilitários, DTOs e funções auxiliares preexistentes em vez de reinventar soluções ou duplicar código.
+- **Respeito aos Contratos e Assinaturas**: Verifique minuciosamente tipos de retorno, interfaces de repositórios e assinaturas de métodos existentes antes de invocá-los ou realizar extensões.
+
+---
+
+## 4. Loop Obrigatório de Validação e Verificação Empírica
 
 Garanta a saúde integral do monorepo executando proativamente a suíte de verificadores antes de finalizar qualquer entrega:
 
@@ -39,7 +50,7 @@ Garanta a saúde integral do monorepo executando proativamente a suíte de verif
 
 ---
 
-## 4. Convenção de Commits Atômicos (Conventional Commits)
+## 5. Convenção de Commits Atômicos (Conventional Commits)
 
 Utilize o padrão **Angular Conventional Commits** (`<tipo>(<escopo>): <descrição curta>`) para registrarmos histórico limpo e auditável no Git.
 
@@ -86,7 +97,7 @@ git commit -m "test(api): add unit tests for global ElysiaJS error and security 
 
 ---
 
-## 5. Diretrizes de Comunicação e Estilo de Código
+## 6. Diretrizes de Comunicação e Estilo de Código
 
 - **Linguagem Técnica**: Escreva código, comentários, schemas e mensagens de commit em **inglês**. Responda ao usuário em **português** direto, objetivo e estruturado em Markdown.
 - **Transparência e Autonomia**: Ao rodar comandos em background (`run_command`), prossiga com a análise silenciosa dos logs e atualize o usuário de forma sintética após a conclusão.
