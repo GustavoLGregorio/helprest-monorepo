@@ -54,5 +54,11 @@ export async function createIndexes(): Promise<void> {
     // Flags: index by type
     await ensureIndex(COLLECTION_NAMES.FLAGS, { type: 1 }, { name: "idx_flags_type" });
 
+    // User Favorites: unique compound index to prevent duplicates and speed up exists/remove
+    await ensureIndex(COLLECTION_NAMES.USER_FAVORITES, { userId: 1, referenceId: 1 }, { unique: true, name: "idx_user_favorites_user_ref" });
+
+    // User Favorites: index to speed up findByUserAndType queries
+    await ensureIndex(COLLECTION_NAMES.USER_FAVORITES, { userId: 1, type: 1 }, { name: "idx_user_favorites_user_type" });
+
     logger.info("Database indexes verified");
 }
