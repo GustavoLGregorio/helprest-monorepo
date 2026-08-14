@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeAll, afterAll, beforeEach } from "bun:test";
 import { connectToDatabase, disconnectDatabase, getDatabase } from "@infra/database/mongodb/connection";
-import { handleRequest } from "@interface/http/router";
+import { app } from "../../src/app";
 import { generateTokens } from "@infra/security/jwt";
 import { ObjectId } from "mongodb";
 
@@ -79,7 +79,7 @@ describe("Geofencing Visit Integration Tests", () => {
             body: JSON.stringify(body)
         });
 
-        const res = await handleRequest(req);
+        const res = await app.handle(req);
         expect(res.status).toBe(201);
 
         const data = await res.json() as { id: string };
@@ -116,7 +116,7 @@ describe("Geofencing Visit Integration Tests", () => {
             body: JSON.stringify(body)
         });
 
-        const res = await handleRequest(req);
+        const res = await app.handle(req);
         expect(res.status).toBe(400);
 
         const data = await res.json() as { error: string; message: string };
@@ -141,7 +141,7 @@ describe("Geofencing Visit Integration Tests", () => {
             body: JSON.stringify(body)
         });
 
-        const res = await handleRequest(req);
+        const res = await app.handle(req);
         expect(res.status).toBe(400);
 
         const data = await res.json() as { error: string; message: string };
@@ -165,7 +165,7 @@ describe("Geofencing Visit Integration Tests", () => {
             body: JSON.stringify(body)
         });
 
-        const res = await handleRequest(req);
+        const res = await app.handle(req);
         expect(res.status).toBe(201);
 
         const data = await res.json() as { id: string };

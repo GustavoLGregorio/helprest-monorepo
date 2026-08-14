@@ -37,7 +37,7 @@ export const createEstablishmentModule = (
     return new Elysia({ prefix: "/api/establishments", name: "establishment-module" })
         .use(authPlugin)
         .get(
-            "/",
+            "",
             async ({ query }) => {
                 const page = query.page ? Number(query.page) : 1;
                 const limit = query.limit ? Number(query.limit) : 20;
@@ -151,7 +151,7 @@ export const createEstablishmentModule = (
             }
         )
         .post(
-            "/",
+            "",
             async ({ user, body, set }) => {
                 if (!user) throw new UnauthorizedError("User is not authenticated");
                 const result = await createEstablishmentUseCase.execute(user.sub, body as CreateEstablishmentInput);

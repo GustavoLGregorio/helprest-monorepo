@@ -222,7 +222,7 @@
   - Criar `errorPlugin`: Interceptador `.onError()` para capturar `NotFoundError`, `ValidationError`, `ForbiddenError`, `UnauthorizedError`, `ConflictError`, `RateLimitError` e formatar respostas JSON padronizadas.
   - Criar `securityPlugin`: Aplicar sanitização NoSQL (`sanitize`), HSTS e `@elysiajs/cors`.
   - Criar `authPlugin`: Macro/Guard nativo via `@elysiajs/bearer` + `@elysiajs/jwt` com extração de `sub`, `email` e macro declarativo de `role`.
-- [ ] **Migração dos Módulos de Rota / Controllers**:
+- [x] **Migração dos Módulos de Rota / Controllers**:
   - [x] `authModule`: Rotas `POST /api/auth/google`, `POST /api/auth/refresh`.
   - [x] `userModule`: Rotas `GET /api/users/me`, `PATCH /api/users/me`, `PATCH /api/users/me/flags`.
   - [x] `establishmentModule`: Rotas `GET /api/establishments`, `GET /api/establishments/recommended`, `GET /api/establishments/nearby`, `GET /api/establishments/search`, `GET /api/establishments/my-establishment`, `GET /api/establishments/:id`, `POST /api/establishments`.
@@ -230,8 +230,8 @@
   - [x] `flagModule`: Rotas `GET /api/flags`, `POST /api/flags`.
   - [x] `visitModule`: Rotas `POST /api/visits`, `GET /api/visits/user/:userId`, `GET /api/visits/establishment/:id`, `GET /api/social/feed`.
   - [x] `favoriteModule`: Rotas `GET /api/favorites`, `POST /api/favorites`, `DELETE /api/favorites/:id`.
-- [ ] **Geração de Documentação OpenAPI/Swagger**: Habilitar a rota `/swagger` no servidor principal com metadados do projeto.
-- [ ] **Atualização do Entrypoint `src/index.ts` & Suíte de Testes**:
+- [x] **Geração de Documentação OpenAPI/Swagger**: Habilitar a rota `/swagger` no servidor principal com metadados do projeto.
+- [x] **Atualização do Entrypoint `src/index.ts` & Suíte de Testes**:
   - Refatorar `src/index.ts` para inicializar a instância principal do Elysia (`app.listen(PORT)`), integrando o Graceful Shutdown com `app.stop()`.
   - Atualizar os testes de integração para disparar requisições via `app.handle(new Request(...))`.
 

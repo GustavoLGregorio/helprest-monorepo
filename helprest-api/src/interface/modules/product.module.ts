@@ -19,7 +19,7 @@ export const createProductModule = (
     return new Elysia({ prefix: "/api/products", name: "product-module" })
         .use(authPlugin)
         .post(
-            "/",
+            "",
             async ({ user, body, set }) => {
                 if (!user) throw new UnauthorizedError("User is not authenticated");
                 const result = await createProductUseCase.execute(user.sub, body as CreateProductInput);

@@ -14,7 +14,7 @@ export const createFlagModule = (
     return new Elysia({ prefix: "/api/flags", name: "flag-module" })
         .use(authPlugin)
         .get(
-            "/",
+            "",
             async () => {
                 return await listFlagsUseCase.execute();
             },
@@ -26,7 +26,7 @@ export const createFlagModule = (
             }
         )
         .post(
-            "/",
+            "",
             async ({ body, set }) => {
                 const result = await createFlagUseCase.execute(body as CreateFlagInput);
                 set.status = 201;

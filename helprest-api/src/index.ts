@@ -1,21 +1,15 @@
-// Compatibility patch for node:v8 startupSnapshot under Bun runtime
-try {
-    const v8 = require("node:v8");
-    if (v8.startupSnapshot) {
-        v8.startupSnapshot.isBuildingSnapshot = () => false;
-    }
-} catch {}
+import "./polyfill";
 
 import { connectToDatabase, disconnectDatabase } from "@infra/database/mongodb/connection";
 import { disconnectRedis } from "@infra/database/redis/connection";
 import { createIndexes } from "@infra/database/mongodb/indexes";
-import { handleRequest } from "@interface/http/router";
+import { app } from "./app";
 import { logger } from "@shared/utils/logger";
 
 const PORT = Number(process.env.PORT) || 3000;
 
 async function main() {
-    logger.info("Starting HelpRest API...");
+    logger.info("Starting HelpRest API with ElysiaJS...");
 
     // Connect to MongoDB
     await connectToDatabase();
@@ -24,12 +18,10 @@ async function main() {
     // Note: Redis is lazy-connected on first use.
     // If Redis is not available, the app still works without caching/rate limiting.
 
-    const server = Bun.serve({
-        port: PORT,
-        fetch: handleRequest,
-    });
+    app.listen(PORT);
 
-    logger.info(`HelpRest API running on http://localhost:${server.port}`);
+    logger.info(`HelpRest API running on http://localhost:${PORT}`);
+    logger.info(`Swagger documentation available on http://localhost:${PORT}/swagger`);
 
     let isShuttingDown = false;
 
@@ -46,8 +38,8 @@ async function main() {
         }, 10_000);
 
         try {
-            logger.info("Stopping HTTP server...");
-            server.stop();
+            logger.info("Stopping Elysia server...");
+            await app.stop();
 
             logger.info("Closing MongoDB connection pool...");
             await disconnectDatabase();

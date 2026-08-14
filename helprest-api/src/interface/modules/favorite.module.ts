@@ -29,7 +29,7 @@ export const createFavoriteModule = (
     return new Elysia({ prefix: "/api/favorites", name: "favorite-module" })
         .use(authPlugin)
         .get(
-            "/",
+            "",
             async ({ user }) => {
                 if (!user) throw new UnauthorizedError("User is not authenticated");
                 return await getUserFavoritesUseCase.execute(user.sub);
@@ -43,7 +43,7 @@ export const createFavoriteModule = (
             }
         )
         .post(
-            "/",
+            "",
             async ({ user, body, set }) => {
                 if (!user) throw new UnauthorizedError("User is not authenticated");
                 await addFavoriteUseCase.execute(

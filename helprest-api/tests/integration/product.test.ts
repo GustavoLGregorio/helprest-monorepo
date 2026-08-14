@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeAll, afterAll, beforeEach } from "bun:test";
 import { connectToDatabase, disconnectDatabase, getDatabase } from "@infra/database/mongodb/connection";
-import { handleRequest } from "@interface/http/router";
+import { app } from "../../src/app";
 import { generateTokens } from "@infra/security/jwt";
 import { ObjectId } from "mongodb";
 
@@ -102,7 +102,7 @@ describe("Product Management Integration Tests", () => {
             body: JSON.stringify(body)
         });
 
-        const res = await handleRequest(req);
+        const res = await app.handle(req);
         expect(res.status).toBe(201);
         
         const data = await res.json() as { id: string };
@@ -130,7 +130,7 @@ describe("Product Management Integration Tests", () => {
             body: JSON.stringify(body)
         });
 
-        const res = await handleRequest(req);
+        const res = await app.handle(req);
         expect(res.status).toBe(403);
     });
 
@@ -150,7 +150,7 @@ describe("Product Management Integration Tests", () => {
             body: JSON.stringify(body)
         });
 
-        const res = await handleRequest(req);
+        const res = await app.handle(req);
         expect(res.status).toBe(403);
     });
 
@@ -170,7 +170,7 @@ describe("Product Management Integration Tests", () => {
             body: JSON.stringify(updateBody)
         });
 
-        const res = await handleRequest(req);
+        const res = await app.handle(req);
         expect(res.status).toBe(200);
 
         const saved = await db.collection("products").findOne({ _id: new ObjectId(productId) });
@@ -193,7 +193,7 @@ describe("Product Management Integration Tests", () => {
             body: JSON.stringify(updateBody)
         });
 
-        const res = await handleRequest(req);
+        const res = await app.handle(req);
         expect(res.status).toBe(403);
     });
 
@@ -205,7 +205,7 @@ describe("Product Management Integration Tests", () => {
             }
         });
 
-        const res = await handleRequest(req);
+        const res = await app.handle(req);
         expect(res.status).toBe(200);
 
         const saved = await db.collection("products").findOne({ _id: new ObjectId(productId) });
@@ -220,7 +220,7 @@ describe("Product Management Integration Tests", () => {
             }
         });
 
-        const res = await handleRequest(req);
+        const res = await app.handle(req);
         expect(res.status).toBe(403);
     });
 });
