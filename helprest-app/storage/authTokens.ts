@@ -1,6 +1,7 @@
 import { MMKV } from "react-native-mmkv";
+import { StorageKeys, StorageInstances } from "./keys";
 
-const storage = new MMKV({ id: "auth-tokens" });
+const storage = new MMKV({ id: StorageInstances.AUTH });
 
 export interface AuthTokens {
     accessToken: string;
@@ -16,8 +17,8 @@ export interface GoogleUserInfo {
 
 export const saveTokens = (tokens: AuthTokens): void => {
     try {
-        storage.set("accessToken", tokens.accessToken);
-        storage.set("refreshToken", tokens.refreshToken);
+        storage.set(StorageKeys.AUTH.ACCESS_TOKEN, tokens.accessToken);
+        storage.set(StorageKeys.AUTH.REFRESH_TOKEN, tokens.refreshToken);
     } catch (error) {
         console.error("Error saving auth tokens:", error);
     }
@@ -25,8 +26,8 @@ export const saveTokens = (tokens: AuthTokens): void => {
 
 export const loadTokens = (): AuthTokens | null => {
     try {
-        const accessToken = storage.getString("accessToken");
-        const refreshToken = storage.getString("refreshToken");
+        const accessToken = storage.getString(StorageKeys.AUTH.ACCESS_TOKEN);
+        const refreshToken = storage.getString(StorageKeys.AUTH.REFRESH_TOKEN);
         if (accessToken && refreshToken) {
             return { accessToken, refreshToken };
         }
@@ -39,8 +40,8 @@ export const loadTokens = (): AuthTokens | null => {
 
 export const clearTokens = (): void => {
     try {
-        storage.delete("accessToken");
-        storage.delete("refreshToken");
+        storage.delete(StorageKeys.AUTH.ACCESS_TOKEN);
+        storage.delete(StorageKeys.AUTH.REFRESH_TOKEN);
     } catch (error) {
         console.error("Error clearing auth tokens:", error);
     }
@@ -52,7 +53,7 @@ export const isAuthenticated = (): boolean => {
 
 export const saveGoogleUserInfo = (user: GoogleUserInfo): void => {
     try {
-        storage.set("googleUser", JSON.stringify(user));
+        storage.set(StorageKeys.AUTH.GOOGLE_USER, JSON.stringify(user));
     } catch (error) {
         console.error("Error saving google user info:", error);
     }
@@ -60,7 +61,7 @@ export const saveGoogleUserInfo = (user: GoogleUserInfo): void => {
 
 export const loadGoogleUserInfo = (): GoogleUserInfo | null => {
     try {
-        const raw = storage.getString("googleUser");
+        const raw = storage.getString(StorageKeys.AUTH.GOOGLE_USER);
         if (raw) return JSON.parse(raw) as GoogleUserInfo;
         return null;
     } catch (error) {
@@ -71,7 +72,7 @@ export const loadGoogleUserInfo = (): GoogleUserInfo | null => {
 
 export const clearGoogleUserInfo = (): void => {
     try {
-        storage.delete("googleUser");
+        storage.delete(StorageKeys.AUTH.GOOGLE_USER);
     } catch (error) {
         console.error("Error clearing google user info:", error);
     }

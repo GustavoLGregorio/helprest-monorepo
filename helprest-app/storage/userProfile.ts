@@ -1,6 +1,7 @@
 import { MMKV } from "react-native-mmkv";
+import { StorageKeys, StorageInstances } from "./keys";
 
-const storage = new MMKV({ id: "user-profile" });
+const storage = new MMKV({ id: StorageInstances.USER_PROFILE });
 
 export interface CachedUserProfile {
     id: string;
@@ -26,7 +27,7 @@ export interface CachedUserProfile {
 
 export function saveUserProfile(profile: CachedUserProfile): void {
     try {
-        storage.set("profile", JSON.stringify(profile));
+        storage.set(StorageKeys.USER.PROFILE, JSON.stringify(profile));
     } catch (error) {
         console.error("Error saving user profile:", error);
     }
@@ -34,7 +35,7 @@ export function saveUserProfile(profile: CachedUserProfile): void {
 
 export function loadUserProfile(): CachedUserProfile | null {
     try {
-        const raw = storage.getString("profile");
+        const raw = storage.getString(StorageKeys.USER.PROFILE);
         if (raw) return JSON.parse(raw) as CachedUserProfile;
         return null;
     } catch (error) {
@@ -45,7 +46,7 @@ export function loadUserProfile(): CachedUserProfile | null {
 
 export function clearUserProfile(): void {
     try {
-        storage.delete("profile");
+        storage.delete(StorageKeys.USER.PROFILE);
     } catch (error) {
         console.error("Error clearing user profile:", error);
     }
@@ -65,7 +66,7 @@ export function getIncompleteOnboardingStep(profile: CachedUserProfile): number 
 
 export function saveCompanyOnboardingStatus(isCompany: boolean): void {
     try {
-        storage.set("is_company_onboarding", isCompany);
+        storage.set(StorageKeys.ONBOARDING.IS_COMPANY, isCompany);
     } catch (error) {
         console.error("Error saving company onboarding status:", error);
     }
@@ -73,7 +74,7 @@ export function saveCompanyOnboardingStatus(isCompany: boolean): void {
 
 export function loadCompanyOnboardingStatus(): boolean {
     try {
-        return storage.getBoolean("is_company_onboarding") ?? false;
+        return storage.getBoolean(StorageKeys.ONBOARDING.IS_COMPANY) ?? false;
     } catch (error) {
         console.error("Error loading company onboarding status:", error);
         return false;
@@ -82,7 +83,7 @@ export function loadCompanyOnboardingStatus(): boolean {
 
 export function clearCompanyOnboardingStatus(): void {
     try {
-        storage.delete("is_company_onboarding");
+        storage.delete(StorageKeys.ONBOARDING.IS_COMPANY);
     } catch (error) {
         console.error("Error clearing company onboarding status:", error);
     }

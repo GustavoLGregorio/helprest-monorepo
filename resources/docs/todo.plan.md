@@ -189,7 +189,7 @@
 - [ ] **Mapeamento Arquitetural & Diagramação do Frontend**: Elaborar especificação detalhada da aplicação mobile (Expo Router), incluindo mapa de telas, fluxos de navegação/onboarding, arquitetura de componentes atômicos e mapa de integração com a API.
 - [x] **Query Key Factory para TanStack Query**: Centralizar todas as chaves de query em uma fábrica fortemente tipada (ex: `establishmentKeys`, `userKeys`) eliminando strings mágicas.
 - [x] **Mutex no Auto-Refresh Token Flow (`services/api.ts`)**: Implementar fila de requisições / mutex para evitar chamadas de refresh duplicadas ou concorrentes quando múltiplos requests retornarem status 401.
-- [ ] **Tipagem Estrita de Storage MMKV**: Encapsular acessos ao `react-native-mmkv` com chaves e tipos fortemente definidos no módulo `storage/`.
+- [x] **Tipagem Estrita de Storage MMKV**: Encapsular acessos ao `react-native-mmkv` com chaves e tipos fortemente definidos no módulo `storage/`.
 
 ---
 
