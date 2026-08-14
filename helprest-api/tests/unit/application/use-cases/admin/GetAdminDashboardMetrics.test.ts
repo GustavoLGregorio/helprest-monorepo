@@ -43,6 +43,7 @@ describe("GetAdminDashboardMetrics Use Case Unit Tests", () => {
         findById: mock(async () => null),
         findByEmail: mock(async () => null),
         findByGoogleId: mock(async () => null),
+        findAll: mock(async () => ({ users: [], total: 0 })),
         create: mock(async () => {}),
         update: mock(async () => {}),
         delete: mock(async () => {}),

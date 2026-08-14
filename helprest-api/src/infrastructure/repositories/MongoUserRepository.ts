@@ -1,5 +1,5 @@
 import { ObjectId } from "mongodb";
-import type { IUserRepository } from "@domain/repositories/IUserRepository";
+import type { IUserRepository, FindUsersFilter } from "@domain/repositories/IUserRepository";
 import { User } from "@domain/entities/User";
 import { getUsersCollection } from "../database/mongodb/collections";
 
@@ -17,6 +17,40 @@ export class MongoUserRepository implements IUserRepository {
     async findByGoogleId(googleId: string): Promise<User | null> {
         const doc = await getUsersCollection().findOne({ googleId });
         return doc ? User.fromDocument(doc) : null;
+    }
+
+    async findAll(filter: FindUsersFilter): Promise<{ users: User[]; total: number }> {
+        const query: Record<string, unknown> = {};
+
+        if (filter.query) {
+            query.$or = [
+                { name: { $regex: filter.query, $options: "i" } },
+                { email: { $regex: filter.query, $options: "i" } },
+            ];
+        }
+
+        if (filter.role) {
+            query.role = filter.role;
+        }
+
+        if (filter.status) {
+            query.status = filter.status;
+        }
+
+        const [docs, total] = await Promise.all([
+            getUsersCollection()
+                .find(query)
+                .sort({ createdAt: -1 })
+                .skip(filter.skip)
+                .limit(filter.limit)
+                .toArray(),
+            getUsersCollection().countDocuments(query),
+        ]);
+
+        return {
+            users: docs.map((doc) => User.fromDocument(doc)),
+            total,
+        };
     }
 
     async create(user: User): Promise<void> {
@@ -50,4 +84,3 @@ export class MongoUserRepository implements IUserRepository {
         return results.map((r) => ({ flagId: r._id as ObjectId, count: r.count as number }));
     }
 }
-

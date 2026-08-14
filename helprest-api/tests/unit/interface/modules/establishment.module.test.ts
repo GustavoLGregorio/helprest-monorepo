@@ -101,6 +101,7 @@ describe("establishmentModule Suite (ElysiaJS)", () => {
         findById: mock(async () => mockUser),
         findByEmail: mock(async () => mockUser),
         findByGoogleId: mock(async () => mockUser),
+        findAll: mock(async () => ({ users: [mockUser], total: 1 })),
         create: mock(async () => {}),
         update: mock(async () => {}),
         delete: mock(async () => {}),

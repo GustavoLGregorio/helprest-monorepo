@@ -25,7 +25,7 @@
 - [x] Dashboard geral com métricas globais: total de usuários, estabelecimentos, visitas, flags mais usadas
 - [x] CRUD completo de flags (criar, editar, desativar, reordenar)
 - [x] Moderação de avaliações (ocultar reviews ofensivas, denúncias)
-- [ ] Gerenciamento de usuários (ban, suspensão, histórico)
+- [x] Gerenciamento de usuários (ban, suspensão, histórico)
 - [ ] Logs de auditoria de ações administrativas
 
 ### 1.3 Painel do Estabelecimento (Establishment Admin)

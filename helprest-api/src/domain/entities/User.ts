@@ -7,6 +7,7 @@ import type { LocationProps } from "../value-objects/Location";
 import type { SocialLinksProps } from "../value-objects/SocialLinks";
 
 export type AuthProvider = "google" | "apple";
+export type UserStatus = "active" | "suspended" | "banned";
 
 export interface UserProps {
     id?: ObjectId;
@@ -21,6 +22,10 @@ export interface UserProps {
     socialLinks?: SocialLinks;
     profilePhoto?: string;
     role?: Role | RoleType | string;
+    status?: UserStatus;
+    isBanned?: boolean;
+    banReason?: string | null;
+    bannedAt?: Date | null;
     createdAt?: Date;
     updatedAt?: Date;
 }
@@ -38,6 +43,10 @@ export class User {
     readonly socialLinks?: SocialLinks;
     readonly profilePhoto?: string;
     readonly role: Role;
+    readonly status: UserStatus;
+    readonly isBanned: boolean;
+    readonly banReason: string | null;
+    readonly bannedAt: Date | null;
     readonly createdAt: Date;
     readonly updatedAt: Date;
 
@@ -54,6 +63,10 @@ export class User {
         this.socialLinks = props.socialLinks;
         this.profilePhoto = props.profilePhoto;
         this.role = props.role;
+        this.status = props.status ?? (props.isBanned ? "banned" : "active");
+        this.isBanned = props.isBanned ?? false;
+        this.banReason = props.banReason ?? null;
+        this.bannedAt = props.bannedAt ?? null;
         this.createdAt = props.createdAt ?? new Date();
         this.updatedAt = props.updatedAt ?? new Date();
     }
@@ -105,8 +118,59 @@ export class User {
                 : undefined,
             profilePhoto: doc.profilePhoto as string | undefined,
             role: doc.role as string | undefined,
+            status: (doc.status as UserStatus) ?? "active",
+            isBanned: (doc.isBanned as boolean) ?? false,
+            banReason: (doc.banReason as string) ?? null,
+            bannedAt: doc.bannedAt ? new Date(doc.bannedAt as string | number | Date) : null,
             createdAt: doc.createdAt ? new Date(doc.createdAt as string | number | Date) : undefined,
             updatedAt: doc.updatedAt ? new Date(doc.updatedAt as string | number | Date) : undefined,
+        });
+    }
+
+    withRole(role: Role | RoleType | string): User {
+        const newRole = role instanceof Role ? role : Role.create(role);
+        return new User({
+            id: this.id,
+            name: this.name,
+            email: this.email,
+            authProvider: this.authProvider,
+            googleId: this.googleId,
+            birthDate: this.birthDate,
+            flags: [...this.flags],
+            location: this.location,
+            socialLinksEnabled: this.socialLinksEnabled,
+            socialLinks: this.socialLinks,
+            profilePhoto: this.profilePhoto,
+            role: newRole,
+            status: this.status,
+            isBanned: this.isBanned,
+            banReason: this.banReason,
+            bannedAt: this.bannedAt,
+            createdAt: this.createdAt,
+            updatedAt: new Date(),
+        });
+    }
+
+    withBan(isBanned: boolean, reason?: string): User {
+        return new User({
+            id: this.id,
+            name: this.name,
+            email: this.email,
+            authProvider: this.authProvider,
+            googleId: this.googleId,
+            birthDate: this.birthDate,
+            flags: [...this.flags],
+            location: this.location,
+            socialLinksEnabled: this.socialLinksEnabled,
+            socialLinks: this.socialLinks,
+            profilePhoto: this.profilePhoto,
+            role: this.role,
+            status: isBanned ? "banned" : "active",
+            isBanned,
+            banReason: isBanned ? (reason ?? "Banido por administrador") : null,
+            bannedAt: isBanned ? new Date() : null,
+            createdAt: this.createdAt,
+            updatedAt: new Date(),
         });
     }
 
@@ -140,6 +204,10 @@ export class User {
                 : undefined,
             profilePhoto: this.profilePhoto,
             role: this.role.value,
+            status: this.status,
+            isBanned: this.isBanned,
+            banReason: this.banReason,
+            bannedAt: this.bannedAt,
             createdAt: this.createdAt,
             updatedAt: this.updatedAt,
         };
