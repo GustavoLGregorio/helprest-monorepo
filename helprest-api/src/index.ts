@@ -1,3 +1,11 @@
+// Compatibility patch for node:v8 startupSnapshot under Bun runtime
+try {
+    const v8 = require("node:v8");
+    if (v8.startupSnapshot) {
+        v8.startupSnapshot.isBuildingSnapshot = () => false;
+    }
+} catch {}
+
 import { connectToDatabase, disconnectDatabase } from "@infra/database/mongodb/connection";
 import { disconnectRedis } from "@infra/database/redis/connection";
 import { createIndexes } from "@infra/database/mongodb/indexes";

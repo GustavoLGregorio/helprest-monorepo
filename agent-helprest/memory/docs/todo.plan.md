@@ -14,8 +14,8 @@
 
 ### 1.1 Sistema de Roles & Permissões
 
-- [ ] Criar entidade `Role` com níveis hierárquicos: `user`, `establishment_admin`, `admin`, `superadmin`
-- [ ] Implementar middleware de autorização por role no backend
+- [x] Criar entidade `Role` com níveis hierárquicos: `user`, `establishment_admin`, `admin`, `superadmin`
+- [x] Implementar middleware de autorização por role no backend
 - [ ] `superadmin` tem acesso total ao sistema (gestão de todas as entidades)
 - [ ] `admin` pode gerenciar estabelecimentos, flags e usuários dentro de um escopo
 - [ ] `establishment_admin` gerencia apenas seu estabelecimento e filiais vinculadas
@@ -178,15 +178,62 @@
 
 ### 7.2 Melhorias Arquiteturais no Backend (helprest-api)
 
-- [ ] **Graceful Shutdown do Servidor Bun & Conexões**: Implementar manipulação de sinais `SIGINT`/`SIGTERM` no entrypoint `src/index.ts` para encerrar graciosamente os pools do MongoDB Atlas e Redis.
-- [ ] **Suíte de Testes Unitários Isolados**: Criar testes unitários em `tests/unit/` cobrindo regras de negócio puras (entidades do domínio, value objects e `RecommendationService`) sem dependência de banco de dados ativo.
-- [ ] **Reforço de Sanitização NoSQL**: Auditar e garantir sanitização estrita via Zod em todos os endpoints de busca/query para eliminar o risco de operadores NoSQL injetados (`$gt`, `$ne`, `$where`).
+- [x] **Graceful Shutdown do Servidor Bun & Conexões**: Implementar manipulação de sinais `SIGINT`/`SIGTERM` no entrypoint `src/index.ts` para encerrar graciosamente os pools do MongoDB Atlas e Redis.
+- [x] **Suíte de Testes Unitários Isolados**: Criar testes unitários em `tests/unit/` cobrindo regras de negócio puras (entidades do domínio, value objects e `RecommendationService`) sem dependência de banco de dados ativo.
+- [x] **Reforço de Sanitização NoSQL**: Auditar e garantir sanitização estrita via Zod em todos os endpoints de busca/query para eliminar o risco de operadores NoSQL injetados (`$gt`, `$ne`, `$where`).
+- [x] **Remoção de Autenticação Local (OAuth-Only)**: Remover endpoints, DTOs e fluxos de cadastro/login local (senha/argon2) para unificar autenticação exclusivamente via provedores de identidade (Google OAuth), reduzindo a complexidade do servidor.
+- [x] **Mapeamento Arquitetural & Diagramação Visual**: Elaborar especificação detalhada da arquitetura (Frontend, Backend e Banco de Dados), incluindo diagramas Mermaid de classes de domínio, Diagrama de Entidade-Relacionamento (DER NoSQL) e fluxos de dados.
 
 ### 7.3 Melhorias Arquiteturais no Frontend (helprest-app)
 
+- [ ] **Mapeamento Arquitetural & Diagramação do Frontend**: Elaborar especificação detalhada da aplicação mobile (Expo Router), incluindo mapa de telas, fluxos de navegação/onboarding, arquitetura de componentes atômicos e mapa de integração com a API.
 - [ ] **Query Key Factory para TanStack Query**: Centralizar todas as chaves de query em uma fábrica fortemente tipada (ex: `establishmentKeys`, `userKeys`) eliminando strings mágicas.
 - [ ] **Mutex no Auto-Refresh Token Flow (`services/api.ts`)**: Implementar fila de requisições / mutex para evitar chamadas de refresh duplicadas ou concorrentes quando múltiplos requests retornarem status 401.
 - [ ] **Tipagem Estrita de Storage MMKV**: Encapsular acessos ao `react-native-mmkv` com chaves e tipos fortemente definidos no módulo `storage/`.
+
+---
+
+## 8. Refatoração Arquitetural e Migração do Backend para ElysiaJS (Elysia + Bun)
+
+### 8.1 Contexto e Justificativa (Como & Por quê)
+
+> **Diagnóstico da Arquitetura Atual (`helprest-api`):**  
+> Atualmente, a camada de entrega HTTP é manipulada via roteador customizado baseado em expressões regulares sobre `Bun.serve` concentrado em [router.ts](file:///home/gustavo/Dev/helprest/helprest-monorepo/helprest-api/src/interface/http/router.ts) (440+ linhas). Embora rápido, a ausência de um framework estruturado facilita o crescimento desordenado de boilerplate, duplicidade em parsers de query/body, checagens manuais de ObjectId e acoplamento de middlewares.
+
+> **Objetivo da Migração para ElysiaJS:**  
+> Migrar a camada de **Interface HTTP** para o framework **ElysiaJS** mantendo o servidor executando nativamente no **Bun** runtime. A arquitetura de **Clean Architecture & DDD** será rigorosamente preservada: as camadas de **Domínio** (`domain/entities`, `domain/value-objects`, `domain/services`), **Aplicação** (`application/use-cases`) e **Infraestrutura** (`infrastructure/repositories`, `infrastructure/database`) **não serão alteradas**.
+
+> **Vantagens Técnicas Garantidas:**  
+> 1. **Modularidade por Domínio**: Organização dos controllers em sub-módulos encapsulados (`src/interface/modules/*`).
+> 2. **Validação de Schema Unificada**: Validação automática de `body`, `query`, `params` e `response` via TypeBox ou Zod nativo.
+> 3. **Documentação Swagger/OpenAPI Automática**: Geração em tempo de execução via `@elysiajs/swagger` no endpoint `/swagger`.
+> **Estratégia de Adoção do Ecossistema Oficial (Primeira Classe):**  
+> Priorizar as ferramentas oficiais desenvolvidas pela equipe do ElysiaJS em substituição aos utilitários manuais da codebase:
+> - **`@elysiajs/jwt` & `@elysiajs/bearer`**: Substituem o wrapper manual `jose` em `jwt.ts` e o parse imperativo de cabeçalho Bearer.
+> - **`@elysiajs/cors`**: Substitui o manipulador manual `cors.middleware.ts`.
+> - **`@elysiajs/swagger`**: Documentação Swagger/OpenAPI viva em `/swagger`.
+> - **Macros Nativas (`.macro({ role: ... })`)**: Validação declarativa de autorização por `Role` sem poluir as funções de controller.
+> - **Estudo Detalhado**: Ver [Análise Profunda do Ecossistema ElysiaJS](./elysia-refactoring-analysis.md).
+
+### 8.2 Sub-tarefas de Implementação
+
+- [x] **Setup de Dependências ElysiaJS**: Instalar `elysia`, `@elysiajs/cors`, `@elysiajs/swagger` e `@elysiajs/jwt` em `helprest-api/package.json`.
+- [x] **Plugins Globais Nativo-Primeiros**:
+  - Criar `errorPlugin`: Interceptador `.onError()` para capturar `NotFoundError`, `ValidationError`, `ForbiddenError`, `UnauthorizedError`, `ConflictError`, `RateLimitError` e formatar respostas JSON padronizadas.
+  - Criar `securityPlugin`: Aplicar sanitização NoSQL (`sanitize`), HSTS e `@elysiajs/cors`.
+  - Criar `authPlugin`: Macro/Guard nativo via `@elysiajs/bearer` + `@elysiajs/jwt` com extração de `sub`, `email` e macro declarativo de `role`.
+- [ ] **Migração dos Módulos de Rota / Controllers**:
+  - [x] `authModule`: Rotas `POST /api/auth/google`, `POST /api/auth/refresh`.
+  - [x] `userModule`: Rotas `GET /api/users/me`, `PATCH /api/users/me`, `PATCH /api/users/me/flags`.
+  - [x] `establishmentModule`: Rotas `GET /api/establishments`, `GET /api/establishments/recommended`, `GET /api/establishments/nearby`, `GET /api/establishments/search`, `GET /api/establishments/my-establishment`, `GET /api/establishments/:id`, `POST /api/establishments`.
+  - [ ] `productModule`: Rotas `POST /api/products`, `PATCH /api/products/:id`, `DELETE /api/products/:id`.
+  - [ ] `flagModule`: Rotas `GET /api/flags`, `POST /api/flags`.
+  - [ ] `visitModule`: Rotas `POST /api/visits`, `GET /api/visits/user/:userId`, `GET /api/visits/establishment/:id`, `GET /api/social/feed`.
+  - [ ] `favoriteModule`: Rotas `GET /api/favorites`, `POST /api/favorites`, `DELETE /api/favorites/:id`.
+- [ ] **Geração de Documentação OpenAPI/Swagger**: Habilitar a rota `/swagger` no servidor principal com metadados do projeto.
+- [ ] **Atualização do Entrypoint `src/index.ts` & Suíte de Testes**:
+  - Refatorar `src/index.ts` para inicializar a instância principal do Elysia (`app.listen(PORT)`), integrando o Graceful Shutdown com `app.stop()`.
+  - Atualizar os testes de integração para disparar requisições via `app.handle(new Request(...))`.
 
 ---
 
@@ -196,9 +243,10 @@
 |---|---|---|
 | **Fase 0 (Imediata)** | Atualização de Pacotes & Graceful Shutdown | Manter estabilidade do ecossistema e compatibilidade do Expo SDK 53 |
 | **Fase 1** | Roles & Permissões, Painel do Estabelecimento, Gestão de Flags | Fundação para todas as features de gestão |
-| **Fase 2** | Sistema Matriz/Filiais, Cardápio e Alimentos | Valor direto para estabelecimentos |
-| **Fase 3** | Analytics e Métricas | Retenção e engajamento de estabelecimentos |
-| **Fase 4** | Painel Admin (SuperAdmin), Favoritos, Social, Notificações | Escala e engajamento de usuários |
+| **Fase 2** | Migração do Backend para ElysiaJS (Elysia + Bun) | Padronização e robustez arquitetural para suportar escala |
+| **Fase 3** | Sistema Matriz/Filiais, Cardápio e Alimentos | Valor direto para estabelecimentos |
+| **Fase 4** | Analytics e Métricas | Retenção e engajamento de estabelecimentos |
+| **Fase 5** | Painel Admin (SuperAdmin), Favoritos, Social, Notificações | Escala e engajamento de usuários |
 
 ---
 
@@ -207,3 +255,8 @@
 - [Arquitetura do Sistema](./base.system.md)
 - [Backend — Arquitetura e Padrões](./backend.md)
 - [Frontend — Arquitetura e Padrões](./frontend.md)
+- [Diretrizes de Arquitetura & Padrões de Qualidade Contínua](./continuous-architecture-standards.md)
+- [Análise Profunda do Ecossistema ElysiaJS](./elysia-refactoring-analysis.md)
+
+
+

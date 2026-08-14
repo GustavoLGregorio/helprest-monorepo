@@ -1,6 +1,13 @@
 // Test setup file — preloaded by Bun test runner
 // Sets environment variables for isolated test runs
 
+try {
+    const v8 = require("node:v8");
+    if (v8.startupSnapshot) {
+        v8.startupSnapshot.isBuildingSnapshot = () => false;
+    }
+} catch {}
+
 process.env.NODE_ENV = "test";
 process.env.JWT_SECRET = "test-jwt-secret";
 process.env.JWT_REFRESH_SECRET = "test-refresh-secret";

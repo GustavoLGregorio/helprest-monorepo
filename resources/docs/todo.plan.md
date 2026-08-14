@@ -225,7 +225,7 @@
 - [ ] **Migração dos Módulos de Rota / Controllers**:
   - [x] `authModule`: Rotas `POST /api/auth/google`, `POST /api/auth/refresh`.
   - [x] `userModule`: Rotas `GET /api/users/me`, `PATCH /api/users/me`, `PATCH /api/users/me/flags`.
-  - [ ] `establishmentModule`: Rotas `GET /api/establishments`, `GET /api/establishments/recommended`, `GET /api/establishments/nearby`, `GET /api/establishments/search`, `GET /api/establishments/my-establishment`, `GET /api/establishments/:id`, `POST /api/establishments`.
+  - [x] `establishmentModule`: Rotas `GET /api/establishments`, `GET /api/establishments/recommended`, `GET /api/establishments/nearby`, `GET /api/establishments/search`, `GET /api/establishments/my-establishment`, `GET /api/establishments/:id`, `POST /api/establishments`.
   - [ ] `productModule`: Rotas `POST /api/products`, `PATCH /api/products/:id`, `DELETE /api/products/:id`.
   - [ ] `flagModule`: Rotas `GET /api/flags`, `POST /api/flags`.
   - [ ] `visitModule`: Rotas `POST /api/visits`, `GET /api/visits/user/:userId`, `GET /api/visits/establishment/:id`, `GET /api/social/feed`.
