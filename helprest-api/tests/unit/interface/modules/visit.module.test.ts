@@ -77,6 +77,7 @@ describe("visitModule Suite (ElysiaJS)", () => {
         create: mock(async () => {}),
         delete: mock(async () => {}),
         countByEstablishment: mock(async () => 1),
+        count: mock(async () => 1),
     };
 
     const mockEstRepo: IEstablishmentRepository = {
@@ -92,6 +93,7 @@ describe("visitModule Suite (ElysiaJS)", () => {
         update: mock(async () => {}),
         delete: mock(async () => {}),
         count: mock(async () => 1),
+        findTopRated: mock(async () => [mockEstablishment]),
     };
 
     const mockUserRepo: IUserRepository = {
@@ -101,6 +103,8 @@ describe("visitModule Suite (ElysiaJS)", () => {
         create: mock(async () => {}),
         update: mock(async () => {}),
         delete: mock(async () => {}),
+        count: mock(async () => 1),
+        getFlagDistribution: mock(async () => []),
     };
 
     const mockFlagRepo: IFlagRepository = {

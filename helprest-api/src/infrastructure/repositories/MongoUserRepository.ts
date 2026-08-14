@@ -35,5 +35,19 @@ export class MongoUserRepository implements IUserRepository {
     async delete(id: ObjectId): Promise<void> {
         await getUsersCollection().deleteOne({ _id: id });
     }
+
+    async count(): Promise<number> {
+        return getUsersCollection().countDocuments();
+    }
+
+    async getFlagDistribution(): Promise<Array<{ flagId: ObjectId; count: number }>> {
+        const pipeline = [
+            { $unwind: "$flags" },
+            { $group: { _id: "$flags", count: { $sum: 1 } } },
+            { $sort: { count: -1 as const } },
+        ];
+        const results = await getUsersCollection().aggregate(pipeline).toArray();
+        return results.map((r) => ({ flagId: r._id as ObjectId, count: r.count as number }));
+    }
 }
 

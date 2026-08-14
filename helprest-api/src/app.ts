@@ -13,6 +13,7 @@ import { productModule } from "@interface/modules/product.module";
 import { flagModule } from "@interface/modules/flag.module";
 import { visitModule } from "@interface/modules/visit.module";
 import { favoriteModule } from "@interface/modules/favorite.module";
+import { adminModule } from "@interface/modules/admin.module";
 
 export const createApp = () => {
     return new Elysia()
@@ -34,6 +35,7 @@ export const createApp = () => {
                         { name: "Visits", description: "Visits, reviews, and geofenced photo uploads" },
                         { name: "Social", description: "Social activity feeds and discovery" },
                         { name: "Favorites", description: "User favorites management" },
+                        { name: "Admin", description: "Administrative analytics, dashboard, and system management" },
                     ],
                 },
             })
@@ -54,7 +56,8 @@ export const createApp = () => {
         .use(productModule)
         .use(flagModule)
         .use(visitModule)
-        .use(favoriteModule);
+        .use(favoriteModule)
+        .use(adminModule);
 };
 
 export const app = createApp();

@@ -40,6 +40,8 @@ describe("userModule Suite (ElysiaJS)", () => {
         create: mock(async () => {}),
         update: mock(async () => {}),
         delete: mock(async () => {}),
+        count: mock(async () => 1),
+        getFlagDistribution: mock(async () => []),
     };
 
     const mockFlagRepo: IFlagRepository = {

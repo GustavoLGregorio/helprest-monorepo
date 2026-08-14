@@ -8,5 +8,6 @@ export interface IVisitRepository {
     create(visit: Visit): Promise<void>;
     delete(id: ObjectId): Promise<void>;
     countByEstablishment(establishmentId: ObjectId): Promise<number>;
+    count(): Promise<number>;
     findRecentWithPhotos(limit: number, skip: number): Promise<Visit[]>;
 }

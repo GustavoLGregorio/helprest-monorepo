@@ -60,7 +60,10 @@ describe("establishmentModule Suite (ElysiaJS)", () => {
     });
 
     const mockEstRepo: IEstablishmentRepository = {
-        findById: mock(async () => mockEstablishment),
+        findById: mock(async (id: ObjectId) => {
+            if (id.equals(estId)) return mockEstablishment;
+            return null;
+        }),
         findByAdminId: mock(async () => mockEstablishment),
         findAll: mock(async () => [mockEstablishment]),
         findManyByIds: mock(async () => [mockEstablishment]),
@@ -72,6 +75,7 @@ describe("establishmentModule Suite (ElysiaJS)", () => {
         update: mock(async () => {}),
         delete: mock(async () => {}),
         count: mock(async () => 1),
+        findTopRated: mock(async () => [mockEstablishment]),
     };
 
     const mockFlagRepo: IFlagRepository = {
@@ -98,6 +102,8 @@ describe("establishmentModule Suite (ElysiaJS)", () => {
         create: mock(async () => {}),
         update: mock(async () => {}),
         delete: mock(async () => {}),
+        count: mock(async () => 1),
+        getFlagDistribution: mock(async () => []),
     };
 
     const testApp = new Elysia()

@@ -8,5 +8,7 @@ export interface IUserRepository {
     create(user: User): Promise<void>;
     update(user: User): Promise<void>;
     delete(id: ObjectId): Promise<void>;
+    count(): Promise<number>;
+    getFlagDistribution(): Promise<Array<{ flagId: ObjectId; count: number }>>;
 }
 

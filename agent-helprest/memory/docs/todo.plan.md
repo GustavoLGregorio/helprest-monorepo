@@ -22,7 +22,7 @@
 
 ### 1.2 Painel Admin (SuperAdmin)
 
-- [ ] Dashboard geral com métricas globais: total de usuários, estabelecimentos, visitas, flags mais usadas
+- [x] Dashboard geral com métricas globais: total de usuários, estabelecimentos, visitas, flags mais usadas
 - [ ] CRUD completo de flags (criar, editar, desativar, reordenar)
 - [ ] Moderação de avaliações (ocultar reviews ofensivas, denúncias)
 - [ ] Gerenciamento de usuários (ban, suspensão, histórico)

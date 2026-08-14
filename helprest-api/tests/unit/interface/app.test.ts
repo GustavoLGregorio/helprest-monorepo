@@ -24,5 +24,6 @@ describe("HelpRest Elysia App Suite (Global & Swagger)", () => {
         expect(swaggerDoc.paths["/api/flags"]).toBeDefined();
         expect(swaggerDoc.paths["/api/visits"]).toBeDefined();
         expect(swaggerDoc.paths["/api/favorites"]).toBeDefined();
+        expect(swaggerDoc.paths["/api/admin/dashboard"]).toBeDefined();
     });
 });

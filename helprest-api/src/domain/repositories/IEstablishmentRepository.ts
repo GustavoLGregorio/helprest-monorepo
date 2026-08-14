@@ -29,4 +29,5 @@ export interface IEstablishmentRepository {
     update(establishment: Establishment): Promise<void>;
     delete(id: ObjectId): Promise<void>;
     count(): Promise<number>;
+    findTopRated(limit: number): Promise<Establishment[]>;
 }

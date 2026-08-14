@@ -70,6 +70,7 @@ describe("productModule Suite (ElysiaJS)", () => {
         update: mock(async () => {}),
         delete: mock(async () => {}),
         count: mock(async () => 1),
+        findTopRated: mock(async () => [mockEstablishment]),
     };
 
     const testApp = new Elysia()
