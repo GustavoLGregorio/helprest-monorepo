@@ -229,7 +229,7 @@
   - [x] `productModule`: Rotas `POST /api/products`, `PATCH /api/products/:id`, `DELETE /api/products/:id`.
   - [x] `flagModule`: Rotas `GET /api/flags`, `POST /api/flags`.
   - [x] `visitModule`: Rotas `POST /api/visits`, `GET /api/visits/user/:userId`, `GET /api/visits/establishment/:id`, `GET /api/social/feed`.
-  - [ ] `favoriteModule`: Rotas `GET /api/favorites`, `POST /api/favorites`, `DELETE /api/favorites/:id`.
+  - [x] `favoriteModule`: Rotas `GET /api/favorites`, `POST /api/favorites`, `DELETE /api/favorites/:id`.
 - [ ] **Geração de Documentação OpenAPI/Swagger**: Habilitar a rota `/swagger` no servidor principal com metadados do projeto.
 - [ ] **Atualização do Entrypoint `src/index.ts` & Suíte de Testes**:
   - Refatorar `src/index.ts` para inicializar a instância principal do Elysia (`app.listen(PORT)`), integrando o Graceful Shutdown com `app.stop()`.
