@@ -14,6 +14,8 @@ export interface FlagProps {
     backgroundColor: string;
     textColor: string;
     images?: FlagImages;
+    isActive?: boolean;
+    order?: number;
 }
 
 export class Flag {
@@ -25,6 +27,8 @@ export class Flag {
     readonly backgroundColor: string;
     readonly textColor: string;
     readonly images: FlagImages;
+    readonly isActive: boolean;
+    readonly order: number;
 
     private constructor(props: FlagProps) {
         this.id = props.id ?? new ObjectId();
@@ -35,6 +39,8 @@ export class Flag {
         this.backgroundColor = props.backgroundColor;
         this.textColor = props.textColor;
         this.images = props.images ?? { tag: null, pin: null };
+        this.isActive = props.isActive ?? true;
+        this.order = props.order ?? 0;
     }
 
     static create(props: FlagProps): Flag {
@@ -60,6 +66,23 @@ export class Flag {
                     pin: (rawImages.pin as string) ?? null,
                 }
                 : { tag: null, pin: null },
+            isActive: (doc.isActive as boolean) ?? true,
+            order: (doc.order as number) ?? 0,
+        });
+    }
+
+    withUpdatedProps(props: Partial<Omit<FlagProps, "id">>): Flag {
+        return new Flag({
+            id: this.id,
+            type: props.type ?? this.type,
+            identifier: props.identifier ?? this.identifier,
+            description: props.description ?? this.description,
+            tag: props.tag ?? this.tag,
+            backgroundColor: props.backgroundColor ?? this.backgroundColor,
+            textColor: props.textColor ?? this.textColor,
+            images: props.images ?? this.images,
+            isActive: props.isActive ?? this.isActive,
+            order: props.order ?? this.order,
         });
     }
 
@@ -73,6 +96,8 @@ export class Flag {
             backgroundColor: this.backgroundColor,
             textColor: this.textColor,
             images: this.images,
+            isActive: this.isActive,
+            order: this.order,
         };
     }
 }

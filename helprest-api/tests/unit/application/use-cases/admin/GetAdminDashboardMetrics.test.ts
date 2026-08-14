@@ -83,7 +83,9 @@ describe("GetAdminDashboardMetrics Use Case Unit Tests", () => {
         findByIds: mock(async () => [mockFlag]),
         findByType: mock(async () => [mockFlag]),
         create: mock(async () => {}),
+        update: mock(async () => {}),
         delete: mock(async () => {}),
+        updateOrder: mock(async () => {}),
     };
 
     it("should return aggregated counts, flag distribution and top rated establishments", async () => {

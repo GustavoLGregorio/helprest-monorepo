@@ -9,8 +9,9 @@ export class MongoFlagRepository implements IFlagRepository {
         return doc ? Flag.fromDocument(doc) : null;
     }
 
-    async findAll(): Promise<Flag[]> {
-        const docs = await getFlagsCollection().find().toArray();
+    async findAll(includeInactive = false): Promise<Flag[]> {
+        const query = includeInactive ? {} : { isActive: { $ne: false } };
+        const docs = await getFlagsCollection().find(query).sort({ order: 1, tag: 1 }).toArray();
         return docs.map((doc) => Flag.fromDocument(doc));
     }
 
@@ -22,7 +23,7 @@ export class MongoFlagRepository implements IFlagRepository {
     }
 
     async findByType(type: string): Promise<Flag[]> {
-        const docs = await getFlagsCollection().find({ type }).toArray();
+        const docs = await getFlagsCollection().find({ type, isActive: { $ne: false } }).sort({ order: 1 }).toArray();
         return docs.map((doc) => Flag.fromDocument(doc));
     }
 
@@ -30,7 +31,23 @@ export class MongoFlagRepository implements IFlagRepository {
         await getFlagsCollection().insertOne(flag.toDocument());
     }
 
+    async update(flag: Flag): Promise<void> {
+        const doc = flag.toDocument();
+        const { _id: _, ...updateData } = doc;
+        await getFlagsCollection().updateOne(
+            { _id: flag.id },
+            { $set: { ...updateData, updatedAt: new Date() } }
+        );
+    }
+
     async delete(id: ObjectId): Promise<void> {
         await getFlagsCollection().deleteOne({ _id: id });
+    }
+
+    async updateOrder(id: ObjectId, order: number): Promise<void> {
+        await getFlagsCollection().updateOne(
+            { _id: id },
+            { $set: { order, updatedAt: new Date() } }
+        );
     }
 }
