@@ -228,7 +228,7 @@
   - [x] `establishmentModule`: Rotas `GET /api/establishments`, `GET /api/establishments/recommended`, `GET /api/establishments/nearby`, `GET /api/establishments/search`, `GET /api/establishments/my-establishment`, `GET /api/establishments/:id`, `POST /api/establishments`.
   - [x] `productModule`: Rotas `POST /api/products`, `PATCH /api/products/:id`, `DELETE /api/products/:id`.
   - [x] `flagModule`: Rotas `GET /api/flags`, `POST /api/flags`.
-  - [ ] `visitModule`: Rotas `POST /api/visits`, `GET /api/visits/user/:userId`, `GET /api/visits/establishment/:id`, `GET /api/social/feed`.
+  - [x] `visitModule`: Rotas `POST /api/visits`, `GET /api/visits/user/:userId`, `GET /api/visits/establishment/:id`, `GET /api/social/feed`.
   - [ ] `favoriteModule`: Rotas `GET /api/favorites`, `POST /api/favorites`, `DELETE /api/favorites/:id`.
 - [ ] **Geração de Documentação OpenAPI/Swagger**: Habilitar a rota `/swagger` no servidor principal com metadados do projeto.
 - [ ] **Atualização do Entrypoint `src/index.ts` & Suíte de Testes**:
