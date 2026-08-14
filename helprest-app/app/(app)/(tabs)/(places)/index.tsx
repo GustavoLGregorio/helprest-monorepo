@@ -42,6 +42,7 @@ import { useRouter } from "expo-router";
 import { api } from "@/services/api";
 import { loadUserProfile } from "@/storage/userProfile";
 import { getCurrentPosition } from "@/services/location";
+import { queryKeys } from "@/constants/queryKeys";
 
 // ─── Fallback asset ────────────────────────────────────────────────────────────
 
@@ -156,7 +157,7 @@ export default function PlacesScreen() {
         isPending: listPending,
         error: listError,
     } = useQuery<EstablishmentsListResponse>({
-        queryKey: ["places"],
+        queryKey: queryKeys.establishments.all,
         queryFn: async () => {
             const res = await api.get<EstablishmentsListResponse>(
                 "/api/establishments?page=1&limit=50",
@@ -175,7 +176,7 @@ export default function PlacesScreen() {
         data: recommendedData,
         isPending: recommendedPending,
     } = useQuery<RecommendedEstablishment[]>({
-        queryKey: ["places/recommended", userCoords?.lat, userCoords?.lng],
+        queryKey: queryKeys.establishments.recommended(userCoords),
         queryFn: async () => {
             const res = await api.get<RecommendedEstablishment[]>(
                 `/api/establishments/recommended?lat=${userCoords!.lat}&lng=${userCoords!.lng}&limit=10`,

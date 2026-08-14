@@ -15,6 +15,7 @@ import { loadUserProfile } from "@/storage/userProfile";
 import { useFavorites } from "@/hooks/queries/useFavorites";
 import ProductBottomSheet from "@/components/ui/ProductBottomSheet";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { queryKeys } from "@/constants/queryKeys";
 
 const PLACEHOLDER_LOGO = require("@/assets/images/icon.png");
 const PLACEHOLDER_BANNER = require("@/assets/images/places/3.jpeg");
@@ -107,7 +108,7 @@ const PlaceDetailsScreen = () => {
     useEffect(() => { resolveLocation(); }, [resolveLocation]);
 
     const { data: est, isPending, error } = useQuery<EstablishmentDetailDTO>({
-        queryKey: ["establishment", actualId],
+        queryKey: queryKeys.establishments.detail(actualId),
         queryFn: async () => {
             if (!actualId) throw new Error("ID não fornecido");
             const res = await api.get<EstablishmentDetailDTO>(

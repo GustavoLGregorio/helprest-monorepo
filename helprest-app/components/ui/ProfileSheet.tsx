@@ -18,6 +18,7 @@ import { api } from "@/services/api";
 import { clearAll } from "@/storage/authTokens";
 import { loadUserProfile, clearUserProfile, type CachedUserProfile } from "@/storage/userProfile";
 import { signOutGoogle } from "@/services/auth";
+import { queryKeys } from "@/constants/queryKeys";
 
 interface FlagItem {
     id: string;
@@ -79,7 +80,7 @@ const ProfileSheet: React.FC = () => {
 
     // Fetch user flags details
     const { data: allFlags } = useQuery<FlagItem[]>({
-        queryKey: ["flags"],
+        queryKey: queryKeys.flags.all,
         queryFn: async () => {
             const response = await api.get<FlagItem[]>("/api/flags");
             if (!response.ok) return [];
