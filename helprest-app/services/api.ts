@@ -4,17 +4,20 @@ const API_URL = process.env.EXPO_PUBLIC_API_URL || "http://10.0.2.2:3000";
 
 type HttpMethod = "GET" | "POST" | "PATCH" | "PUT" | "DELETE";
 
-interface RequestOptions {
+export interface RequestOptions {
     body?: Record<string, unknown>;
     authenticated?: boolean;
     headers?: Record<string, string>;
 }
 
-interface ApiResponse<T = unknown> {
+export interface ApiResponse<T = unknown> {
     data: T;
     status: number;
     ok: boolean;
 }
+
+// Single-flight Mutex promise to deduplicate concurrent token refresh calls
+let refreshPromise: Promise<string | null> | null = null;
 
 async function refreshAccessToken(): Promise<string | null> {
     const tokens = loadTokens();
@@ -47,6 +50,27 @@ async function refreshAccessToken(): Promise<string | null> {
     }
 }
 
+/**
+ * Thread-safe / Concurrency-safe Token Refresh Mutex.
+ * Ensures that if multiple concurrent requests encounter a 401 Unauthorized,
+ * only one single HTTP POST /api/auth/refresh call is dispatched over the wire.
+ */
+export async function getOrRefreshAccessToken(): Promise<string | null> {
+    if (refreshPromise) {
+        return refreshPromise;
+    }
+
+    refreshPromise = (async () => {
+        try {
+            return await refreshAccessToken();
+        } finally {
+            refreshPromise = null;
+        }
+    })();
+
+    return refreshPromise;
+}
+
 async function request<T = unknown>(
     method: HttpMethod,
     path: string,
@@ -74,9 +98,9 @@ async function request<T = unknown>(
         body: body ? JSON.stringify(body) : undefined,
     });
 
-    // Auto-refresh on 401
+    // Auto-refresh with Mutex on 401 for authenticated requests
     if (response.status === 401 && authenticated) {
-        const newToken = await refreshAccessToken();
+        const newToken = await getOrRefreshAccessToken();
         if (newToken) {
             headers["Authorization"] = `Bearer ${newToken}`;
             response = await fetch(`${API_URL}${path}`, {
@@ -87,7 +111,13 @@ async function request<T = unknown>(
         }
     }
 
-    const data = (await response.json()) as T;
+    let data: T;
+    try {
+        data = (await response.json()) as T;
+    } catch {
+        data = {} as T;
+    }
+
     return { data, status: response.status, ok: response.ok };
 }
 
