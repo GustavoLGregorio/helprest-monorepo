@@ -2,6 +2,7 @@ import { Elysia, t } from "elysia";
 import { authPlugin } from "../plugins/auth.plugin";
 import { CreateVisit, ListUserVisits, GetEstablishmentVisits } from "@application/use-cases/visit";
 import { GetSocialFeed } from "@application/use-cases/visit/GetSocialFeed";
+import { ReportVisit } from "@application/use-cases/visit/ReportVisit";
 import { MongoVisitRepository } from "@infra/repositories/MongoVisitRepository";
 import { MongoEstablishmentRepository } from "@infra/repositories/MongoEstablishmentRepository";
 import { MongoUserRepository } from "@infra/repositories/MongoUserRepository";
@@ -23,9 +24,34 @@ export const createVisitModule = (
     const listUserVisitsUseCase = new ListUserVisits(visitRepo);
     const getEstablishmentVisitsUseCase = new GetEstablishmentVisits(visitRepo);
     const getSocialFeedUseCase = new GetSocialFeed(visitRepo, estRepo, userRepo, flagRepo);
+    const reportVisitUseCase = new ReportVisit(visitRepo);
 
     return new Elysia({ name: "visit-module" })
         .use(authPlugin)
+        .post(
+            "/api/visits/:id/report",
+            async ({ user, params, body }) => {
+                if (!user) throw new UnauthorizedError("User is not authenticated");
+                return await reportVisitUseCase.execute({
+                    userId: user.sub,
+                    visitId: params.id,
+                    reason: body.reason,
+                });
+            },
+            {
+                role: "user",
+                params: t.Object({
+                    id: t.String({ minLength: 24, maxLength: 24 }),
+                }),
+                body: t.Object({
+                    reason: t.String({ minLength: 3, maxLength: 500 }),
+                }),
+                detail: {
+                    summary: "Report an Offensive or Inappropriate Visit/Review",
+                    tags: ["Visits"],
+                },
+            }
+        )
         .post(
             "/api/visits",
             async ({ user, body, set }) => {

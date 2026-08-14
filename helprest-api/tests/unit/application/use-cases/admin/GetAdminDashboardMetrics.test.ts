@@ -71,10 +71,14 @@ describe("GetAdminDashboardMetrics Use Case Unit Tests", () => {
         findByUserId: mock(async () => []),
         findByEstablishmentId: mock(async () => []),
         create: mock(async () => {}),
+        update: mock(async () => {}),
         delete: mock(async () => {}),
         countByEstablishment: mock(async () => 0),
         count: mock(async () => 340),
         findRecentWithPhotos: mock(async () => []),
+        findReported: mock(async () => []),
+        moderate: mock(async () => {}),
+        addReport: mock(async () => {}),
     };
 
     const mockFlagRepo: IFlagRepository = {

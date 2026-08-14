@@ -8,6 +8,7 @@ import type { IVisitRepository } from "../../../../src/domain/repositories/IVisi
 import type { IFlagRepository } from "../../../../src/domain/repositories/IFlagRepository";
 import { Flag } from "../../../../src/domain/entities/Flag";
 import { Establishment } from "../../../../src/domain/entities/Establishment";
+import { Visit } from "../../../../src/domain/entities/Visit";
 import { Location } from "../../../../src/domain/value-objects/Location";
 import { ObjectId } from "mongodb";
 import { Elysia } from "elysia";
@@ -16,6 +17,7 @@ describe("adminModule Suite (ElysiaJS)", () => {
     const adminId = new ObjectId();
     const flagId = new ObjectId();
     const estId = new ObjectId();
+    const visitId = new ObjectId();
 
     const mockFlag = Flag.create({
         id: flagId,
@@ -44,6 +46,15 @@ describe("adminModule Suite (ElysiaJS)", () => {
         ratingTotal: 98,
     });
 
+    const mockVisit = Visit.create({
+        id: visitId,
+        establishmentId: estId,
+        userId: adminId,
+        date: new Date(),
+        review: "Review sob análise",
+        rating: 1,
+    });
+
     const mockUserRepo: IUserRepository = {
         findById: mock(async () => null),
         findByEmail: mock(async () => null),
@@ -56,8 +67,8 @@ describe("adminModule Suite (ElysiaJS)", () => {
     };
 
     const mockEstRepo: IEstablishmentRepository = {
-        findById: mock(async () => null),
-        findByAdminId: mock(async () => null),
+        findById: mock(async () => mockEstablishment),
+        findByAdminId: mock(async () => mockEstablishment),
         findAll: mock(async () => []),
         findManyByIds: mock(async () => []),
         findNearby: mock(async () => []),
@@ -72,14 +83,18 @@ describe("adminModule Suite (ElysiaJS)", () => {
     };
 
     const mockVisitRepo: IVisitRepository = {
-        findById: mock(async () => null),
+        findById: mock(async () => mockVisit),
         findByUserId: mock(async () => []),
         findByEstablishmentId: mock(async () => []),
         create: mock(async () => {}),
+        update: mock(async () => {}),
         delete: mock(async () => {}),
         countByEstablishment: mock(async () => 0),
         count: mock(async () => 1200),
         findRecentWithPhotos: mock(async () => []),
+        findReported: mock(async () => [mockVisit]),
+        moderate: mock(async () => {}),
+        addReport: mock(async () => {}),
     };
 
     const mockFlagRepo: IFlagRepository = {
@@ -164,5 +179,44 @@ describe("adminModule Suite (ElysiaJS)", () => {
             })
         );
         expect(res.status).toBe(200);
+    });
+
+    it("should return reported visits for GET /api/admin/visits/reported with role 'admin'", async () => {
+        const tokenRes = await testApp.handle(new Request("http://localhost/sign-token?role=admin"));
+        const token = await tokenRes.text();
+
+        const res = await testApp.handle(
+            new Request("http://localhost/api/admin/visits/reported", {
+                headers: { Authorization: `Bearer ${token}` },
+            })
+        );
+        expect(res.status).toBe(200);
+        const data = (await res.json()) as Array<{ id: string; review: string }>;
+        expect(Array.isArray(data)).toBe(true);
+        expect(data.length).toBe(1);
+        expect(data[0]!.id).toBe(visitId.toHexString());
+    });
+
+    it("should moderate (hide) a review with 200 for PATCH /api/admin/visits/:id/moderate", async () => {
+        const tokenRes = await testApp.handle(new Request("http://localhost/sign-token?role=admin"));
+        const token = await tokenRes.text();
+
+        const res = await testApp.handle(
+            new Request(`http://localhost/api/admin/visits/${visitId.toHexString()}/moderate`, {
+                method: "PATCH",
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    isModerated: true,
+                    reason: "Discurso ofensivo",
+                }),
+            })
+        );
+        expect(res.status).toBe(200);
+        const body = (await res.json()) as { success: boolean; isModerated: boolean };
+        expect(body.success).toBe(true);
+        expect(body.isModerated).toBe(true);
     });
 });

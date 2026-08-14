@@ -75,9 +75,13 @@ describe("visitModule Suite (ElysiaJS)", () => {
         findByEstablishmentId: mock(async () => [mockVisit]),
         findRecentWithPhotos: mock(async () => [mockVisit]),
         create: mock(async () => {}),
+        update: mock(async () => {}),
         delete: mock(async () => {}),
         countByEstablishment: mock(async () => 1),
         count: mock(async () => 1),
+        findReported: mock(async () => [mockVisit]),
+        moderate: mock(async () => {}),
+        addReport: mock(async () => {}),
     };
 
     const mockEstRepo: IEstablishmentRepository = {
@@ -206,5 +210,26 @@ describe("visitModule Suite (ElysiaJS)", () => {
         expect(res.status).toBe(200);
         const body = (await res.json()) as unknown[];
         expect(Array.isArray(body)).toBe(true);
+    });
+
+    it("should report a visit with 200 for POST /api/visits/:id/report", async () => {
+        const tokenRes = await testApp.handle(new Request("http://localhost/sign-user-token"));
+        const token = await tokenRes.text();
+
+        const res = await testApp.handle(
+            new Request(`http://localhost/api/visits/${visitId.toHexString()}/report`, {
+                method: "POST",
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    reason: "Conteúdo impróprio / spam",
+                }),
+            })
+        );
+        expect(res.status).toBe(200);
+        const body = (await res.json()) as { success: boolean };
+        expect(body.success).toBe(true);
     });
 });
