@@ -7,11 +7,13 @@ import type { IEstablishmentRepository } from "../../../../src/domain/repositori
 import type { IVisitRepository } from "../../../../src/domain/repositories/IVisitRepository";
 import type { IFlagRepository } from "../../../../src/domain/repositories/IFlagRepository";
 import type { IUserFavoriteRepository } from "../../../../src/domain/repositories/IUserFavoriteRepository";
+import type { IAuditLogRepository } from "../../../../src/domain/repositories/IAuditLogRepository";
 import { Flag } from "../../../../src/domain/entities/Flag";
 import { Establishment } from "../../../../src/domain/entities/Establishment";
 import { Visit } from "../../../../src/domain/entities/Visit";
 import { User } from "../../../../src/domain/entities/User";
 import { UserFavorite } from "../../../../src/domain/entities/UserFavorite";
+import { AuditLog } from "../../../../src/domain/entities/AuditLog";
 import { Location } from "../../../../src/domain/value-objects/Location";
 import { ObjectId } from "mongodb";
 import { Elysia } from "elysia";
@@ -140,6 +142,22 @@ describe("adminModule Suite (ElysiaJS)", () => {
         exists: mock(async () => true),
     };
 
+    const mockAuditLogRepo: IAuditLogRepository = {
+        create: mock(async () => {}),
+        findAll: mock(async () => ({
+            logs: [
+                AuditLog.create({
+                    adminId,
+                    adminEmail: "admin@helprest.com",
+                    action: "BAN_USER",
+                    targetEntity: "User",
+                    targetId: targetUserId.toHexString(),
+                }),
+            ],
+            total: 1,
+        })),
+    };
+
     const testApp = new Elysia()
         .use(authPlugin)
         .get("/sign-token", async ({ jwtService, query }) => {
@@ -147,7 +165,7 @@ describe("adminModule Suite (ElysiaJS)", () => {
             return jwtService.sign({ sub: adminId.toHexString(), email: "admin@helprest.com", role });
         })
         .use(errorPlugin)
-        .use(createAdminModule(mockUserRepo, mockEstRepo, mockVisitRepo, mockFlagRepo, mockFavoriteRepo));
+        .use(createAdminModule(mockUserRepo, mockEstRepo, mockVisitRepo, mockFlagRepo, mockFavoriteRepo, mockAuditLogRepo));
 
     it("should return 401 Unauthorized for GET /api/admin/dashboard without Bearer token", async () => {
         const res = await testApp.handle(new Request("http://localhost/api/admin/dashboard"));
@@ -295,5 +313,21 @@ describe("adminModule Suite (ElysiaJS)", () => {
         expect(body.user.name).toBe("Target User");
         expect(body.visits.length).toBe(1);
         expect(body.favorites.length).toBe(1);
+    });
+
+    it("should list audit logs for GET /api/admin/audit-logs with role 'admin'", async () => {
+        const tokenRes = await testApp.handle(new Request("http://localhost/sign-token?role=admin"));
+        const token = await tokenRes.text();
+
+        const res = await testApp.handle(
+            new Request("http://localhost/api/admin/audit-logs?page=1&limit=10", {
+                headers: { Authorization: `Bearer ${token}` },
+            })
+        );
+        expect(res.status).toBe(200);
+        const body = (await res.json()) as { data: Array<{ id: string; action: string }>; pagination: { total: number } };
+        expect(body.data.length).toBe(1);
+        expect(body.data[0]!.action).toBe("BAN_USER");
+        expect(body.pagination.total).toBe(1);
     });
 });

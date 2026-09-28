@@ -8,6 +8,7 @@ export const COLLECTION_NAMES = {
     VISITS: "visits",
     PRODUCTS: "products",
     USER_FAVORITES: "user_favorites",
+    AUDIT_LOGS: "audit_logs",
 } as const;
 
 export function getUsersCollection(): Collection<Document> {
@@ -32,4 +33,8 @@ export function getProductsCollection(): Collection<Document> {
 
 export function getUserFavoritesCollection(): Collection<Document> {
     return getDatabase().collection(COLLECTION_NAMES.USER_FAVORITES);
+}
+
+export function getAuditLogsCollection(): Collection<Document> {
+    return getDatabase().collection(COLLECTION_NAMES.AUDIT_LOGS);
 }
